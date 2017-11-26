@@ -1,4 +1,4 @@
-user:
+tralala_users:
  - uid:int (PK)
  - pid:int (FK -> profile)
  - email:text
@@ -6,19 +6,18 @@ user:
  - role_id:int (FK)
  - verified:boolean
 
-roles:
+tralala_profile:
+ - pid:int (PK)
+ - prename:text
+ - surname:text
+
+tralala_roles:
  - role_id:int (PK)
  - role_name:text
  - del_user:boolean
  - set_role:boolean
 
-profile:
- - pid:int (PK)
- - email:text
- - prename:text
- - surname:text
-
-post_list:
+tralala_posts:
  - post_id:int (PK)
  - uid:int (FK -> user) (oder besser auf profile?)
  - timestamp:date
@@ -26,3 +25,8 @@ post_list:
  - hashtags:text
  - upvotes:int
  - downvotes:int
+
+Constraints:
+
+- tralala_users:-> tralala_profile:
+ ON DELETE CASCADE: Wenn ein User gelöscht wird, soll sein zugehöriges Profil auch gelöscht werden
