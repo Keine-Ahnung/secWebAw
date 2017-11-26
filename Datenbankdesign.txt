@@ -6,17 +6,17 @@ user:
  - role_id:int (FK)
  - verified:boolean
 
-roles:
- - role_id:int (PK)
- - role_name:text
- - del_user:boolean
- - set_role:boolean
-
 profile:
  - pid:int (PK)
  - email:text
  - prename:text
  - surname:text
+
+roles:
+ - role_id:int (PK)
+ - role_name:text
+ - del_user:boolean
+ - set_role:boolean
 
 post_list:
  - post_id:int (PK)
