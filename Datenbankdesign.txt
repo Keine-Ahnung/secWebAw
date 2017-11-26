@@ -1,0 +1,28 @@
+user:
+ - uid:int (PK)
+ - pid:int (FK -> profile)
+ - email:text
+ - password:text
+ - role_id:int (FK)
+ - verified:boolean
+
+roles:
+ - role_id:int (PK)
+ - role_name:text
+ - del_user:boolean
+ - set_role:boolean
+
+profile:
+ - pid:int (PK)
+ - email:text
+ - prename:text
+ - surname:text
+
+post_list:
+ - post_id:int (PK)
+ - uid:int (FK -> user) (oder besser auf profile?)
+ - timestamp:date
+ - post_text:text
+ - hashtags:text
+ - upvotes:int
+ - downvotes:int
