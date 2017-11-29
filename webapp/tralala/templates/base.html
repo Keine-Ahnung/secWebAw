@@ -12,9 +12,36 @@
 <div id="smooth_backg">
     <img id="back" src="{{ url_for('static', filename='images/background.jpg') }}" border="0" alt="Hintergrundbild">
     <div id="content">
-        {% block navigation %}
 
-        {% endblock %}
+
+        <!-- {% block navigation %} -->
+
+
+        <div>
+            <a href="{{ url_for('index') }}" class="nav_link">
+                <button class="admin" class="menubtn">Start</button>
+            </a>
+            <br/>
+            {% if session["logged_in"] %}
+            <a href="{{ url_for('logout') }}" class="nav_link">
+                <button class="admin" class="menubtn">Logout</button>
+            </a>
+            {% else %}
+            <button class="signup" onclick="document.getElementById('id01').style.display='block'">Login</button>
+            <br>
+            <!-- Button to open the modal -->
+            <button class="signup" onclick="document.getElementById('id02').style.display='block'">Sign Up</button>
+            <br>
+            {% endif %}
+
+
+            {% if logged_in %}
+            {% if admin %}
+            <button class="admin" class="menubtn"><a href="{{ url_for('admin_dashboard') }}">Administration</a></button>
+            {% endif %}
+            {% endif %}
+        </div>
+        <!-- {% endblock %} -->
 
         <div class="tral">Tralala</div>
         <div id="main">

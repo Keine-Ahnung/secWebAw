@@ -9,6 +9,7 @@ Welche Schwachstellen sollen überprüft und sanitized werden?
 1. SQL Injection (SQLi)
 1. Cross Site Scripting (XSS)
 1. User Enumeration über das Verification Token
+1. Session Tampering
 
 # Mitigation
 ## SQL Injection
@@ -26,3 +27,7 @@ Mithilfe von `%s` und der Übergabe eines Tupels mit `, (var)` (mit einem Komma)
 ## User Enumeration über das Verification Token
 
 Sobald das Token entweder manipuliert wurde wird dem Benutzer eine Seite präsentiert, die ihn darüber informiert, dass der Benutzer mit diesem Token nicht bestätigt wurde (*Der Benutzer konnte nicht bestätigt werden!*). Dadurch wird kein Rückschluss darauf zugelassen, ob ein User mit diesem Token überhaupt existiert. Wird ein User erneut über eine Bestätigungs-URL bestätigt, wird eine andere Nachricht präsentiert (*Der Benutzer wurde bereits bestätigt!*).
+
+## Session Tampering
+
+Backend reagiert nur auf valide Session Tokens, andere werden mit generischen Nachrichten abgefangen.

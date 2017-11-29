@@ -55,12 +55,23 @@ def login():
     if code == -1:
         return render_template("quick_info.html", info_text="Passwort und/oder Benutzername sind inkorrekt!")
     app.logger.debug("user found=" + data["email"] + ":" + data["password"])
+
     # Überprüfe gehashte Passwörter
+    if not check_password_hash(data["password"], login_password):
+        return render_template("quick_info.html", info_text="Benutzername und/oder Passwort sind inkorrekt!")
+    else:
+        # Setze Sessionvariable
+        session["logged_in"] = True
+        session["user"] = login_email
+        return render_template("quick_info.html",
+                               info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
 
-    # Setze Sessionvariable
 
-
-    return "Login ok email=" + login_email + " pw=" + login_password + " hashed=" + login_password_hashed
+@app.route("/logout", methods=["POST", "GET"])
+def logout():
+    session.pop("logged_in", None)
+    session.pop("user", None)
+    return render_template("quick_info.html", info_text="Du wurdest erfolgreich ausgeloggt!")
 
 
 @app.route("/signup/post_user", methods=["POST", "GET"])
@@ -146,7 +157,7 @@ def confirm():
         return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestätigt werden!")
     if success == 1:
         app.logger.debug("User wurde bestätigt")
-        return render_template("quick_info.html", info_text="Der Benutzer wurde erfolgreich bestätigt!")
+        return render_template("quick_info.html", info_text="Der Benutzer wurde erfolgreich bestätigt. Du kannst dich nun einloggen.")
 
 
 """

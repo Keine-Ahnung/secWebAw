@@ -6,6 +6,7 @@
 - [ ] Backend prüft auf SQLi
 - [X] Backend prüft auf Passwortbestätigung
 - [ ] Backend sanitized (normalisiert) Eingabe bzw. escaped
+- [ ] Nur Email-Adressen zulassen
 
 ## Account bestätigen
 - [X] Mail an User senden
@@ -15,7 +16,7 @@
 - [ ] Token sanitizen bevor es zur DB geschickt wird
 
 ## Login
-- [ ] Auf SQLi prüfen
+- [X] Auf SQLi prüfen
 
 
 ## Nachricht posten
@@ -23,3 +24,6 @@
 
 ## Passwort vergessen
 - [ ] Auf SQLi prüfen
+
+## Session
+- [ ] Pollingservice der Sessionstartzeiten ständig überprüft und Benutzer ausloggt, die zu lange inaktiv waren
