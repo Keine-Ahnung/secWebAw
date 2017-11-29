@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %} Registration successful!{% endblock %}
+
+{% block navigation %}
+<div>
+    <!-- Button to open the modal login form -->
+    <button class="login" onclick="document.getElementById('id01').style.display='block'">Login</button>
+    <br>
+    <!-- Button to open the modal -->
+    <button class="signup" onclick="document.getElementById('id02').style.display='block'">Sign Up</button>
+    <br>
+
+    {% if logged_in %}
+    {% if admin %}
+    <button class="admin" class="menubtn"><a href="{{ url_for('admin_dashboard') }}">Administration</a></button>
+    {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block body %}
+<p> Thank you for your registration. A verification email has been sent to  <b>{{ reg_email }}</b></p>
+{% endblock %}

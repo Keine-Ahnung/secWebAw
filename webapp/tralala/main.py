@@ -1,4 +1,4 @@
-from flask import Flask, request, session, url_for, redirect
+from flask import Flask, request, session, url_for, redirect, render_template
 from db_handler import DB_Handler
 import json
 import time
@@ -6,10 +6,15 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
+app.config["MYSQL_DATABASE_USER"] = "db_admin_tralala"
+app.config["MYSQL_DATABASE_PASSWORD"] = "tr4l4l4_mysql_db."
+app.config["MYSQL_DATABASE_DB"] = "tralala"
+app.config["MYSQL_DATABASE_HOST"] = "localhost"
+
 
 @app.route("/")
 def index():
-    return "Willkommen auf Tralala!"
+    return render_template("index.html")
 
 
 @app.route("/signup/post_user", methods=["POST", "GET"])
@@ -21,15 +26,31 @@ def post_user():
         return prepare_info_json(url_for("post_user"), "called restricted HTTP method", return_info)
 
     else:
-        reg_username = request.form["reg_username"]
         reg_email = request.form["reg_email"]
-        reg_password = generate_password_hash(request.form["reg_password"])
+        reg_password = request.form["reg_password"]
+        reg_password_repeat = request.form["reg_password_repeat"]
 
-        if reg_username == "" or reg_email == "" or reg_password == "":  # Reicht es, das allein durch JavaScript zu überprüfen?
+        if reg_email == "" or reg_password == "" or reg_password_repeat == "":  # Reicht es, das allein durch JavaScript zu überprüfen?
             return prepare_info_json(url_for("post_user"), "some registration fields were left empty")
 
         # Hier überprüfen und ggf. sanitizen
-        
+
+        # Überprüfe ob User schon existiert
+        print("reg_data=" + reg_email + ":" + reg_password + ":" + reg_password_repeat)
+        print("pw_hash=" + generate_password_hash(reg_password))
+        #register_new_account(app, reg_email, generate_password_hash(reg_password))
+        send_verification_email(reg_email)
+
+        return render_template("registration_success.html", reg_email=reg_email)
+
+
+@app.route("/admin/dashboard")
+def admin_dashboard():
+    return render_template("admin.html")
+
+
+def send_verification_email(reg_email):
+    app.logger.debug("Verification email sent to '" + reg_email + "' ...")
 
 
 def prepare_info_json(affected_url, info_text, additions):
@@ -55,6 +76,16 @@ def prepare_info_json(affected_url, info_text, additions):
         return json.dumps(copy, indent=4)
 
     return json.dumps(return_info, indent=4)
+
+
+"""
+    Zugriff auf die DB mit der DB_Handler Klasse
+"""
+
+
+def register_new_account(app, email, pw_hash):
+    db_handler = DB_Handler(None)
+    db_handler.add_new_user(app, email, pw_hash)
 
 
 if __name__ == '__main__':

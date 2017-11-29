@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %} Tralala! Hier wird nicht gejodelt! {% endblock %}
+
+{% block navigation %}
+
+<div>
+    <!-- Button to open the modal login form -->
+    <button class="login" onclick="document.getElementById('id01').style.display='block'">Login</button>
+    <br>
+    <!-- Button to open the modal -->
+    <button class="signup" onclick="document.getElementById('id02').style.display='block'">Sign Up</button>
+    <br>
+
+    {% if logged_in %}
+        {% if admin %}
+            <button class="admin" class="menubtn"><a href="{{ url_for('admin_dashboard') }}">Administration</a></button>
+        {% endif %}
+    {% endif %}
+</div>
+{% endblock %}
+
+
+{% block body %}
+
+<div class="red">
+    <div id="usr">FooBar</div>
+    <p>Willkommen zu Tralala!</p>
+    <div id="upvote">+</div>
+    <div id="downvote">-</div>
+</div>
+
+<div class="blue">
+    <div id="usr">F00Baz</div>
+    <p>Hier wird nicht gejodelt, hier wird getraellert!</p>
+    <div id="upvote">+</div>
+    <div id="downvote">-</div>
+</div>
+
+<div class="green">
+    <div id="usr">Foo</div>
+    <p>Be Excellent to Each Other!</p>
+    <div id="upvote">+</div>
+    <div id="downvote">-</div>
+</div>
+
+<div class="yellow">
+    <div id="usr">Bar</div>
+    <p>enjoy your stay</p>
+    <div id="upvote">+</div>
+    <div id="downvote">-</div>
+</div>
+
+{% endblock %}
+
+
