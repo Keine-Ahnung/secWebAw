@@ -33,6 +33,16 @@ def index():
 
 @app.route("/login", methods=["POST", "GET"])
 def login():
+    """
+    tbd
+    """
+    # Falls bereits eingeloggt
+    try:
+        session["logged_in"]
+        return render_template("Du bist bereits eingeloggt!")
+    except:
+        pass
+
     # Hole Daten aus Loginform
     if request.method == "GET":
         return_info = {}
@@ -63,12 +73,22 @@ def login():
         # Setze Sessionvariable
         session["logged_in"] = True
         session["user"] = login_email
+        session["uid"] = data["uid"]
         return render_template("quick_info.html",
                                info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
 
 
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
+    """
+    tbd
+    """
+    try:
+        # Zugriff auf die Session Variable wirft einen KeyError. Durch den Catch wird das Template gerendert
+        session["logged_in"]
+    except:
+        return render_template("quick_info.html", info_text="Du bist nicht eingeloggt!")
+
     session.pop("logged_in", None)
     session.pop("user", None)
     return render_template("quick_info.html", info_text="Du wurdest erfolgreich ausgeloggt!")
@@ -82,6 +102,9 @@ def post_user():
     eine Bestätigungsemail an die angegebene Email.
     :return:
     """
+    if session["logged_in"]:
+        redirect(url_for("index"))
+
     if request.method == "GET":
         return_info = {}
         return_info["invalid_method"] = "GET"
@@ -157,7 +180,26 @@ def confirm():
         return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestätigt werden!")
     if success == 1:
         app.logger.debug("User wurde bestätigt")
-        return render_template("quick_info.html", info_text="Der Benutzer wurde erfolgreich bestätigt. Du kannst dich nun einloggen.")
+        return render_template("quick_info.html",
+                               info_text="Der Benutzer wurde erfolgreich bestätigt. Du kannst dich nun einloggen.")
+
+
+@app.route("/post_message", methods=["POST", "GET"])
+def post_message():
+    # Post sanitizen
+    message = request.form["post_message"]
+    hashtags = request.form["post_hashtags"]
+
+    # Post in DB schreiben
+    db_handler = DB_Handler()
+    success = db_handler.post_message_to_db(mysql, session["uid"], None, message, hashtags)
+
+    if success == -1:
+        return "error"
+    elif success == 1:
+        return "success"
+
+    return "post message uid=" + str(session["uid"]) + " message=" + message + " hashtags=" + hashtags
 
 
 """

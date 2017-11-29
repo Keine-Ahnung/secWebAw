@@ -1,10 +1,12 @@
 from flask import Flask
 from flaskext.mysql import MySQL
+import time
 
 
 class DB_Handler:
     db_connection_data = {}
     DB_TABLE_TRALALA_USERS = "tralala_users"
+    DB_TABLE_TRALALA_POSTS = "tralala_posts"
 
     def __init__(self):
         self.db_connection_data = None
@@ -122,7 +124,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         cursor.execute(
-            "select email, password from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
+            "select email, password, uid from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -130,4 +132,33 @@ class DB_Handler:
             return -1, "no_user"
         else:
             conn.close();
-            return 1, {"email": data[0], "password": data[1]}
+            return 1, {"email": data[0], "password": data[1], "uid": data[2]}
+
+    def post_message_to_db(self, mysql, uid, email, text, hashtags):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        post_date = time.strftime('%Y-%m-%d %H:%M:%S')
+        hashtag_list = ""
+        temp = hashtags.strip().split(",")
+
+        for hashtag in temp:
+            t = "#" + hashtag
+            hashtag_list += " " + t
+
+        record = [uid, post_date, text, hashtag_list, 0, 0]
+
+        try:
+            cursor.execute(
+                "INSERT INTO " + self.DB_TABLE_TRALALA_POSTS + " (uid, post_date, post_text, hashtags, upvotes, downvotes) VALUES (%s,%s,%s,%s,%s,%s)",
+                record)
+
+            conn.commit()
+            conn.close()
+            return 1
+        except Exception as e:
+            conn.close()
+            return -1

@@ -26,6 +26,8 @@
             <a href="{{ url_for('logout') }}" class="nav_link">
                 <button class="admin" class="menubtn">Logout</button>
             </a>
+            </br>
+            <button class="signup" onclick="document.getElementById('id03').style.display='block'">Neuer Post</button>
             {% else %}
             <button class="signup" onclick="document.getElementById('id01').style.display='block'">Login</button>
             <br>
@@ -52,7 +54,7 @@
 
         </div> <!-- END main -->
 
-        <!-- The Modal (contains the Sign Up form) REGISTER -->
+        <!-- Registrierung -->
         <div id="id02" class="modal">
     <span onclick="document.getElementById('id02').style.display='none'" class="close"
           title="Close Modal">&times;</span>
@@ -81,7 +83,7 @@
         </div>
 
 
-        <!-- The Modal LOGIN -->
+        <!-- Login -->
         <div id="id01" class="modal">
     <span onclick="document.getElementById('id01').style.display='none'" class="close"
           title="Close Modal">&times;</span>
@@ -106,29 +108,22 @@
             </form>
         </div>
 
-        <!-- The Modal LOGIN -->
+        <!-- Neuer Post -->
         <div id="id03" class="modal">
-  <span onclick="document.getElementById('id03').style.display='none'"
-        class="close" title="Close Modal">&times;</span>
-
-            <!-- Modal Content -->
-            <form class="modal-content animate" action="{{ url_for('login') }}" method="POST">
+    <span onclick="document.getElementById('id03').style.display='none'" class="close"
+          title="Close Modal">&times;</span>
+            <form class="modal-content animate" method="POST" action="{{ url_for('post_message') }}">
                 <div class="container">
-                    <label><b>Email</b></label>
-                    <input type="text" placeholder="Email eingeben..." name="login_email" required>
-
-                    <label><b>Password</b></label>
-                    <input type="password" placeholder="Password eingeben..." name="login_password" required>
-
-                    <button type="submit">Login</button>
-                    <input type="checkbox" checked="checked"> Remember me
-                </div>
-
-                <div class="container" style="background-color:#f1f1f1">
-                    <button type="button" onclick="document.getElementById('id01').style.display='none'"
-                            class="cancelbtn">Cancel
-                    </button>
-                    <span class="psw">Forgot <a href="#">password?</a></span>
+                    <label><b>Nachricht</b></label>
+                    <input type="text" placeholder="Neue Nachricht eingeben..." name="post_message" id="post_message" required>
+                    <label><b>Hashtags</b></label>
+                    <input type="text" placeholder="Hashtags ohne # und mit Komma trennen..." name="post_hashtags" id="post_hashtags" required>
+                    <div class="clearfix">
+                        <button type="button" onclick="document.getElementById('id03').style.display='none'"
+                                class="cancelbtn">Abbrechen
+                        </button>
+                        <button type="submit" class="signupbtn">Absenden</button>
+                    </div>
                 </div>
             </form>
         </div>
