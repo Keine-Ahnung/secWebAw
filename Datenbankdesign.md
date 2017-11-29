@@ -37,4 +37,4 @@
 
 # Zu klären
 
-- [] tralala_posts.uid auf user.uid oder auf profile.pid?
+- [ ] tralala_posts.uid auf user.uid oder auf profile.pid?
