@@ -31,7 +31,7 @@
         <entry file="file://$PROJECT_DIR$/db_handler.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="245">
-              <caret line="43" column="28" lean-forward="false" selection-start-line="43" selection-start-column="28" selection-end-line="43" selection-end-column="28" />
+              <caret line="43" column="57" lean-forward="false" selection-start-line="43" selection-start-column="57" selection-end-line="43" selection-end-column="57" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
               </folding>
@@ -128,8 +128,8 @@
         <option value="$PROJECT_DIR$/templates/registration_success.html" />
         <option value="$PROJECT_DIR$/templates/admin.html" />
         <option value="$PROJECT_DIR$/templates/registration_no_success.html" />
-        <option value="$PROJECT_DIR$/db_handler.py" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/db_handler.py" />
       </list>
     </option>
   </component>
@@ -420,7 +420,7 @@
     <entry file="file://$PROJECT_DIR$/db_handler.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="245">
-          <caret line="43" column="28" lean-forward="false" selection-start-line="43" selection-start-column="28" selection-end-line="43" selection-end-column="28" />
+          <caret line="43" column="57" lean-forward="false" selection-start-line="43" selection-start-column="57" selection-end-line="43" selection-end-column="57" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
           </folding>

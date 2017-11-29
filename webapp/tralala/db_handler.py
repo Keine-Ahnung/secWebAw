@@ -41,7 +41,7 @@ class DB_Handler:
         cursor.execute("select email from " + self.DB_TABLE_TRALALA_USERS + " where email=\"" + email + "\"")
         data = cursor.fetchone()
 
-        if cursor.rowcount != 0:
+        if cursor.rowcount != 0: # User existiert bereits
             return 0
 
         # Füge neuen User zur DB
