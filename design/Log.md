@@ -21,7 +21,10 @@
 
 
 ## Nachricht posten
-- [ ] Auf XSS prüfen
+- [X] Auf XSS prüfen (Sollte durch Verwendung durch `, (val)` escaped werden)
+- [X] Nachricht in DB posten mit Postdaten
+- [X] Es können keine leeren Posts abgesendet werden (wird client- und serverseitig überprüft)
+
 
 ## Passwort vergessen
 - [ ] Auf SQLi prüfen

@@ -190,6 +190,10 @@ def post_message():
     message = request.form["post_message"]
     hashtags = request.form["post_hashtags"]
 
+    if message == "":
+        return render_template("quick_info.html",
+                               info_text="Leider konnte deine Nachricht nicht gepostet werden, da du keine Nachricht angegeben hast. Versuche es bitte erneut!")
+
     # Post in DB schreiben
     db_handler = DB_Handler()
     success = db_handler.post_message_to_db(mysql, session["uid"], None, message, hashtags)
