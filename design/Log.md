@@ -11,7 +11,8 @@
 - [X] Mail an User senden
 - [X] System sendet zufällige Buchstabenfolge als Mail, muss bei Bestätigung unverändert zurückgeliefert werden
 - [X] Bestätigungsstatus in DB ändern nach erfolgreicher Bestätigung
-- [ ] Rückmeldung an User wenn gleicher Bestätigungslink erneut angeklickt wird
+- [X] Rückmeldung an User wenn gleicher Bestätigungslink erneut angeklickt wird
+- [ ] Token sanitizen bevor es zur DB geschickt wird
 
 ## Login
 - [ ] Auf SQLi prüfen

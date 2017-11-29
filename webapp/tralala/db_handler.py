@@ -83,16 +83,18 @@ class DB_Handler:
         cursor = conn.cursor()
 
         cursor.execute(
-            "select email from " + self.DB_TABLE_TRALALA_USERS + " where verification_token=\"" + token + "\"")
+            "select email, verified from " + self.DB_TABLE_TRALALA_USERS + " where verification_token=\"%s\"", (token,))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
             conn.close();
             return -1, "no_email"
         else:
-            conn.close();
-
-            return 1, data[0]
+            if data[1] == 1: # wenn der Benutzer bereits bestätigt ist (verified=1)
+                conn.close();
+                return 2, data[0]
+            else:
+                return 1, data[0]
 
     def user_successful_verify(self, mysql, email):
         """
@@ -103,7 +105,7 @@ class DB_Handler:
 
         try:
             cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1, verification_token=\"verified\" WHERE email=\"" + email + "\"")
+                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1 WHERE email=\"" + email + "\"")
             conn.commit();
             conn.close();
             return 1
