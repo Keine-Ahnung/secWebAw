@@ -1,5 +1,6 @@
 from flask import Flask, request, session, url_for, redirect, render_template
 from db_handler import DB_Handler
+from flaskext.mysql import MySQL
 import json
 import time
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -10,6 +11,9 @@ app.config["MYSQL_DATABASE_USER"] = "db_admin_tralala"
 app.config["MYSQL_DATABASE_PASSWORD"] = "tr4l4l4_mysql_db."
 app.config["MYSQL_DATABASE_DB"] = "tralala"
 app.config["MYSQL_DATABASE_HOST"] = "localhost"
+
+mysql = MySQL()
+mysql.init_app(app)
 
 
 @app.route("/")
@@ -38,9 +42,16 @@ def post_user():
         # Überprüfe ob User schon existiert
         print("reg_data=" + reg_email + ":" + reg_password + ":" + reg_password_repeat)
         print("pw_hash=" + generate_password_hash(reg_password))
-        #register_new_account(app, reg_email, generate_password_hash(reg_password))
-        send_verification_email(reg_email)
+        success = register_new_account(mysql, reg_email, generate_password_hash(reg_password))
+        if success == -1:
+            app.logger.error("Neuer Benutzer konnte nicht in die Datenbank geschrieben werden. Versuche es erneut")
+            return render_template("registration_no_success.html", code=-1)
+        elif success == 0:
+            app.logger.error("Benutzer existiert bereits")
+            return render_template("registration_no_success.html", code=0, reg_email=reg_email)
 
+        app.logger.debug("Registrierung war erfolgreich. Benutzer wurde in die DB geschrieben")
+        send_verification_email(reg_email)
         return render_template("registration_success.html", reg_email=reg_email)
 
 
@@ -50,7 +61,7 @@ def admin_dashboard():
 
 
 def send_verification_email(reg_email):
-    app.logger.debug("Verification email sent to '" + reg_email + "' ...")
+    app.logger.debug("Sende Bestätigungsemail an '" + reg_email + "' ...")
 
 
 def prepare_info_json(affected_url, info_text, additions):
@@ -83,9 +94,11 @@ def prepare_info_json(affected_url, info_text, additions):
 """
 
 
-def register_new_account(app, email, pw_hash):
-    db_handler = DB_Handler(None)
-    db_handler.add_new_user(app, email, pw_hash)
+def register_new_account(mysql, email, pw_hash):
+    db_handler = DB_Handler()
+    success = db_handler.add_new_user(mysql, email, pw_hash)
+
+    return success
 
 
 if __name__ == '__main__':

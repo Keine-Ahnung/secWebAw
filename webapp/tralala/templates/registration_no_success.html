@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %} Registrierung war erfolgreich!{% endblock %}
+{% block title %} Registrierung war nicht erfolgreich!{% endblock %}
 
 {% block navigation %}
 <div>
@@ -23,5 +23,9 @@
 {% endblock %}
 
 {% block body %}
-<p> Vielen Dank für deine Registrierung. Wir haben eine Bestätigungsmail an  <b>{{ reg_email }}</b> gesendet.</p>
+{% if code==-1 %}
+<p> Leider war deine Registrierung nicht erfolgreich. Bitte versuche es erneut!</p>
+{% elif code==0 %}
+<p> Leider war deine Registrierung nicht erfolgreich. Der User <b>{{ reg_email }}</b> existiert bereits!</p>
+{% endif %}
 {% endblock %}

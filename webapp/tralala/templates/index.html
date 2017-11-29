@@ -5,6 +5,9 @@
 {% block navigation %}
 
 <div>
+    <button class="admin" class="menubtn"><a href="{{ url_for('index') }}" class="nav_link">Start</a>
+    </button>
+    <br/>
     <!-- Button to open the modal login form -->
     <button class="login" onclick="document.getElementById('id01').style.display='block'">Login</button>
     <br>
@@ -13,9 +16,9 @@
     <br>
 
     {% if logged_in %}
-        {% if admin %}
-            <button class="admin" class="menubtn"><a href="{{ url_for('admin_dashboard') }}">Administration</a></button>
-        {% endif %}
+    {% if admin %}
+    <button class="admin" class="menubtn"><a href="{{ url_for('admin_dashboard') }}">Administration</a></button>
+    {% endif %}
     {% endif %}
 </div>
 {% endblock %}

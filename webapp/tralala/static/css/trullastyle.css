@@ -198,3 +198,7 @@ td, th {
 tr:nth-child(even) {
     background-color: #dddddd;
 }
+
+.nav_link {
+	text-decoration: none;
+}
