@@ -17,6 +17,7 @@
 
 ## Login
 - [X] Auf SQLi prüfen
+- [ ] Rollen für User abrufen und in die Session eintrage (für Admin Dashboard)
 
 
 ## Nachricht posten
