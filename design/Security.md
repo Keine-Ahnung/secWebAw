@@ -8,3 +8,8 @@ Welche Schwachstellen sollen überprüft und sanitized werden?
 
 1. SQL Injection (SQLi)
 1. Cross Site Scripting (XSS)
+
+# Lösung
+
+1. X
+1. X
