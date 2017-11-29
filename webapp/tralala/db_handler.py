@@ -16,4 +16,6 @@ class DB_Handler:
             print("custom... " + str(self.db_connection_data))
 
     def add_user(self):
-
+        """
+            DB-Verbindung nach jedem Call wieder schließen
+        """

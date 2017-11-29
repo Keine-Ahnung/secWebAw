@@ -6,5 +6,5 @@
 
 Welche Schwachstellen sollen überprüft und sanitized werden?
 
-* SQL Injection (SQLi)
-* Cross Site Scripting (XSS)
+1. SQL Injection (SQLi)
+1. Cross Site Scripting (XSS)
