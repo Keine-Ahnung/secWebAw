@@ -72,7 +72,6 @@ class DB_Handler:
 
             return -1, "no_token"
         else:
-            print("token=" + data[0])
             conn.close();
             return 1, data[0]
 
@@ -91,7 +90,6 @@ class DB_Handler:
             conn.close();
             return -1, "no_email"
         else:
-            print("email_by_token=" + data[0])
             conn.close();
 
             return 1, data[0]

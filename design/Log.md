@@ -8,9 +8,10 @@
 - [ ] Backend sanitized (normalisiert) Eingabe bzw. escaped
 
 ## Account bestätigen
-- [ ] Mail an User senden
-- [ ] System sendet zufällige Buchstabenfolge als Mail, muss bei Bestätigung unverändert zurückgeliefert werden
-- [ ] Bestätigungsstatus in DB ändern nach erfolgreicher Bestätigung
+- [X] Mail an User senden
+- [X] System sendet zufällige Buchstabenfolge als Mail, muss bei Bestätigung unverändert zurückgeliefert werden
+- [X] Bestätigungsstatus in DB ändern nach erfolgreicher Bestätigung
+- [ ] Rückmeldung an User wenn gleicher Bestätigungslink erneut angeklickt wird
 
 ## Login
 - [ ] Auf SQLi prüfen

@@ -61,8 +61,6 @@ def post_user():
             return render_template("registration_no_success.html", code=2)
 
         # Überprüfe, ob User schon existiert
-        print("reg_data=" + reg_email + ":" + reg_password + ":" + reg_password_repeat)
-        print("pw_hash=" + generate_password_hash(reg_password))
         success = register_new_account(mysql, reg_email, generate_password_hash(reg_password),
                                        generate_verification_token(50))
         if success == -1:
@@ -78,7 +76,6 @@ def post_user():
         if success == -1:
             return render_template("registration_no_success.html", code=3, reg_email=reg_email)
 
-        print("token wurde erfolgreich gelesen")
         return render_template("registration_success.html", reg_email=reg_email)
 
 
@@ -149,7 +146,7 @@ def send_verification_email(reg_email):
     msg["Subject"] = "Bestätige dein Account bei Tralala!"
 
     msg.attach(MIMEText(u"Hallo " + reg_email + "!</br>" \
-                                                "Benutze den folgenden Link, um deinen Account zu bestaetigen. Du musst diesen in die Adresszeile deine Browsers kopieren.</br></br>" \
+                                                "Benutze den folgenden Link, um deinen Account zu bestaetigen. Du musst diesen in die Adresszeile deines Browsers kopieren.</br></br>" \
                                                 "<a href=\"localhost:5000" + url_for(
         "confirm") + "?token=" + token + "\">" + "localhost:5000" + url_for(
         "confirm") + "?token=" + token + "</a>",
