@@ -83,7 +83,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         cursor.execute(
-            "select email, verified from " + self.DB_TABLE_TRALALA_USERS + " where verification_token=\"%s\"", (token,))
+            "select email, verified from " + self.DB_TABLE_TRALALA_USERS + " where verification_token=%s", (token,))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:

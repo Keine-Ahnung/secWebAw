@@ -8,6 +8,7 @@ Welche Schwachstellen sollen überprüft und sanitized werden?
 
 1. SQL Injection (SQLi)
 1. Cross Site Scripting (XSS)
+1. User Enumeration über das Verification Token
 
 # Mitigation
 ## SQL Injection
@@ -22,4 +23,6 @@ Mithilfe von `%s` und der Übergabe eines Tupels mit `, (var)` (mit einem Komma)
 
 **Test durchführen, ob das auch wirklich so ist** [StackOverflow](https://stackoverflow.com/questions/7929364/python-best-practice-and-securest-to-connect-to-mysql-and-execute-queries)
 
-## Cross Site Scripting
+## User Enumeration über das Verification Token
+
+Sobald das Token entweder manipuliert wurde wird dem Benutzer eine Seite präsentiert, die ihn darüber informiert, dass der Benutzer mit diesem Token nicht bestätigt wurde. Dadurch wird kein Rückschluss darauf zugelassen, ob ein User mit diesem Token überhaupt existiert. Wird ein User erneut über eine Bestätigungs-URL bestätigt, wird eine andere Nachricht präsentiert.

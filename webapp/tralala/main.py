@@ -98,7 +98,8 @@ def confirm():
     db_handler = DB_Handler()
     (success, email) = db_handler.get_user_for_token(mysql, token)
     if success == -1:
-        app.logger.error("Es konnte kein User for das Token '" + token + "' zurückgeliefert werden")
+        app.logger.error("Es konnte kein User for das Token '" + token + "' zurückgeliefert werden (ungültiges Token)")
+        return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestätigt werden!")
     if success == 2:
         app.logger.debug("Benutzer ist bereits bestätigt!")
         return render_template("quick_info.html", info_text="Der Benutzer wurde bereits bestätigt!")
@@ -109,8 +110,8 @@ def confirm():
     success = db_handler.user_successful_verify(mysql, email)
 
     if success == -1:
-        app.logger.error("User konnte nicht bestätigt werden")
-        return "User konnte nicht bestätigt werden"
+        app.logger.error("User konnte nicht bestätigt werden (Benutzer konnte in der DB nicht bestätigt werden)")
+        return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestätigt werden!")
     if success == 1:
         app.logger.debug("User wurde bestätigt")
         return render_template("quick_info.html", info_text="Der Benutzer wurde erfolgreich bestätigt!")
