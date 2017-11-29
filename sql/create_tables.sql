@@ -2,9 +2,10 @@ CREATE TABLE tralala_users(
 	uid  INT NOT NULL AUTO_INCREMENT,
     pid INT NOT NULL,
     email VARCHAR(100) NOT NULL,
-    password VARCHAR(40) NOT NULL,
+    password VARCHAR(200) NOT NULL,
     role_id INT NOT NULL,
     verified BOOLEAN NOT NULL,
+    verification_token varchar(100) NOT NULL,
     PRIMARY KEY (uid)
 ) ENGINE=INNODB;
 
