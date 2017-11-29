@@ -28,5 +28,8 @@ tralala_posts:
 
 Constraints:
 
-- tralala_users:-> tralala_profile:
+- tralala_users -> tralala_profile:
  ON DELETE CASCADE: Wenn ein User gelöscht wird, soll sein zugehöriges Profil auch gelöscht werden
+
+- tralala_posts -> tralala_users:
+ ON DELETE NO ACTION: Wenn ein Post gelöscht wird, soll der referenzierte User nicht gelöscht werden
