@@ -31,6 +31,36 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/login", methods=["POST", "GET"])
+def login():
+    # Hole Daten aus Loginform
+    if request.method == "GET":
+        return_info = {}
+        return_info["invalid_method"] = "GET"
+
+        return prepare_info_json(url_for("post_user"), "GET ist unzulässig für den Login", return_info)
+
+    login_email = request.form["login_email"]
+    login_password = request.form["login_password"]
+
+    if login_email == "" or login_password == "":
+        return prepare_info_json(url_for("post_user"), "Es wurden Felder beim Login leergelassen")
+
+    # Hashe Passwort
+    login_password_hashed = generate_password_hash(login_password)
+
+    return "Login ok email=" + login_email + " pw=" + login_password + " hashed=" + login_password_hashed
+
+    # Suche nach User in DB
+
+    # Überprüfe gehashte Passwörter
+
+    # Setze Sessionvariable
+
+
+    return "User wurde eingeloggt"
+
+
 @app.route("/signup/post_user", methods=["POST", "GET"])
 def post_user():
     """
@@ -43,7 +73,7 @@ def post_user():
         return_info = {}
         return_info["invalid_method"] = "GET"
 
-        return prepare_info_json(url_for("post_user"), "called restricted HTTP method", return_info)
+        return prepare_info_json(url_for("post_user"), "GET ist unzulässig für die Registration", return_info)
 
     else:
         reg_email = request.form["reg_email"]
@@ -51,7 +81,7 @@ def post_user():
         reg_password_repeat = request.form["reg_password_repeat"]
 
         if reg_email == "" or reg_password == "" or reg_password_repeat == "":  # Reicht es, das allein durch JavaScript zu überprüfen?
-            return prepare_info_json(url_for("post_user"), "some registration fields were left empty")
+            return prepare_info_json(url_for("post_user"), "Es wurden Fehler bei der Registrierung leer gelassen")
 
         # Hier überprüfen und ggf. sanitizen
 
@@ -147,7 +177,7 @@ def send_verification_email(reg_email):
     msg = MIMEMultipart()
     msg["From"] = sender
     msg["To"] = reg_email
-    msg["Subject"] = "Bestätige dein Account bei Tralala!"
+    msg["Subject"] = "Bestätige deinen Account bei Tralala!"
 
     msg.attach(MIMEText(u"Hallo " + reg_email + "!</br>" \
                                                 "Benutze den folgenden Link, um deinen Account zu bestaetigen. Du musst diesen in die Adresszeile deines Browsers kopieren.</br></br>" \

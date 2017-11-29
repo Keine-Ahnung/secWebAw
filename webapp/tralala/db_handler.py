@@ -113,3 +113,6 @@ class DB_Handler:
             print("Error bei user_successful_verify " + str(e))
             conn.close();
             return -1
+
+    def check_for_existence(self, mysql, email):
+        pass
