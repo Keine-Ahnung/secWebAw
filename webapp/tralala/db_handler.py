@@ -90,7 +90,7 @@ class DB_Handler:
             conn.close();
             return -1, "no_email"
         else:
-            if data[1] == 1: # wenn der Benutzer bereits bestätigt ist (verified=1)
+            if data[1] == 1:  # wenn der Benutzer bereits bestätigt ist (verified=1)
                 conn.close();
                 return 2, data[0]
             else:
@@ -115,4 +115,19 @@ class DB_Handler:
             return -1
 
     def check_for_existence(self, mysql, email):
-        pass
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "select email, password from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
+        data = cursor.fetchone()
+
+        if cursor.rowcount == 0:
+            conn.close();
+            return -1, "no_user"
+        else:
+            conn.close();
+            return 1, {"email": data[0], "password": data[1]}

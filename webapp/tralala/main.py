@@ -49,16 +49,18 @@ def login():
     # Hashe Passwort
     login_password_hashed = generate_password_hash(login_password)
 
-    return "Login ok email=" + login_email + " pw=" + login_password + " hashed=" + login_password_hashed
-
     # Suche nach User in DB
-
+    db_handler = DB_Handler()
+    (code, data) = db_handler.check_for_existence(mysql, login_email)
+    if code == -1:
+        return render_template("quick_info.html", info_text="Passwort und/oder Benutzername sind inkorrekt!")
+    app.logger.debug("user found=" + data["email"] + ":" + data["password"])
     # Überprüfe gehashte Passwörter
 
     # Setze Sessionvariable
 
 
-    return "User wurde eingeloggt"
+    return "Login ok email=" + login_email + " pw=" + login_password + " hashed=" + login_password_hashed
 
 
 @app.route("/signup/post_user", methods=["POST", "GET"])
