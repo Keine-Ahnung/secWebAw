@@ -20,6 +20,6 @@ cursor.execute("select email, verified from " + self.DB_TABLE_TRALALA_USERS + " 
 
 Mithilfe von `%s` und der Übergabe eines Tupels mit `,(var)` wird der String escaped an den Cursor übergeben. Die Verwendung von `%s` mittels `% (var)` würde einer direkt Stringsubstitution gleichkommen.
 
-*Test durchführen, ob das auch wirklich so ist* [StackOverflow](https://stackoverflow.com/questions/7929364/python-best-practice-and-securest-to-connect-to-mysql-and-execute-queries)
+**Test durchführen, ob das auch wirklich so ist** [StackOverflow](https://stackoverflow.com/questions/7929364/python-best-practice-and-securest-to-connect-to-mysql-and-execute-queries)
 
 1. X
