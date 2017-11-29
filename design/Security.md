@@ -10,7 +10,7 @@ Welche Schwachstellen sollen überprüft und sanitized werden?
 1. Cross Site Scripting (XSS)
 
 # Mitigation
-## SQLi
+## SQL Injection
 
 Verwendung einer Escaped Substitution, wenn Daten über einen SQL-Cursor an die Datenbank übergeben werden.
 
@@ -22,4 +22,4 @@ Mithilfe von `%s` und der Übergabe eines Tupels mit `, (var)` (mit einem Komma)
 
 **Test durchführen, ob das auch wirklich so ist** [StackOverflow](https://stackoverflow.com/questions/7929364/python-best-practice-and-securest-to-connect-to-mysql-and-execute-queries)
 
-1. X
+## Cross Site Scripting
