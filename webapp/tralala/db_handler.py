@@ -20,7 +20,7 @@ class DB_Handler:
     #     self.db_connection_data = db_connection_data
 
 
-    def add_new_user(self, mysql, email, pw_hash):
+    def add_new_user(self, mysql, email, pw_hash, verification_token):
         """
             DB-Verbindung nach jedem Call wieder schließen
 
@@ -35,23 +35,81 @@ class DB_Handler:
         role_id = 3  # unverified
         verified = 0
 
-        record = [pid, email, pw_hash, role_id, verified]
+        record = [pid, email, pw_hash, role_id, verified, verification_token]
 
         # Überprüfe ob User schon existiert
         cursor.execute("select email from " + self.DB_TABLE_TRALALA_USERS + " where email=\"" + email + "\"")
         data = cursor.fetchone()
 
-        if cursor.rowcount != 0: # User existiert bereits
+        if cursor.rowcount != 0:  # User existiert bereits
             return 0
 
         # Füge neuen User zur DB
         try:
             cursor.execute(
-                "insert into " + self.DB_TABLE_TRALALA_USERS + " (pid, email, password, role_id, verified) values (%s,%s,%s,%s,%s)",
+                "insert into " + self.DB_TABLE_TRALALA_USERS + " (pid, email, password, role_id, verified, verification_token) values (%s,%s,%s,%s,%s,%s)",
                 record)
             conn.commit()
             conn.close()
             return 1
         except Exception as e:
             conn.close()
+            return -1
+
+    def get_token_for_user(self, mysql, email):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "select verification_token from " + self.DB_TABLE_TRALALA_USERS + " where email=\"" + email + "\"")
+        data = cursor.fetchone()
+
+        if cursor.rowcount == 0:
+            conn.close();
+
+            return -1, "no_token"
+        else:
+            print("token=" + data[0])
+            conn.close();
+            return 1, data[0]
+
+    def get_user_for_token(self, mysql, token):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "select email from " + self.DB_TABLE_TRALALA_USERS + " where verification_token=\"" + token + "\"")
+        data = cursor.fetchone()
+
+        if cursor.rowcount == 0:
+            conn.close();
+            return -1, "no_email"
+        else:
+            print("email_by_token=" + data[0])
+            conn.close();
+
+            return 1, data[0]
+
+    def user_successful_verify(self, mysql, email):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1, verification_token=\"verified\" WHERE email=\"" + email + "\"")
+            conn.commit();
+            conn.close();
+            return 1
+        except Exception as e:
+            print("Error bei user_successful_verify " + str(e))
+            conn.close();
             return -1
