@@ -1,5 +1,8 @@
 # Implementierte Features
 
+## Zugriff auf die Datenbank
+- [ ] Benutzen von Stored Procedures
+
 ## Registrierung
 - [X] User kann ein Account registrieren
 - [X] Backend prüft nach, ob User schon existiert
