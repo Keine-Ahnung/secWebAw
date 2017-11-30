@@ -1,22 +1,14 @@
 # Tabellen
 ## tralala_users
 * uid:`int` (PK)
-* pid:`int` (FK -> profile.pid)
 * role_id:`int` (FK -> roles.role_id)
 * email:`varchar(100)`
 * password:`varchar(40)`
 * verified:`boolean`
 
-## tralala_profiles
-* pid:`int` (PK)
-* prename:`varchar(20)`
-* surname:`varchar(50)`
-
 ## tralala_roles
 * role_id:`int` (PK)
 * role_name:`varchar(100)`
-* del_user:`boolean`
-* set_role:`boolean`
 
 ## tralala_posts
 * post_id:`int` (PK)
