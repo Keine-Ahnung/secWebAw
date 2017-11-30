@@ -2,6 +2,7 @@
 ## tralala_users
 * uid:`int` (PK)
 * pid:`int` (FK -> profile.pid)
+* role_id:`int` (FK -> roles.role_id)
 * email:`varchar(100)`
 * password:`varchar(40)`
 * verified:`boolean`
