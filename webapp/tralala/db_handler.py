@@ -233,3 +233,21 @@ class DB_Handler:
         except:
             conn.close();
             return -1
+
+    def get_all_users(self, mysql):
+        """
+                tbd
+                """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "select email, uid, role_id from " + self.DB_TABLE_TRALALA_USERS)
+        data = cursor.fetchall()
+
+        if cursor.rowcount == 0:
+            conn.close();
+            return -1, "no_user"
+        else:
+            conn.close();
+            return 1, data

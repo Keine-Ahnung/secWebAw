@@ -44,7 +44,7 @@ def index():
     for row in data:
         color_key = random.randint(0, 3)
         upvotes = int(row[5])
-        downvotes = -int(row[6]) # Vorzeichenwechsel
+        downvotes = -int(row[6])  # Vorzeichenwechsel
         total_votes = upvotes + downvotes
 
         html_trans = ""
@@ -187,7 +187,60 @@ def admin_dashboard():
     """
     tbd
     """
+    # Benutzerdaten holen
+    db_handler = DB_Handler()
+    (code, data) = db_handler.get_all_users(mysql)
+
+    if not code == 1:
+        return render_template("admin.html",
+                               error="Admin Dashboard konnte nicht geladen werden. Versuche es später noch einmal.")
+
+    admin_table = ""
+    admin_table += "<table>"
+    admin_table += "<tr>" \
+                   "<th>ID</th>" \
+                   "<th>E-Mail</th>" \
+                   "<th>Benutzer löschen</th>" \
+                   "<th>Rolle ändern</th>" \
+                   "</tr>"
+
+    for row in data:
+        admin_table += "<tr>"
+        admin_table += "<td>" + str(row[1]) + "</td>"
+        admin_table += "<td>" + str(row[0]) + "</td>"
+        admin_table += "<td>" + "Benutzer löschen" + "</td>"
+        admin_table += "<td>" + "Rolle ändern" + "</td>"
+        admin_table += "</tr>"
+
+    admin_table += "</table>"
+
+    return render_template("admin.html", dashboard=admin_table)
+
+    # In Dashboard eintragen
+
+
     return render_template("admin.html")
+
+
+"""
+    
+    <tr>
+        <th>ID</th>
+        <th>E-Mail</th>
+        <th>Benutzer löschen</th>
+        <th>Rolle ändern</th>
+    </tr>
+    
+    <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>E-Mail</th>
+        <th>PWD Reset</th>
+        <th>User L&ouml;schen</th>
+        <th>Make Admin</th>
+    </tr>
+
+"""
 
 
 @app.route("/confirm")

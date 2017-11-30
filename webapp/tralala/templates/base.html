@@ -39,7 +39,8 @@
             <br>
             {% if session["logged_in"] %}
             {% if session["role_id"]|string() == "5" %}
-            <button class="admin" class="menubtn"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></button>
+            <button class="admin" class="menubtn"><a href="{{ url_for('admin_dashboard') }}"
+                                                     style="text-decoration: none;">Dashboard</a></button>
             {% endif %}
             {% endif %}
         </div>
