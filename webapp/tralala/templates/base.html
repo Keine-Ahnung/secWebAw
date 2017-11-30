@@ -6,6 +6,7 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/trullastyle.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/login.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/signup.css') }}">
+
 </head>
 <body>
 
@@ -115,9 +116,11 @@
             <form class="modal-content animate" method="POST" action="{{ url_for('post_message') }}">
                 <div class="container">
                     <label><b>Nachricht</b></label>
-                    <input type="text" placeholder="Neue Nachricht eingeben..." name="post_message" id="post_message" required>
+                    <input type="text" placeholder="Neue Nachricht eingeben..." name="post_message" id="post_message"
+                           required>
                     <label><b>Hashtags</b></label>
-                    <input type="text" placeholder="Hashtags ohne # und mit Komma trennen..." name="post_hashtags" id="post_hashtags" required>
+                    <input type="text" placeholder="Hashtags ohne # und mit Komma trennen..." name="post_hashtags"
+                           id="post_hashtags" required>
                     <div class="clearfix">
                         <button type="button" onclick="document.getElementById('id03').style.display='none'"
                                 class="cancelbtn">Abbrechen

@@ -162,3 +162,20 @@ class DB_Handler:
         except Exception as e:
             conn.close()
             return -1
+
+    def get_all_posts(self, mysql):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT * FROM " + self.DB_TABLE_TRALALA_POSTS + " ORDER BY post_id DESC")
+        data = cursor.fetchall()
+
+        if cursor.rowcount == 0:
+            conn.close();
+            return -1, "no_posts"
+        else:
+            conn.close();
+            return 1, data

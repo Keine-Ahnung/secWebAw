@@ -31,3 +31,8 @@
 
 ## Session
 - [ ] Pollingservice der Sessionstartzeiten ständig überprüft und Benutzer ausloggt, die zu lange inaktiv waren
+
+## Postliste
+- [ ] Zufälle Auswahl von Farben für den Hintergrund von Posts
+- [ ] Email über dem Post anzeigen
+- [ ] Up- und Downvotebuttons durch Links mit Icons ersetzen

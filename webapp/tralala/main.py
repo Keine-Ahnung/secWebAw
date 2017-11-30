@@ -27,8 +27,44 @@ mysql.init_app(app)
 def index():
     """
     Startseite
+    Hier muss ebenfalls die Darstellung aller Posts aus der DB behandelt werden
     """
-    return render_template("index.html")
+
+    db_handler = DB_Handler()
+    (code, data) = db_handler.get_all_posts(mysql)
+
+    if code == -1:
+        return "Keine Posts gefunden"
+    ret = str(len(data)) + " 0:" + str(
+        data[0][0]) + " 1:" + str(data[0][1]) + " 2:" + str(data[0][2]) + " 3:" + str(data[0][3]) + " 4:" + str(
+        data[0][4]) + " 5:" + str(data[0][5]) + " 6:" + str(data[0][6])
+
+    post_list = []
+
+    for row in data:
+        html_trans = ""
+        html_trans += "<div class=\"red\">"
+        html_trans += "<div id=\"usr\">TODO</div>"
+        html_trans += "<p>" + row[3] + "<p>"
+        html_trans += "</br></br>"
+        html_trans += "<div><b>" + row[4] + "</b>&nbsp;&nbsp;&nbsp;"
+        html_trans += "<a class=\"post_vote_up\" href=\"#\">+</a>&nbsp;&nbsp;&nbsp;"
+        html_trans += "<a class=\"post_vote_down\" style=\"background-color: red; font-size: 200%;\" href=\"#\">-</a> </div>"
+        html_trans += "</div>"
+        post_list.append(html_trans)
+
+    return render_template("index.html", post_list=post_list)
+
+
+"""
+    <div class="red">
+    <div id="usr">FooBar</div>
+    <p>Willkommen zu Tralala!</p>
+    <div id="upvote">+</div>
+    <div id="downvote">-</div>
+</div>
+
+"""
 
 
 @app.route("/login", methods=["POST", "GET"])
@@ -186,6 +222,11 @@ def confirm():
 
 @app.route("/post_message", methods=["POST", "GET"])
 def post_message():
+    try:
+        session["logged_in"]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+    except:
+        return render_template("quick_info.html", info_text="Du musst eingeloggt sein, um eine Nachricht zu posten!")
+
     # Post sanitizen
     message = request.form["post_message"]
     hashtags = request.form["post_hashtags"]

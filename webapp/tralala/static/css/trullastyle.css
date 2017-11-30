@@ -17,6 +17,27 @@ html, body {
     overflow: auto;
 }
 
+.post_vote_up {
+    background-color: green;
+    font-size: 200%;
+    text-decoration: none;
+    padding: 0.5%;
+    padding-top: 0.5%;
+    padding-left: 1%;
+    padding-bottom: 0.5%;
+    padding-right: 1%;
+}
+
+.post_vote_down {
+    background-color: red;
+    font-size: 200%;
+    text-decoration: none;
+    padding-top: 0.5%;
+    padding-left: 1%;
+    padding-bottom: 0.5%;
+    padding-right: 1%;
+}
+
 @font-face {
     font-family: 'UrbanJungle';
     src: url('../font/UrbanJungle.otf');
@@ -49,7 +70,7 @@ format('truetype');
     border-style: solid;
     border: 3px;
     border-color: #000000;
-    opacity: 0.4;
+    opacity: 1.0;
     filter: alpha(opacity=45); /* For IE8 and earlier */
 
 }
@@ -63,7 +84,7 @@ format('truetype');
     border-style: solid;
     border: 3px;
     border-color: #000000;
-    opacity: 0.4;
+    opacity: 1.0;
     filter: alpha(opacity=45); /* For IE8 and earlier */
 
 }
@@ -89,7 +110,7 @@ format('truetype');
     height: 20%;
     left: 20%;
     margin-top: 1%;
-    padding: 1%;
+    padding: 2%;
     border-radius: 4px;
     opacity: 0.7;
     filter: alpha(opacity=75); /* For IE8 and earlier */
