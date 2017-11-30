@@ -8,7 +8,7 @@
 - [X] Backend prüft nach, ob User schon existiert
 - [ ] Backend prüft auf SQLi
 - [X] Backend prüft auf Passwortbestätigung
-- [ ] Backend sanitized (normalisiert) Eingabe bzw. escaped
+- [X] Backend sanitized (normalisiert) Eingabe bzw. escaped
 - [ ] Nur Email-Adressen zulassen
 
 ## Account bestätigen
@@ -43,6 +43,7 @@
 - [ ] Es dürfen nur Benutzer posten, deren Account verifiziert ist
 - [ ] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden?
 - [ ] Pro Post darf nur ein User voten
+- [ ] Wenn Benutzer gelöscht wurde, zeige OP als unbekannt an
 
 ## Voting
 - [ ] Ungültige Formen von Parametern: IDs als Text, IDs negativ oder zu groß, ...

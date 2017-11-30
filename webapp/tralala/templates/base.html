@@ -36,11 +36,10 @@
             <button class="signup" onclick="document.getElementById('id02').style.display='block'">Registrieren</button>
             <br>
             {% endif %}
-
-
-            {% if logged_in %}
-            {% if admin %}
-            <button class="admin" class="menubtn"><a href="{{ url_for('admin_dashboard') }}">Administration</a></button>
+            <br>
+            {% if session["logged_in"] %}
+            {% if session["role_id"]|string() == "5" %}
+            <button class="admin" class="menubtn"><a href="{{ url_for('admin_dashboard') }}">Dashboard</a></button>
             {% endif %}
             {% endif %}
         </div>

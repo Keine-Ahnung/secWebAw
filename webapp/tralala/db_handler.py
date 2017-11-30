@@ -107,7 +107,7 @@ class DB_Handler:
 
         try:
             cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1 WHERE email=\"" + email + "\"")
+                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1, role_id=4 WHERE email=\"" + email + "\"")
             conn.commit();
             conn.close();
             return 1
@@ -124,7 +124,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         cursor.execute(
-            "select email, password, uid from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
+            "select email, password, uid, role_id from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -132,7 +132,7 @@ class DB_Handler:
             return -1, "no_user"
         else:
             conn.close();
-            return 1, {"email": data[0], "password": data[1], "uid": data[2]}
+            return 1, {"email": data[0], "password": data[1], "uid": data[2], "role_id": data[3]}
 
     def post_message_to_db(self, mysql, uid, email, text, hashtags):
         """

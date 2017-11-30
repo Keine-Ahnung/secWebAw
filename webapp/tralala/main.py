@@ -107,6 +107,7 @@ def login():
         session["logged_in"] = True
         session["user"] = login_email
         session["uid"] = data["uid"]
+        session["role_id"] = data["role_id"]
         return render_template("quick_info.html",
                                info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
 
