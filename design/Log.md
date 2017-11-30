@@ -36,3 +36,6 @@
 - [ ] Zufälle Auswahl von Farben für den Hintergrund von Posts
 - [ ] Email über dem Post anzeigen
 - [ ] Up- und Downvotebuttons durch Links mit Icons ersetzen
+- [ ] Es dürfen nur Benutzer posten, deren Account verifiziert ist
+- [ ] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden?
+- [ ] Pro Post darf nur ein User voten

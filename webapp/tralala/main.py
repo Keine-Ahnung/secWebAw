@@ -9,6 +9,7 @@ import time
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import random
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -34,17 +35,18 @@ def index():
     (code, data) = db_handler.get_all_posts(mysql)
 
     if code == -1:
-        return "Keine Posts gefunden"
-    ret = str(len(data)) + " 0:" + str(
-        data[0][0]) + " 1:" + str(data[0][1]) + " 2:" + str(data[0][2]) + " 3:" + str(data[0][3]) + " 4:" + str(
-        data[0][4]) + " 5:" + str(data[0][5]) + " 6:" + str(data[0][6])
+        return render_template("index.html", error_message="Keine Posts gefunden!")
+
+    colors = ["red", "blue", "green", "yellow"]
 
     post_list = []
 
     for row in data:
+        color_key = random.randint(0,3)
+
         html_trans = ""
-        html_trans += "<div class=\"red\">"
-        html_trans += "<div id=\"usr\">TODO</div>"
+        html_trans += "<div class=\"" + colors[color_key] + "\">"
+        html_trans += "<div id=\"usr\">" + row[1] + "</div>"
         html_trans += "<p>" + row[3] + "<p>"
         html_trans += "</br></br>"
         html_trans += "<div><b>" + row[4] + "</b>&nbsp;&nbsp;&nbsp;"
@@ -54,17 +56,6 @@ def index():
         post_list.append(html_trans)
 
     return render_template("index.html", post_list=post_list)
-
-
-"""
-    <div class="red">
-    <div id="usr">FooBar</div>
-    <p>Willkommen zu Tralala!</p>
-    <div id="upvote">+</div>
-    <div id="downvote">-</div>
-</div>
-
-"""
 
 
 @app.route("/login", methods=["POST", "GET"])
@@ -138,8 +129,11 @@ def post_user():
     eine Bestätigungsemail an die angegebene Email.
     :return:
     """
-    if session["logged_in"]:
-        redirect(url_for("index"))
+    try:
+        session["logged_in"]  # Falls der User bereits eingeloggt ist, soll er auf die Startseite weitergeleitet werden
+        return redirect(url_for("index"))
+    except:
+        pass
 
     if request.method == "GET":
         return_info = {}
@@ -240,9 +234,9 @@ def post_message():
     success = db_handler.post_message_to_db(mysql, session["uid"], None, message, hashtags)
 
     if success == -1:
-        return "error"
+        return render_template("quick_info.html", info_text="Deine Nachricht konnte nicht geposted werden. Versuche es erneut!")
     elif success == 1:
-        return "success"
+        return render_template("quick_info.html", info_text="Deine Nachricht wurde geposted. Du kannst sie auf der Postseite nun sehen!")
 
     return "post message uid=" + str(session["uid"]) + " message=" + message + " hashtags=" + hashtags
 

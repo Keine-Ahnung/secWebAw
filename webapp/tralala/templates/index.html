@@ -4,9 +4,15 @@
 
 {% block body %}
 
+{% if error_message %}
+{{ error_message }}
+{% else %}
+
 {% for post in post_list %}
 {{ post|safe }}
 {% endfor %}
+
+{% endif %}
 
 <!--
 <div class="red">
