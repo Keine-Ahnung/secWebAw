@@ -176,8 +176,59 @@ class DB_Handler:
         data = cursor.fetchall()
 
         if cursor.rowcount == 0:
-            conn.close();
+            conn.close()
             return -1, "no_posts"
         else:
-            conn.close();
+            conn.close()
             return 1, data
+
+    def get_post_by_pid(self, mysql, post_id):
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        # cursor.execute("SELECT * FROM " + self.DB_TABLE_TRALALA_POSTS + " WHERE post_id=%s", (post_id,))
+        cursor.execute(
+            "SELECT tralala_posts.post_id, tralala_users.email, tralala_posts.post_date, tralala_posts.post_text, tralala_posts.hashtags, tralala_posts.upvotes, tralala_posts.downvotes FROM tralala_posts INNER JOIN tralala_users ON tralala_posts.uid = tralala_users.uid WHERE post_id=%s",
+            (post_id,))
+        data = cursor.fetchone()
+
+        if cursor.rowcount == 0:
+            conn.close()
+            return -1, "no_post"
+        else:
+            conn.close()
+            return 1, data
+
+    def do_upvote(self, mysql, post_id):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                "UPDATE " + self.DB_TABLE_TRALALA_POSTS + " SET upvotes = upvotes + 1 WHERE post_id=%s", (post_id,))
+            conn.commit();
+            conn.close();
+            return 1
+        except:
+            conn.close();
+            return -1
+
+    def do_downvote(self, mysql, post_id):
+        """
+                tbd
+                """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                "UPDATE " + self.DB_TABLE_TRALALA_POSTS + " SET upvotes = upvotes - 1 WHERE post_id=%s", (post_id,))
+            conn.commit();
+            conn.close();
+            return 1
+        except:
+            conn.close();
+            return -1

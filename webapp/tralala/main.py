@@ -42,16 +42,21 @@ def index():
     post_list = []
 
     for row in data:
-        color_key = random.randint(0,3)
+        color_key = random.randint(0, 3)
 
         html_trans = ""
         html_trans += "<div class=\"" + colors[color_key] + "\">"
-        html_trans += "<div id=\"usr\">" + row[1] + "</div>"
+        html_trans += "<div id=\"usr\">" + str(row[1]) + " | " + str(
+            row[2]) + " | (<b><span style=\"color: green;\">" + str(
+            row[5]) + "</span>/<span style=\"color: red;\">" + str(
+            row[6]) + "</span></b>)</div>"
         html_trans += "<p>" + row[3] + "<p>"
         html_trans += "</br></br>"
         html_trans += "<div><b>" + row[4] + "</b>&nbsp;&nbsp;&nbsp;"
-        html_trans += "<a class=\"post_vote_up\" href=\"#\">+</a>&nbsp;&nbsp;&nbsp;"
-        html_trans += "<a class=\"post_vote_down\" style=\"background-color: red; font-size: 200%;\" href=\"#\">-</a> </div>"
+        html_trans += "<a class=\"post_vote_up\" href=\"" + url_for("vote") + "?method=upvote&post_id=" + str(
+            row[0]) + "\">+</a>&nbsp;&nbsp;&nbsp;"
+        html_trans += "<a class=\"post_vote_down\" href=\"" + url_for("vote") + "?method=downvote&post_id=" + str(
+            row[0]) + "\">-</a>&nbsp;&nbsp;&nbsp;</div>"
         html_trans += "</div>"
         post_list.append(html_trans)
 
@@ -231,14 +236,85 @@ def post_message():
 
     # Post in DB schreiben
     db_handler = DB_Handler()
-    success = db_handler.post_message_to_db(mysql, session["uid"], None, message, hashtags)
+    success = db_handler.post_message_to_db(mysql, session["uid"], None, message[:279], hashtags)
 
     if success == -1:
-        return render_template("quick_info.html", info_text="Deine Nachricht konnte nicht geposted werden. Versuche es erneut!")
+        return render_template("quick_info.html",
+                               info_text="Deine Nachricht konnte nicht geposted werden. Versuche es erneut!")
     elif success == 1:
-        return render_template("quick_info.html", info_text="Deine Nachricht wurde geposted. Du kannst sie auf der Postseite nun sehen!")
+        return render_template("quick_info.html",
+                               info_text="Deine Nachricht wurde geposted. Du kannst sie auf der Postseite nun sehen!")
 
     return "post message uid=" + str(session["uid"]) + " message=" + message + " hashtags=" + hashtags
+
+
+@app.route("/vote")
+def vote():
+    """
+
+    /vote_up?post_id=123
+    """
+    # Lese GET-Parameter
+    method = request.args.get("method")
+    post_id = request.args.get("post_id")
+
+    if post_id == "" or method == "":
+        return render_template("quick_info.html", info_text="Ungültige Post ID oder Zugriffsmethode!")
+
+    # Hole Post aus DB
+    db_handler = DB_Handler()
+    (code, data) = db_handler.get_post_by_pid(mysql, post_id)
+
+    if code == -1:
+        return render_template("quick_info.html",
+                               info_text="Wir konnten leider keinen Post mit der ID " + str(post_id) + " finden!")
+
+    method_labels = {"upvote": "Upvote", "downvote": "Downvote"}
+    csrf_seq = generate_verification_token(8)
+
+    # Gebe Seite mit vollständigem Post zurück
+    # Präsentiere zufällige Zeichenfolge, die eingegeben werden muss, um CSRF-Attacken zu unterbinden
+    return render_template("vote.html", post=data, csrf_seq=csrf_seq, method=method,
+                           method_label=method_labels[method])
+
+
+@app.route("/finish_vote", methods=["GET", "POST"])
+def finish_vote():
+    """
+    tbd
+    """
+    # Hole GET-Parameter
+    csrf_token = request.args.get("csrf_token")
+    post_id = request.args.get("post_id")
+    method = request.args.get("method")
+    input_csrf = request.form["vote_code"]
+
+    try:
+        post_id_int = int(post_id)
+    except:
+        return render_template("quick_info.html", info_text="Deine Anfrage war ungültig. Bitte versuche es erneut!")
+
+    if input_csrf == "" or csrf_token == "" or post_id == "" or post_id_int < 0 or not method in ["upvote", "downvote"]:
+        return render_template("quick_info.html", info_text="Deine Anfrage war ungültig. Bitte versuche es erneut!")
+    # Überprüfe csrf_seq
+    if not csrf_token == input_csrf:
+        return render_template("quick_info.html",
+                               info_text="Der eingegebene Code war leider falsch. Bitte versuche es erneut!")
+
+    # Persistiere Vote
+    db_handler = DB_Handler()
+
+    if method == "upvote":
+        success = db_handler.do_upvote(mysql, post_id)
+        if success == -1:
+            return render_template("quick_info.html", info_text="Etwas ist schiefgelaufen! Versuche es erneut!")
+        return render_template("quick_info.html", info_text="Upvote erfolgreich!")
+
+    elif method == "downvote":
+        success = db_handler.do_downvote(mysql, post_id)
+        if success == -1:
+            return render_template("quick_info.html", info_text="Etwas ist schiefgelaufen! Versuche es erneut!")
+        return render_template("quick_info.html", info_text="Downvote erfolgreich!")
 
 
 """

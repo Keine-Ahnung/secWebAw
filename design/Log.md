@@ -39,6 +39,10 @@
 - [X] Zufällige Auswahl von Farben für den Hintergrund von Posts
 - [X] Email über dem Post anzeigen
 - [X] Up- und Downvotebuttons durch Links (mit Icons) ersetzen
+- [ ] Zeilenumbruch für lange Nachrichten einfügen
 - [ ] Es dürfen nur Benutzer posten, deren Account verifiziert ist
 - [ ] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden?
 - [ ] Pro Post darf nur ein User voten
+
+## Voting
+- [ ] Ungültige Formen von Parametern: IDs als Text, IDs negativ oder zu groß, ...
