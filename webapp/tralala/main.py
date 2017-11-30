@@ -43,13 +43,14 @@ def index():
 
     for row in data:
         color_key = random.randint(0, 3)
+        upvotes = int(row[5])
+        downvotes = -int(row[6]) # Vorzeichenwechsel
+        total_votes = upvotes + downvotes
 
         html_trans = ""
         html_trans += "<div class=\"" + colors[color_key] + "\">"
         html_trans += "<div id=\"usr\">" + str(row[1]) + " | " + str(
-            row[2]) + " | (<b><span style=\"color: green;\">" + str(
-            row[5]) + "</span>/<span style=\"color: red;\">" + str(
-            row[6]) + "</span></b>)</div>"
+            row[2]) + " | <b>Votes: " + str(total_votes) + "</b></div>"
         html_trans += "<p>" + row[3] + "<p>"
         html_trans += "</br></br>"
         html_trans += "<div><b>" + row[4] + "</b>&nbsp;&nbsp;&nbsp;"

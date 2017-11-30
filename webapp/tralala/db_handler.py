@@ -172,7 +172,7 @@ class DB_Handler:
 
         # cursor.execute("SELECT * FROM " + self.DB_TABLE_TRALALA_POSTS + " ORDER BY post_id DESC")
         cursor.execute(
-            "SELECT tralala_posts.post_id, tralala_users.email, tralala_posts.post_date, tralala_posts.post_text, tralala_posts.hashtags, tralala_posts.upvotes, tralala_posts.downvotes FROM tralala_posts INNER JOIN tralala_users ON tralala_posts.uid = tralala_users.uid")
+            "SELECT tralala_posts.post_id, tralala_users.email, tralala_posts.post_date, tralala_posts.post_text, tralala_posts.hashtags, tralala_posts.upvotes, tralala_posts.downvotes FROM tralala_posts INNER JOIN tralala_users ON tralala_posts.uid = tralala_users.uid ORDER BY post_id DESC")
         data = cursor.fetchall()
 
         if cursor.rowcount == 0:
@@ -218,14 +218,15 @@ class DB_Handler:
 
     def do_downvote(self, mysql, post_id):
         """
-                tbd
-                """
+        tbd
+        votes = upvotes + (neg(downvotes))
+        """
         conn = mysql.connect()
         cursor = conn.cursor()
 
         try:
             cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_POSTS + " SET upvotes = upvotes - 1 WHERE post_id=%s", (post_id,))
+                "UPDATE " + self.DB_TABLE_TRALALA_POSTS + " SET downvotes = downvotes + 1 WHERE post_id=%s", (post_id,))
             conn.commit();
             conn.close();
             return 1
