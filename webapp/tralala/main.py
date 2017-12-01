@@ -81,7 +81,7 @@ def login():
         return_info = {}
         return_info["invalid_method"] = "GET"
 
-        return prepare_info_json(url_for("post_user"), "GET ist unzulässig für den Login", return_info)
+        return prepare_info_json(url_for("post_user"), "GET ist unzulaessig fUer den Login", return_info)
 
     login_email = request.form["login_email"]
     login_password = request.form["login_password"]
@@ -99,7 +99,7 @@ def login():
         return render_template("quick_info.html", info_text="Passwort und/oder Benutzername sind inkorrekt!")
     app.logger.debug("user found=" + data["email"] + ":" + data["password"])
 
-    # Überprüfe gehashte Passwörter
+    # UeberprUefe gehashte Passwoerter
     if not check_password_hash(data["password"], login_password):
         return render_template("quick_info.html", info_text="Benutzername und/oder Passwort sind inkorrekt!")
     else:
@@ -109,7 +109,7 @@ def login():
         session["uid"] = data["uid"]
         session["role_id"] = data["role_id"]
         return render_template("quick_info.html",
-                               info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
+                               info_text="Du wurdest eingeloggt. Willkommen zurUeck, " + login_email)
 
 
 @app.route("/logout", methods=["POST", "GET"])
@@ -131,9 +131,9 @@ def logout():
 @app.route("/signup/post_user", methods=["POST", "GET"])
 def post_user():
     """
-    Überprüfe die Eingaben des Benutzers unabhängig von der clientseitigen Überprüfung.
+    UeberprUefe die Eingaben des Benutzers unabhaengig von der clientseitigen UeberprUefung.
     Sollten alle Eingaben korrekt sein, persistiere das neue Benutzerkonto in der Datenbank und schicke
-    eine Bestätigungsemail an die angegebene Email.
+    eine Bestaetigungsemail an die angegebene Email.
     :return:
     """
     try:
@@ -146,24 +146,24 @@ def post_user():
         return_info = {}
         return_info["invalid_method"] = "GET"
 
-        return prepare_info_json(url_for("post_user"), "GET ist unzulässig für die Registration", return_info)
+        return prepare_info_json(url_for("post_user"), "GET ist unzulaessig fUer die Registration", return_info)
 
     else:
         reg_email = request.form["reg_email"]
         reg_password = request.form["reg_password"]
         reg_password_repeat = request.form["reg_password_repeat"]
 
-        if reg_email == "" or reg_password == "" or reg_password_repeat == "":  # Reicht es, das allein durch JavaScript zu überprüfen?
+        if reg_email == "" or reg_password == "" or reg_password_repeat == "":  # Reicht es, das allein durch JavaScript zu UeberprUefen?
             return prepare_info_json(url_for("post_user"), "Es wurden Fehler bei der Registrierung leer gelassen")
 
-        # Hier überprüfen und ggf. sanitizen
+        # Hier UeberprUefen und ggf. sanitizen
 
-        # Überprüfe, ob Password und Passwordwiederholung übereinstimmen
+        # UeberprUefe, ob Password und Passwordwiederholung Uebereinstimmen
         if not reg_password == reg_password_repeat:
             app.logger.error("Passwort wurde nicht korrekt wiederholt")
             return render_template("registration_no_success.html", code=2)
 
-        # Überprüfe, ob User schon existiert
+        # UeberprUefe, ob User schon existiert
         success = register_new_account(mysql, reg_email, generate_password_hash(reg_password),
                                        generate_verification_token(50))
         if success == -1:
@@ -193,23 +193,23 @@ def admin_dashboard():
 
     if not code == 1:
         return render_template("admin.html",
-                               error="Admin Dashboard konnte nicht geladen werden. Versuche es später noch einmal.")
+                               error="Admin Dashboard konnte nicht geladen werden. Versuche es spaeter noch einmal.")
 
     admin_table = ""
     admin_table += "<table>"
     admin_table += "<tr>" \
                    "<th>ID</th>" \
                    "<th>E-Mail</th>" \
-                   "<th>Benutzer löschen</th>" \
-                   "<th>Rolle ändern</th>" \
+                   "<th>Benutzer loeschen</th>" \
+                   "<th>Rolle aendern</th>" \
                    "</tr>"
 
     for row in data:
         admin_table += "<tr>"
         admin_table += "<td>" + str(row[1]) + "</td>"
         admin_table += "<td>" + str(row[0]) + "</td>"
-        admin_table += "<td>" + "Benutzer löschen" + "</td>"
-        admin_table += "<td>" + "Rolle ändern" + "</td>"
+        admin_table += "<td>" + "Benutzer loeschen" + "</td>"
+        admin_table += "<td>" + "Rolle aendern" + "</td>"
         admin_table += "</tr>"
 
     admin_table += "</table>"
@@ -220,27 +220,6 @@ def admin_dashboard():
 
 
     return render_template("admin.html")
-
-
-"""
-    
-    <tr>
-        <th>ID</th>
-        <th>E-Mail</th>
-        <th>Benutzer löschen</th>
-        <th>Rolle ändern</th>
-    </tr>
-    
-    <tr>
-        <th>ID</th>
-        <th>Username</th>
-        <th>E-Mail</th>
-        <th>PWD Reset</th>
-        <th>User L&ouml;schen</th>
-        <th>Make Admin</th>
-    </tr>
-
-"""
 
 
 @app.route("/confirm")
@@ -254,30 +233,30 @@ def confirm():
     db_handler = DB_Handler()
     (success, email) = db_handler.get_user_for_token(mysql, token)
     if success == -1:
-        app.logger.error("Es konnte kein User for das Token '" + token + "' zurückgeliefert werden (ungültiges Token)")
-        return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestätigt werden!")
+        app.logger.error("Es konnte kein User for das Token '" + token + "' zurUeckgeliefert werden (ungUeltiges Token)")
+        return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestaetigt werden!")
     if success == 2:
-        app.logger.debug("Benutzer ist bereits bestätigt!")
-        return render_template("quick_info.html", info_text="Der Benutzer wurde bereits bestätigt!")
+        app.logger.debug("Benutzer ist bereits bestaetigt!")
+        return render_template("quick_info.html", info_text="Der Benutzer wurde bereits bestaetigt!")
     if success == 1:
-        app.logger.debug("Account bestätigt für Benutzer '" + email + "' für Token '" + token + "'")
+        app.logger.debug("Account bestaetigt fUer Benutzer '" + email + "' fUer Token '" + token + "'")
 
     # Setze Token auf Defaultwert und setze verified auf 1
     success = db_handler.user_successful_verify(mysql, email)
 
     if success == -1:
-        app.logger.error("User konnte nicht bestätigt werden (Benutzer konnte in der DB nicht bestätigt werden)")
-        return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestätigt werden!")
+        app.logger.error("User konnte nicht bestaetigt werden (Benutzer konnte in der DB nicht bestaetigt werden)")
+        return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestaetigt werden!")
     if success == 1:
-        app.logger.debug("User wurde bestätigt")
+        app.logger.debug("User wurde bestaetigt")
         return render_template("quick_info.html",
-                               info_text="Der Benutzer wurde erfolgreich bestätigt. Du kannst dich nun einloggen.")
+                               info_text="Der Benutzer wurde erfolgreich bestaetigt. Du kannst dich nun einloggen.")
 
 
 @app.route("/post_message", methods=["POST", "GET"])
 def post_message():
     try:
-        session["logged_in"]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+        session["logged_in"]  # Nur eingeloggte Benutzer dUerfen Nachrichten posten
     except:
         return render_template("quick_info.html", info_text="Du musst eingeloggt sein, um eine Nachricht zu posten!")
 
@@ -314,7 +293,7 @@ def vote():
     post_id = request.args.get("post_id")
 
     if post_id == "" or method == "":
-        return render_template("quick_info.html", info_text="Ungültige Post ID oder Zugriffsmethode!")
+        return render_template("quick_info.html", info_text="UngUeltige Post ID oder Zugriffsmethode!")
 
     # Hole Post aus DB
     db_handler = DB_Handler()
@@ -327,8 +306,8 @@ def vote():
     method_labels = {"upvote": "Upvote", "downvote": "Downvote"}
     csrf_seq = generate_verification_token(8)
 
-    # Gebe Seite mit vollständigem Post zurück
-    # Präsentiere zufällige Zeichenfolge, die eingegeben werden muss, um CSRF-Attacken zu unterbinden
+    # Gebe Seite mit vollstaendigem Post zurUeck
+    # Praesentiere zufaellige Zeichenfolge, die eingegeben werden muss, um CSRF-Attacken zu unterbinden
     return render_template("vote.html", post=data, csrf_seq=csrf_seq, method=method,
                            method_label=method_labels[method])
 
@@ -347,11 +326,11 @@ def finish_vote():
     try:
         post_id_int = int(post_id)
     except:
-        return render_template("quick_info.html", info_text="Deine Anfrage war ungültig. Bitte versuche es erneut!")
+        return render_template("quick_info.html", info_text="Deine Anfrage war ungUeltig. Bitte versuche es erneut!")
 
     if input_csrf == "" or csrf_token == "" or post_id == "" or post_id_int < 0 or not method in ["upvote", "downvote"]:
-        return render_template("quick_info.html", info_text="Deine Anfrage war ungültig. Bitte versuche es erneut!")
-    # Überprüfe csrf_seq
+        return render_template("quick_info.html", info_text="Deine Anfrage war ungUeltig. Bitte versuche es erneut!")
+    # UeberprUefe csrf_seq
     if not csrf_token == input_csrf:
         return render_template("quick_info.html",
                                info_text="Der eingegebene Code war leider falsch. Bitte versuche es erneut!")
@@ -383,10 +362,10 @@ def generate_verification_token(length):
 
 def send_verification_email(reg_email):
     """
-        Sende Bestätigungsmail mit Verification Token.
+        Sende Bestaetigungsmail mit Verification Token.
     """
 
-    app.logger.debug("Sende Bestätigungsmail.")
+    app.logger.debug("Sende Bestaetigungsmail.")
 
     # Hole Verification Token aus der DB
     db_handler = DB_Handler()
@@ -395,14 +374,14 @@ def send_verification_email(reg_email):
     if success == -1:
         return -1
 
-    # Sende Bestätigungsemail mit Token
+    # Sende Bestaetigungsemail mit Token
     sender = "verification_tralala@gmx.de"
     password = "sichwebapp_2017"
 
     msg = MIMEMultipart()
     msg["From"] = sender
     msg["To"] = reg_email
-    msg["Subject"] = "Bestätige deinen Account bei Tralala!"
+    msg["Subject"] = "Bestaetige deinen Account bei Tralala!"
 
     msg.attach(MIMEText(u"Hallo " + reg_email + "!</br>" \
                                                 "Benutze den folgenden Link, um deinen Account zu bestaetigen. Du musst diesen in die Adresszeile deines Browsers kopieren.</br></br>" \
@@ -419,16 +398,16 @@ def send_verification_email(reg_email):
         server.sendmail(sender, reg_email, msg.as_string())
         server.quit()
     except Exception as e:
-        app.logger.error("Fehler beim Senden der Bestätigungsmail...\n" + str(e))
+        app.logger.error("Fehler beim Senden der Bestaetigungsmail...\n" + str(e))
         return -1
 
-    app.logger.debug("Bestätigungsemail gesendet an '" + reg_email + "' ...")
+    app.logger.debug("Bestaetigungsemail gesendet an '" + reg_email + "' ...")
     return 1
 
 
 def prepare_info_json(affected_url, info_text, additions):
     """
-        Gebe eine Info- bzw. Fehlermeldung im JSON-Format zurück.
+        Gebe eine Info- bzw. Fehlermeldung im JSON-Format zurUeck.
         Dictionary akzeptiert keine additions, falls folgende Keys in den additions existieren:
             1. called_url
             2. timestamp
@@ -464,5 +443,5 @@ def register_new_account(mysql, email, pw_hash, verification_token):
 
 
 if __name__ == '__main__':
-    app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
+    app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig fUer Sessions, da Cookies durch diesen Key signiert sind!
     app.run(debug=True)
