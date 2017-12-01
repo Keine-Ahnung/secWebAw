@@ -39,7 +39,7 @@ Timeout für Sitzungen implementieren.
 - Hashtags nur mit Komma eingeben
 - HTML Entity Injection (HTML darf nicht gerendert werden)
 
-** Lösungen:**
+**Lösungen:**
 - HTTP-Only und Secury Flag
 - Nachrichtenlänge im Frontend auf 280 Zeichen beschränken in HTML Tag
 - Prüfung der Hashtagliste im Frontend (durch Kommatrennung)
