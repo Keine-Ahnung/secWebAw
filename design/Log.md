@@ -47,3 +47,11 @@
 
 ## Voting
 - [ ] Ungültige Formen von Parametern: IDs als Text, IDs negativ oder zu groß, ...
+
+## Security
+- [x] Implemented a method to strip down html from messagebox
+- [x] Implemented method to strip down html and # from hashtags. Method is based on the change request.
+
+## Changerequests
+- [ ] Change method to store the hashtags from the actual to something like: Storing data in database splitted by,
+      Read list from db and add # before rendering
