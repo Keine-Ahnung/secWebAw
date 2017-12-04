@@ -10,6 +10,7 @@ Welche Schwachstellen sollen überprüft und sanitized werden?
 1. Cross Site Scripting (XSS)
 1. User Enumeration über das Verification Token
 1. Session Tampering
+1. Clientseitige Überprüfung
 
 # Mitigation
 ## SQL Injection
