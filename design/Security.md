@@ -31,3 +31,12 @@ Sobald das Token entweder manipuliert wurde wird dem Benutzer eine Seite präsen
 ## Session Tampering
 
 Backend reagiert nur auf valide Session Tokens, andere werden mit generischen Nachrichten abgefangen.
+
+## Clientseitige Überprüfung
+
+Alles, was clientseitig durch JavaScript überprüft wird, muss ebenfalls serverseitig überprüft werden, da die Überprüfungen durch einen erfahrenen Anwender/Hacker aus der Seite entfernt werden können. Dies betrifft:
+
+* Überprüfung der Passwortstärke
+* Sind alle Eingabefelder ausgefüllt?
+* Sind alle Eingabefelder im richtigen Format?
+* ...
