@@ -49,8 +49,8 @@ def index():
         total_votes = upvotes + downvotes
 
         hashtags = ''
-        for hashtag in row[4]:
-            hashtags.join(('#', hashtag, ' '))  #space at the end
+        for hashtag in row[4].split(','):
+             hashtags = hashtags + '#' + hashtag + ' '  #space at the end
 
 
         html_trans = ""

@@ -21,10 +21,12 @@ Will replace : everything what looks like html
 def clean_hashtags(hashtags_text):
     html_cleaned = bleach.clean(hashtags_text)
 
-    hashtag_list = html_cleaned.split(',')  # string.replace would be possible although. should talk about that
-    hashtag_list.remove('#')
+    hashtag_list = html_cleaned.split(' ')  # string.replace would be possible although. should talk about that
 
-    return ','.join(map(str, hashtag_list))
+    if '#' in hashtag_list:
+        hashtag_list.remove('#')
+
+    return ','.join(hashtag_list)
 
 
 '''
@@ -39,7 +41,7 @@ Second part for passwords between 10 and 15 chars
 def check_password_strength(password_text):
 
     if len(password_text) >= 15:
-        if bool(re.search('[a-z]+', password_text)) and bool(re.search('[A-Z]+', password_text)):
+        if re.search('[a-z]+', password_text) and re.search('[A-Z]+', password_text):
             return True, "nist"
 
     elif 10 < len(password_text) < 15:

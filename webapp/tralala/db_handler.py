@@ -2,6 +2,7 @@ from flask import Flask
 from flaskext.mysql import MySQL
 import time
 import security_helper
+import traceback
 
 
 class DB_Handler:
@@ -35,10 +36,10 @@ class DB_Handler:
         cursor = conn.cursor()
 
         pid = 1  # unverified
-        role_id = 3  # unverified
+        role_id = 1  # unverified
         verified = 0
 
-        record = [pid, email, pw_hash, role_id, verified, verification_token]
+        record = [email, pw_hash, role_id, verified, verification_token]
 
         # Überprüfe ob User schon existiert
         cursor.execute("select email from " + self.DB_TABLE_TRALALA_USERS + " where email=\"" + email + "\"")
@@ -50,12 +51,13 @@ class DB_Handler:
         # Füge neuen User zur DB
         try:
             cursor.execute(
-                "insert into " + self.DB_TABLE_TRALALA_USERS + " (pid, email, password, role_id, verified, verification_token) values (%s,%s,%s,%s,%s,%s)",
+                "insert into " + self.DB_TABLE_TRALALA_USERS + " (email, password, role_id, verified, verification_token) values (%s,%s,%s,%s,%s)",
                 record)
             conn.commit()
             conn.close()
             return 1
         except Exception as e:
+            print(traceback.print_exc())
             conn.close()
             return -1
 
@@ -71,11 +73,11 @@ class DB_Handler:
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
-            conn.close();
+            conn.close()
 
             return -1, "no_token"
         else:
-            conn.close();
+            conn.close()
             return 1, data[0]
 
     def get_user_for_token(self, mysql, token):
@@ -90,11 +92,11 @@ class DB_Handler:
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
-            conn.close();
+            conn.close()
             return -1, "no_email"
         else:
             if data[1] == 1:  # wenn der Benutzer bereits bestätigt ist (verified=1)
-                conn.close();
+                conn.close()
                 return 2, data[0]
             else:
                 return 1, data[0]
@@ -109,12 +111,12 @@ class DB_Handler:
         try:
             cursor.execute(
                 "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1, role_id=4 WHERE email=\"" + email + "\"")
-            conn.commit();
-            conn.close();
+            conn.commit()
+            conn.close()
             return 1
         except Exception as e:
             print("Error bei user_successful_verify " + str(e))
-            conn.close();
+            conn.close()
             return -1
 
     def check_for_existence(self, mysql, email):
@@ -207,11 +209,11 @@ class DB_Handler:
         try:
             cursor.execute(
                 "UPDATE " + self.DB_TABLE_TRALALA_POSTS + " SET upvotes = upvotes + 1 WHERE post_id=%s", (post_id,))
-            conn.commit();
-            conn.close();
+            conn.commit()
+            conn.close()
             return 1
         except:
-            conn.close();
+            conn.close()
             return -1
 
     def do_downvote(self, mysql, post_id):
@@ -225,11 +227,11 @@ class DB_Handler:
         try:
             cursor.execute(
                 "UPDATE " + self.DB_TABLE_TRALALA_POSTS + " SET downvotes = downvotes + 1 WHERE post_id=%s", (post_id,))
-            conn.commit();
-            conn.close();
+            conn.commit()
+            conn.close()
             return 1
         except:
-            conn.close();
+            conn.close()
             return -1
 
     def get_all_users(self, mysql):
@@ -244,8 +246,8 @@ class DB_Handler:
         data = cursor.fetchall()
 
         if cursor.rowcount == 0:
-            conn.close();
+            conn.close()
             return -1, "no_user"
         else:
-            conn.close();
+            conn.close()
             return 1, data
