@@ -21,6 +21,7 @@
 
 ## Login
 - [X] Auf SQLi prüfen
+- [ ] prüfen ob user schon verifiziert ist
 - [ ] Rollen für User abrufen und in die Session eintragen (für Admin Dashboard)
 
 
