@@ -10,7 +10,7 @@
 - [ ] Backend prüft auf SQLi
 - [X] Backend prüft auf Passwortbestätigung
 - [X] Backend sanitized (normalisiert) Eingabe bzw. escaped
-- [ ] Nur Email-Adressen zulassen
+- [x] Nur Email-Adressen zulassen
 
 ## Account bestätigen
 - [X] Mail an User senden
