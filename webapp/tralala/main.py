@@ -2,7 +2,7 @@ import random
 import string
 
 from flask import Flask, request, session, url_for, redirect, render_template
-from .db_handler import DB_Handler
+from db_handler import DB_Handler
 from flaskext.mysql import MySQL
 import json
 import time
@@ -173,7 +173,7 @@ def post_user():
             app.logger.error("Passwort wurde nicht korrekt wiederholt")
             return render_template("registration_no_success.html", code=2)
 
-        (passed, comment) = security_helper.check_password_strength(reg_password)
+        passed, comment = security_helper.check_password_strength(reg_password)
         if not passed:
             app.logger.error("Passwort nicht stark genug")
             return render_template("registration_no_success.html", code=4, comment=comment)

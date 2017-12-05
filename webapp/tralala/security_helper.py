@@ -39,19 +39,19 @@ Second part for passwords between 10 and 15 chars
 def check_password_strength(password_text):
 
     if len(password_text) >= 15:
-        if re.search("a-zA-Z", password_text):
+        if bool(re.search('[a-z]+', password_text)) and bool(re.search('[A-Z]+', password_text)):
             return True, "nist"
 
     elif 10 < len(password_text) < 15:
         special_chars = {'!', '"', '§', '$', '%', '&', '/', '(', ')', '=', '?'}
 
-        if not re.search("a-z", password_text):
+        if not re.search('[a-z]+', password_text):
             return False, "charset Lower"
 
-        if not re.search("A-Z", password_text):
+        if not re.search('[A-Z]+', password_text):
             return False, "chartset Upper"
 
-        if not re.search("0-9", password_text):
+        if not re.search('[0-9]+', password_text):
             return False, "charset Numbers"
 
         if not any(spec_char in special_chars for spec_char in password_text):
@@ -59,8 +59,7 @@ def check_password_strength(password_text):
 
         return True, "not nist"
 
-    else:
-        return False, "to short"
+    return False, "to short"
 
 
 '''
