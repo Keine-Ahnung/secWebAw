@@ -60,7 +60,6 @@
 ## Skripte
 
 - [ ] Passwörter für Mockdaten durch Webapp generieren lassen, sodass sie im PKCS-Format geschrieben werden können
-- 
 
 ## Changerequests
 - [x] Change method to store the hashtags from the actual to something like: Storing data in database splitted by,
