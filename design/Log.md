@@ -29,7 +29,7 @@
 - [X] Auf XSS prüfen (sollte durch Verwendung von `, (val)` escaped werden)
 - [X] Nachricht in DB posten mit Postdaten
 - [X] Es können keine leeren Posts abgesendet werden (wird client- und serverseitig überprüft)
-- [] Nachrichten die reinkopiert werden bekommen keinen Linebreak, Nachrichten, die man schreibt jedoch schon
+- [ ] Nachrichten die reinkopiert werden bekommen keinen Linebreak, Nachrichten, die man schreibt jedoch schon
 
 
 ## Passwort vergessen
