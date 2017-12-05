@@ -57,7 +57,7 @@ class DB_Handler:
             conn.close()
             return 1
         except Exception as e:
-            print(traceback.print_exc())
+            print(str(e))
             conn.close()
             return -1
 
