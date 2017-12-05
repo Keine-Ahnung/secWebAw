@@ -61,3 +61,18 @@ def check_password_strength(password_text):
 
     else:
         return False, "to short"
+
+
+'''
+Method to validate the mailaddress
+regex gemopst bei https://www.scottbrady91.com/Email-Verification/Python-Email-Verification-Script
+'''
+
+
+def check_mail(mailaddress):
+    success = re.match('^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', mailaddress)
+
+    if success:
+        return True
+    else:
+        return False

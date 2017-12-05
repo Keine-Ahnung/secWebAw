@@ -14,5 +14,7 @@
     anzufordern für <b>{{ reg_email }}</b></p>
 {% elif code==4 %}
 <p> Das Passwort stimmt nicht mit den benötigten Passwortrichtlinien überein! {{ comment }}</p>
+{% elif code==5 %}
+<p> Mailadresse nicht valide.</p>
 {% endif %}
 {% endblock %}
