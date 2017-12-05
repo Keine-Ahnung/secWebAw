@@ -160,9 +160,13 @@ def post_user():
         reg_password_repeat = request.form["reg_password_repeat"]
 
         if reg_email == "" or reg_password == "" or reg_password_repeat == "":  # Reicht es, das allein durch JavaScript zu UeberprUefen?
-            return prepare_info_json(url_for("post_user"), "Es wurden Fehler bei der Registrierung leer gelassen")
+            return prepare_info_json(url_for("post_user"), "Es wurden Felder bei der Registrierung leer gelassen")
 
         # Hier UeberprUefen und ggf. sanitizen
+
+        if not security_helper.check_mail(reg_email):
+            app.logger.error("Mailadresse nicht valide")
+            return render_template("registration_no_success.html", code=5)
 
         # UeberprUefe, ob Password und Passwordwiederholung Uebereinstimmen
         if not reg_password == reg_password_repeat:
@@ -172,7 +176,7 @@ def post_user():
         (passed, comment) = security_helper.check_password_strength(reg_password)
         if not passed:
             app.logger.error("Passwort nicht stark genug")
-            return render_template("registration_no_success.html", code=2, comment=comment)
+            return render_template("registration_no_success.html", code=4, comment=comment)
 
         # UeberprUefe, ob User schon existiert
         success = register_new_account(mysql, reg_email, generate_password_hash(reg_password),
