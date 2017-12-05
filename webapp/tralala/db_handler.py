@@ -1,6 +1,7 @@
 from flask import Flask
 from flaskext.mysql import MySQL
 import time
+import security_helper
 
 
 class DB_Handler:
@@ -142,14 +143,10 @@ class DB_Handler:
         cursor = conn.cursor()
 
         post_date = time.strftime('%Y-%m-%d %H:%M:%S')
-        hashtag_list = ""
-        temp = hashtags.strip().split(",")
 
-        for hashtag in temp:
-            t = "#" + hashtag
-            hashtag_list += " " + t
+        cleaned_hashtags = security_helper.clean_hashtags(hashtags.strip())
 
-        record = [uid, post_date, text, hashtag_list, 0, 0]
+        record = [uid, post_date, text,  cleaned_hashtags, 0, 0]
 
         try:
             cursor.execute(

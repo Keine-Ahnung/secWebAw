@@ -2,11 +2,12 @@ import random
 import string
 
 from flask import Flask, request, session, url_for, redirect, render_template
-from db_handler import DB_Handler
+from .db_handler import DB_Handler
 from flaskext.mysql import MySQL
 import json
 import time
 import smtplib
+import security_helper
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import random
@@ -47,13 +48,18 @@ def index():
         downvotes = -int(row[6])  # Vorzeichenwechsel
         total_votes = upvotes + downvotes
 
+        hashtags = ''
+        for hashtag in row[4]:
+            hashtags.join(('#', hashtag, ' '))  #space at the end
+
+
         html_trans = ""
         html_trans += "<div class=\"" + colors[color_key] + "\">"
         html_trans += "<div id=\"usr\">" + str(row[1]) + " | " + str(
             row[2]) + " | <b>Votes: " + str(total_votes) + "</b></div>"
         html_trans += "<p>" + row[3] + "<p>"
         html_trans += "</br></br>"
-        html_trans += "<div><b>" + row[4] + "</b>&nbsp;&nbsp;&nbsp;"
+        html_trans += "<div><b>" + hashtags + "</b>&nbsp;&nbsp;&nbsp;"
         html_trans += "<a class=\"post_vote_up\" href=\"" + url_for("vote") + "?method=upvote&post_id=" + str(
             row[0]) + "\">+</a>&nbsp;&nbsp;&nbsp;"
         html_trans += "<a class=\"post_vote_down\" href=\"" + url_for("vote") + "?method=downvote&post_id=" + str(
@@ -163,6 +169,11 @@ def post_user():
             app.logger.error("Passwort wurde nicht korrekt wiederholt")
             return render_template("registration_no_success.html", code=2)
 
+        (passed, comment) = security_helper.check_password_strength(reg_password)
+        if not passed:
+            app.logger.error("Passwort nicht stark genug")
+            return render_template("registration_no_success.html", code=2, comment=comment)
+
         # UeberprUefe, ob User schon existiert
         success = register_new_account(mysql, reg_email, generate_password_hash(reg_password),
                                        generate_verification_token(50))
@@ -235,9 +246,11 @@ def confirm():
     if success == -1:
         app.logger.error("Es konnte kein User for das Token '" + token + "' zurUeckgeliefert werden (ungUeltiges Token)")
         return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestaetigt werden!")
+
     if success == 2:
         app.logger.debug("Benutzer ist bereits bestaetigt!")
         return render_template("quick_info.html", info_text="Der Benutzer wurde bereits bestaetigt!")
+
     if success == 1:
         app.logger.debug("Account bestaetigt fUer Benutzer '" + email + "' fUer Token '" + token + "'")
 
@@ -247,6 +260,7 @@ def confirm():
     if success == -1:
         app.logger.error("User konnte nicht bestaetigt werden (Benutzer konnte in der DB nicht bestaetigt werden)")
         return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestaetigt werden!")
+
     if success == 1:
         app.logger.debug("User wurde bestaetigt")
         return render_template("quick_info.html",
@@ -266,7 +280,8 @@ def post_message():
 
     if message == "":
         return render_template("quick_info.html",
-                               info_text="Leider konnte deine Nachricht nicht gepostet werden, da du keine Nachricht angegeben hast. Versuche es bitte erneut!")
+                               info_text="Leider konnte deine Nachricht nicht gepostet werden, da du keine Nachricht"
+                                         " angegeben hast. Versuche es bitte erneut!")
 
     # Post in DB schreiben
     db_handler = DB_Handler()
