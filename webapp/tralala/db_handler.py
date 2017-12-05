@@ -129,10 +129,10 @@ class DB_Handler:
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
-            conn.close();
+            conn.close()
             return -1, "no_user"
         else:
-            conn.close();
+            conn.close()
             return 1, {"email": data[0], "password": data[1], "uid": data[2], "role_id": data[3]}
 
     def post_message_to_db(self, mysql, uid, email, text, hashtags):
@@ -145,8 +145,9 @@ class DB_Handler:
         post_date = time.strftime('%Y-%m-%d %H:%M:%S')
 
         cleaned_hashtags = security_helper.clean_hashtags(hashtags.strip())
+        cleaned_text = security_helper.clean_messages(text)
 
-        record = [uid, post_date, text,  cleaned_hashtags, 0, 0]
+        record = [uid, post_date, cleaned_text,  cleaned_hashtags, 0, 0]
 
         try:
             cursor.execute(
