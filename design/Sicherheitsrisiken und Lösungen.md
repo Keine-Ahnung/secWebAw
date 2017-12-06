@@ -47,3 +47,18 @@ Timeout für Sitzungen implementieren.
 ## CSRF
 
 CSRF-System überarbeiten.
+
+# Zu prüfende Eingabefelder:
+
+## Registrierung
+- [ ] Email
+- [ ] Passwort
+- [ ] Passwort wiederholen
+
+## Login
+- [ ] Email
+- [ ] Passwort
+
+## Neuer Post
+- [ ] Nachricht
+- [ ] Hashtags
