@@ -1,7 +1,7 @@
 # Tabellen
 ## tralala_users
 * uid:`int` (PK)
-* role_id:`int` (FK -> roles.role_id)
+* role_id:`int` (FK -> tralala_roles.role_id)
 * email:`varchar(100)`
 * password:`varchar(40)`
 * verified:`boolean`
@@ -9,15 +9,25 @@
 ## tralala_roles
 * role_id:`int` (PK)
 * role_name:`varchar(100)`
+* del_user:`boolean`
+* set_role:`boolean`
 
 ## tralala_posts
 * post_id:`int` (PK)
-* uid:`int` (FK -> user.uid)
+* uid:`int` (FK -> tralala_users.uid)
 * timestamp:`datetime`
 * post_text:`varchar(280)`
 * hashtags:`varchar(280)`
 * upvotes:`int`
 * downvotes:`int`
+
+## tralala_post_votes
+* vote_id:`int` (PK)
+* uid:`int` (FK -> tralala_users.uid)
+* vote_time:`datetime`
+* post_id`int` (FK -> tralala_posts.post_id)
+* was_upvote:`boolean`
+* was_downvote:`boolean`
 
 # Constraints
 ## tralala_users -> tralala_profiles
