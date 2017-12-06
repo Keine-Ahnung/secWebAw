@@ -293,6 +293,7 @@ def post_message():
                                info_text="Leider konnte deine Nachricht nicht gepostet werden, da du keine Nachricht"
                                          " angegeben hast. Versuche es bitte erneut!")
 
+    # Nur bestätigte Benutzer dürfen voten
     if not session["verified"]:
         return render_template("quick_info.html", info_text="Du musst deinen Account zuerst bestätigen, bevor du etwas posten kannst.")
 
@@ -319,12 +320,19 @@ def vote():
     # Lese GET-Parameter
     method = request.args.get("method")
     post_id = request.args.get("post_id")
+    uid = session["uid"]
 
     if post_id == "" or method == "":
-        return render_template("quick_info.html", info_text="UngUeltige Post ID oder Zugriffsmethode!")
+        return render_template("quick_info.html", info_text="Ungültige Post ID oder Zugriffsmethode!")
+
+    db_handler = DB_Handler()
+
+    (code, data) = db_handler.check_if_already_voted(mysql, post_id, uid)
+
+    if code == -1:
+        return render_template("quick_info.html", info_text="Du hast bereits für diesen Post gevoted.")
 
     # Hole Post aus DB
-    db_handler = DB_Handler()
     (code, data) = db_handler.get_post_by_pid(mysql, post_id)
 
     if code == -1:
@@ -350,6 +358,8 @@ def finish_vote():
     post_id = request.args.get("post_id")
     method = request.args.get("method")
     input_csrf = request.form["vote_code"]
+    uid = session["uid"]
+
 
     try:
         post_id_int = int(post_id)
@@ -358,7 +368,7 @@ def finish_vote():
 
     if input_csrf == "" or csrf_token == "" or post_id == "" or post_id_int < 0 or not method in ["upvote", "downvote"]:
         return render_template("quick_info.html", info_text="Deine Anfrage war ungUeltig. Bitte versuche es erneut!")
-    # UeberprUefe csrf_seq
+    # Ueberprüfe csrf_seq
     if not csrf_token == input_csrf:
         return render_template("quick_info.html",
                                info_text="Der eingegebene Code war leider falsch. Bitte versuche es erneut!")
@@ -366,15 +376,29 @@ def finish_vote():
     # Persistiere Vote
     db_handler = DB_Handler()
 
+
+    (code, data) = db_handler.check_if_already_voted(mysql, post_id, uid)
+
+    if code == -1:
+        return render_template("quick_info.html", info_text="Du hast bereits für diesen Post gevoted.")
+
     if method == "upvote":
+        # Registriere Upvote
+        success_register = db_handler.register_vote(mysql, post_id, uid, "upvote")
+
+        # Poste Upvote
         success = db_handler.do_upvote(mysql, post_id)
-        if success == -1:
+        if success == -1 or success_register == -1:
             return render_template("quick_info.html", info_text="Etwas ist schiefgelaufen! Versuche es erneut!")
         return render_template("quick_info.html", info_text="Upvote erfolgreich!")
 
     elif method == "downvote":
+        # Registriere Downvote
+        success_register = db_handler.register_vote(mysql, post_id, uid, "downvote")
+
+        # Poste Downvote
         success = db_handler.do_downvote(mysql, post_id)
-        if success == -1:
+        if success == -1 or success_register == -1:
             return render_template("quick_info.html", info_text="Etwas ist schiefgelaufen! Versuche es erneut!")
         return render_template("quick_info.html", info_text="Downvote erfolgreich!")
 

@@ -48,7 +48,7 @@ Posts besser zu designen
 - [ ] Zeilenumbruch für lange Nachrichten einfügen
 - [X] Es dürfen nur Benutzer posten, deren Account verifiziert ist
 - [ ] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden?
-- [ ] Pro Post darf nur ein User voten
+- [X] Pro Post darf nur ein User voten
 - [ ] Wenn Benutzer gelöscht wurde, zeige OP als unbekannt an
 
 ## Voting

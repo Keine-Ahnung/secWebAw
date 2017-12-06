@@ -9,6 +9,7 @@ class DB_Handler:
     db_connection_data = {}
     DB_TABLE_TRALALA_USERS = "tralala_users"
     DB_TABLE_TRALALA_POSTS = "tralala_posts"
+    DB_TABLE_TRALALA_POST_VOTES = "tralala_post_votes"
 
     def __init__(self):
         self.db_connection_data = None
@@ -127,7 +128,8 @@ class DB_Handler:
         cursor = conn.cursor()
 
         cursor.execute(
-            "select email, password, uid, role_id, verified from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email.lower(),))
+            "select email, password, uid, role_id, verified from " + self.DB_TABLE_TRALALA_USERS + " where email=%s",
+            (email.lower(),))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -252,3 +254,46 @@ class DB_Handler:
         else:
             conn.close()
             return 1, data
+
+    def check_if_already_voted(self, mysql, post_id, uid):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "select * from " + self.DB_TABLE_TRALALA_POST_VOTES + " where post_id=%s and uid=%s",
+            (post_id, uid,))
+        data = cursor.fetchone()
+
+        if not cursor.rowcount == 0:
+            conn.close()
+            return -1, "already_voted"
+        else:
+            conn.close()
+            return 1, "not_voted_yet"
+
+    def register_vote(self, mysql, post_id, uid, method):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        vote_date = time.strftime('%Y-%m-%d %H:%M:%S')
+        was_upvote = 1 if method == "upvote" else 0
+        was_downvote = 1 if method == "downvote" else 0
+
+        record = [uid, vote_date, post_id, was_upvote, was_downvote]
+
+        try:
+            cursor.execute(
+                "INSERT INTO " + self.DB_TABLE_TRALALA_POST_VOTES + " (uid, vote_date, post_id, was_upvote, was_downvote) VALUES (%s,%s,%s,%s,%s)",
+                record)
+            conn.commit()
+            conn.close()
+            return 1
+        except Exception as e:
+            conn.close()
+            return -1
