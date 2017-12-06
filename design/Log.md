@@ -2,7 +2,8 @@
 
 ## Zugriff auf die Datenbank
 - [ ] Benutzen von Stored Procedures
-- [ ] autogenerate tech. user
+- [ ] Generierung des technischen Benutzers durch das Skript
+- [ ] Rechtevergabe durch SQL-Skript
 
 ## Registrierung
 - [X] User kann ein Account registrieren
@@ -31,12 +32,9 @@
 - [X] Es können keine leeren Posts abgesendet werden (wird client- und serverseitig überprüft)
 - [ ] Nachrichten die reinkopiert werden bekommen keinen Linebreak, Nachrichten, die man schreibt jedoch schon
 
-
-## Passwort vergessen
-- [ ] Auf SQLi prüfen
-
 ## Session
-- [ ] Pollingservice der Sessionstartzeiten ständig überprüft und Benutzer ausloggt, die zu lange inaktiv waren
+- [ ] Pollingservice der Sessionstartzeiten ständig überprüft und Benutzer ausloggt, die zu lange inaktiv waren (nicht nötig)
+- [ ] Timestamp bei Erstellung der User Session anlegen, nach jedem weiterem Request der selben Session überprüfen, ob inaktiv
 
 ## Postliste
 - [X] Zufällige Auswahl von Farben für den Hintergrund von Posts
@@ -56,6 +54,7 @@
 - [x] Implemented method to strip down html and # from hashtags. Method is based on the change request.
 - [x] Check password strength (Length, Charset)
 - [x] Check if mail is correct
+- [x] Use escaped string substitution for parametrized SQL queries
 
 ## Skripte
 

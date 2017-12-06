@@ -1,4 +1,8 @@
-CREATE TABLE tralala_users(
+DROP DATABASE IF EXISTS tralala;
+
+CREATE DATABASE tralala;
+
+CREATE TABLE tralala.tralala_users(
 	uid  INT NOT NULL AUTO_INCREMENT,
     email VARCHAR(100) NOT NULL,
     password VARCHAR(200) NOT NULL,
@@ -8,14 +12,16 @@ CREATE TABLE tralala_users(
     PRIMARY KEY (uid)
 ) ENGINE=INNODB;
 
-CREATE TABLE tralala_roles(
+CREATE TABLE tralala.tralala_roles(
 	role_id INT NOT NULL AUTO_INCREMENT,
 	role_name VARCHAR(100) NOT NULL UNIQUE,
+	del_user BOOLEAN,
+	set_role BOOLEAN,
 	PRIMARY KEY (role_id),
 	UNIQUE (role_name)
 ) ENGINE=INNODB;
 
-CREATE TABLE tralala_posts(
+CREATE TABLE tralala.tralala_posts(
 	post_id INT NOT NULL AUTO_INCREMENT,
 	uid INT,
 	post_date DATETIME NOT NULL,
@@ -25,3 +31,8 @@ CREATE TABLE tralala_posts(
 	downvotes int NOT NULL,
 	PRIMARY KEY (post_id)
 ) ENGINE=INNODB;
+
+
+DROP USER IF EXISTS 'db_admin_tralala'@'localhost', 'db_admin_tralala'@'%';
+FLUSH PRIVILEGES;
+CREATE USER 'db_admin_tralala'@'localhost' IDENTIFIED BY 'tr4l4l4_mysql_db.';

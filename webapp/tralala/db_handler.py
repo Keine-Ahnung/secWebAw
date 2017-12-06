@@ -42,7 +42,7 @@ class DB_Handler:
         record = [email, pw_hash, role_id, verified, verification_token]
 
         # Überprüfe ob User schon existiert
-        cursor.execute("select email from " + self.DB_TABLE_TRALALA_USERS + " where email=\"" + email + "\"")
+        cursor.execute("select email from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
         data = cursor.fetchone()
 
         if cursor.rowcount != 0:  # User existiert bereits
@@ -69,7 +69,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         cursor.execute(
-            "select verification_token from " + self.DB_TABLE_TRALALA_USERS + " where email=\"" + email + "\"")
+            "select verification_token from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -110,7 +110,7 @@ class DB_Handler:
 
         try:
             cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1, role_id=4 WHERE email=\"" + email + "\"")
+                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1, role_id=4 WHERE email=%s", (email,))
             conn.commit()
             conn.close()
             return 1
@@ -149,7 +149,7 @@ class DB_Handler:
         cleaned_hashtags = security_helper.clean_hashtags(hashtags.strip())
         cleaned_text = security_helper.clean_messages(text)
 
-        record = [uid, post_date, cleaned_text,  cleaned_hashtags, 0, 0]
+        record = [uid, post_date, cleaned_text, cleaned_hashtags, 0, 0]
 
         try:
             cursor.execute(
@@ -170,7 +170,6 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        # cursor.execute("SELECT * FROM " + self.DB_TABLE_TRALALA_POSTS + " ORDER BY post_id DESC")
         cursor.execute(
             "SELECT tralala_posts.post_id, tralala_users.email, tralala_posts.post_date, tralala_posts.post_text, tralala_posts.hashtags, tralala_posts.upvotes, tralala_posts.downvotes FROM tralala_posts INNER JOIN tralala_users ON tralala_posts.uid = tralala_users.uid ORDER BY post_id DESC")
         data = cursor.fetchall()
