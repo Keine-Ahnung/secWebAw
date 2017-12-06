@@ -8,8 +8,6 @@ Posts besser zu designen
 
 ## Zugriff auf die Datenbank
 - [ ] Benutzen von Stored Procedures
-- [X] Generierung des technischen Benutzers durch das Skript
-- [X] Rechtevergabe durch SQL-Skript
 
 ## Registrierung
 - [X] User kann ein Account registrieren
@@ -65,7 +63,8 @@ Posts besser zu designen
 - [x] Corrected logic flaws in the validation of the password strength
 
 ## Skripte
-
+- [X] Generierung des technischen Benutzers durch das Skript
+- [X] Rechtevergabe durch SQL-Skript
 - [X] Passwörter für Mockdaten durch Webapp generieren lassen, sodass sie im PKCS-Format geschrieben werden können
 
 ## Changerequests
