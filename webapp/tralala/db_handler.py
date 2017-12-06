@@ -127,15 +127,17 @@ class DB_Handler:
         cursor = conn.cursor()
 
         cursor.execute(
-            "select email, password, uid, role_id from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email.lower(),))
+            "select email, password, uid, role_id, verified from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email.lower(),))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
             conn.close()
             return -1, "no_user"
+        elif data[4] == 0:
+            return -2, "not_verified"
         else:
             conn.close()
-            return 1, {"email": data[0], "password": data[1], "uid": data[2], "role_id": data[3]}
+            return 1, {"email": data[0], "password": data[1], "uid": data[2], "role_id": data[3], "verified": data[4]}
 
     def post_message_to_db(self, mysql, uid, email, text, hashtags):
         """

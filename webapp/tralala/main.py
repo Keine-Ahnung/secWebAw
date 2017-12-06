@@ -103,6 +103,8 @@ def login():
     (code, data) = db_handler.check_for_existence(mysql, login_email)
     if code == -1:
         return render_template("quick_info.html", info_text="Passwort und/oder Benutzername sind inkorrekt!")
+    elif code == -2:
+        return render_template("quick_info.html", info_text="Du musst deinen Account bestätigen, bevor du dich einloggen kannst.")
     app.logger.debug("user found=" + data["email"] + ":" + data["password"])
 
     # UeberprUefe gehashte Passwoerter
@@ -114,8 +116,12 @@ def login():
         session["user"] = login_email
         session["uid"] = data["uid"]
         session["role_id"] = data["role_id"]
+        if data["verified"] == 1:
+            session["verified"] = True
+        else:
+            session["verified"] = False
         return render_template("quick_info.html",
-                               info_text="Du wurdest eingeloggt. Willkommen zurUeck, " + login_email)
+                               info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
 
 
 @app.route("/logout", methods=["POST", "GET"])
@@ -168,7 +174,7 @@ def post_user():
             app.logger.error("Mailadresse nicht valide")
             return render_template("registration_no_success.html", code=5)
 
-        # UeberprUefe, ob Password und Passwordwiederholung Uebereinstimmen
+        # UeberprUefe, ob Password und Passwordwiederholung übereinstimmen
         if not reg_password == reg_password_repeat:
             app.logger.error("Passwort wurde nicht korrekt wiederholt")
             return render_template("registration_no_success.html", code=2)
@@ -286,6 +292,9 @@ def post_message():
         return render_template("quick_info.html",
                                info_text="Leider konnte deine Nachricht nicht gepostet werden, da du keine Nachricht"
                                          " angegeben hast. Versuche es bitte erneut!")
+
+    if not session["verified"]:
+        return render_template("quick_info.html", info_text="Du musst deinen Account zuerst bestätigen, bevor du etwas posten kannst.")
 
     # Post in DB schreiben
     db_handler = DB_Handler()

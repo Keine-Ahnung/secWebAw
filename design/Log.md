@@ -27,7 +27,7 @@ Posts besser zu designen
 
 ## Login
 - [X] Auf SQLi prüfen
-- [ ] prüfen ob user schon verifiziert ist
+- [x] Nur verifizierte Benutzer können sich einloggen
 - [ ] Rollen für User abrufen und in die Session eintragen (für Admin Dashboard)
 
 
@@ -46,7 +46,7 @@ Posts besser zu designen
 - [X] Email über dem Post anzeigen
 - [X] Up- und Downvotebuttons durch Links (mit Icons) ersetzen
 - [ ] Zeilenumbruch für lange Nachrichten einfügen
-- [ ] Es dürfen nur Benutzer posten, deren Account verifiziert ist
+- [X] Es dürfen nur Benutzer posten, deren Account verifiziert ist
 - [ ] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden?
 - [ ] Pro Post darf nur ein User voten
 - [ ] Wenn Benutzer gelöscht wurde, zeige OP als unbekannt an

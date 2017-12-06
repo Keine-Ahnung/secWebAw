@@ -68,11 +68,11 @@ def check_password_strength(password_text):
     if len(password_text) >= 8 and len(password_text) <= 24:
         if not re.search('[a-zA-Z0-9]+', password_text) and not any(
                         spec_char in special_chars for spec_char in password_text):
-            return False, "no_compliance"
+            return False, "Das Passwort enthält keine Buchstaben/Zahlen oder Sonderzeichen."
         else:
-            return True, "ok"
+            return True, "Das Passwort entspricht unserern Sicherheitsrichtlinien."
     else:
-        return False, "length_out_of_bounds"
+        return False, "Leider war das Passwort nicht innerhalb der vorgegebenen Länge (Mindestens 8 Zeichen, höchstens 24 Zeichen)."
 
 
 '''
