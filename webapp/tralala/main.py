@@ -435,6 +435,39 @@ def finish_vote():
         return render_template("quick_info.html", info_text="Downvote erfolgreich!")
 
 
+@app.route("/controlpanel/change-email")
+def change_email():
+    """
+    tbd
+    """
+    try:
+        session["logged_in"]  # Nur eingeloggte Benutzer dUerfen Nachrichten posten
+    except:
+        return render_template("quick_info.html", info_text="Du musst eingeloggt sein, um deine Email zu ändern.")
+
+    db_handler = DB_Handler()
+
+    # Session Timeout Handling
+    if session["logged_in"]:
+        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
+            db_handler.invalidate_session(mysql, session["uid"])
+            delete_user_session()
+            return render_template("session_timeout.html",
+                                   timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+
+
+
+    return render_template("quick_info.html", info_text="Change Email")
+
+
+@app.route("/controlpanel/change-password")
+def change_password():
+    """
+    tbd
+    """
+    return render_template("quick_info.html", info_text="Change Password")
+
+
 """
 Hilfsfunktionen, die keine HTTP Requests bearbeiten
 """

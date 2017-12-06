@@ -6,6 +6,9 @@ Posts besser zu designen
 
 # Implementierte Features
 
+## Allgemein
+- [ ] Dokumentation der Funktionen im Code
+
 ## Zugriff auf die Datenbank
 - [ ] Benutzen von Stored Procedures
 
