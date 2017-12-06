@@ -13,7 +13,7 @@ class DB_Handler:
     DB_TABLE_TRALALA_POST_VOTES = "tralala_post_votes"
     DB_TABLE_TRALALA_ACTIVE_SESSIONS = "tralala_active_sessions"
 
-    MAX_SESSION_TIME = 60  # Minuten
+    MAX_SESSION_TIME = 1  # Minuten
 
     def __init__(self):
         self.db_connection_data = None
@@ -337,7 +337,7 @@ class DB_Handler:
 
         try:
             cursor.execute(
-                "SELECT uid, session_max_alive FROM " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + "WHERE uid=%s", (uid,))
+                "select uid, session_max_alive FROM " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + " where uid=%s", (uid,))
             data = cursor.fetchone()
 
             if cursor.rowcount == 0:
@@ -348,16 +348,14 @@ class DB_Handler:
                 session_max_alive = data[1]
 
             if current_time < session_max_alive:
-                conn.commit()
-                conn.close()
-                return 1, "session_still_active"
+                # return 1, "session_still_active"
+                return 1, "times: now=" + str(current_time) + " max_active=" + str(session_max_alive)
             else:
-                conn.commit()
-                conn.close()
-                return -1, "session_timeout"
+                # return -1, "session_timeout"
+                return -1, "times: now=" + str(current_time) + " max_active=" + str(session_max_alive)
         except Exception as e:
             conn.close()
-            return -1
+            return -1, "current=" + str(current_time) + " FEHLER " + str(e)
 
     def invalidate_session(self, mysql, uid):
         """
@@ -368,7 +366,9 @@ class DB_Handler:
 
         try:
             cursor.execute("DELETE FROM " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + " WHERE uid=%s", (uid,))
-            return 1
+            conn.commit()
+            conn.close()
+            return 1, None
         except Exception as e:
             conn.close()
             return -1, e

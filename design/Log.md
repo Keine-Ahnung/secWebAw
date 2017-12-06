@@ -39,7 +39,8 @@ Posts besser zu designen
 
 ## Session
 - [ ] Pollingservice der Sessionstartzeiten ständig überprüft und Benutzer ausloggt, die zu lange inaktiv waren (nicht nötig)
-- [ ] Timestamp bei Erstellung der User Session anlegen, nach jedem weiterem Request der selben Session überprüfen, ob inaktiv
+- [X] Timestamp bei Erstellung der User Session anlegen, nach jedem weiterem Request der selben Session überprüfen, ob inaktiv
+- [X] User wird nach einer bestimmten Zeit automatisch ausgeloggt und die Session wird aus der zugehörigen Tabelle entfernt
 
 ## Postliste
 - [X] Zufällige Auswahl von Farben für den Hintergrund von Posts
