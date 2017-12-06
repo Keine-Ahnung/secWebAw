@@ -5,7 +5,7 @@ CREATE DATABASE tralala;
 CREATE TABLE tralala.tralala_users(
 	uid  INT NOT NULL AUTO_INCREMENT,
     email VARCHAR(100) NOT NULL,
-    password VARCHAR(200) NOT NULL,
+    password VARCHAR(400) NOT NULL,
     role_id INT NOT NULL,
     verified BOOLEAN NOT NULL,
     verification_token varchar(100) NOT NULL,

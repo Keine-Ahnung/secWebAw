@@ -1,3 +1,9 @@
+# Zu klären
+
+- Sollen wir in User Messages nur br, b, i und strong zulassen? bleach.ALLOWED_TAGS ist etwas liberaler und lässt den Benutzern auch mehr Freiheit, ihre eigenen
+Posts besser zu designen
+
+
 # Implementierte Features
 
 ## Zugriff auf die Datenbank
@@ -8,10 +14,11 @@
 ## Registrierung
 - [X] User kann ein Account registrieren
 - [X] Backend prüft nach, ob User schon existiert
-- [ ] Backend prüft auf SQLi
+- [X] Backend prüft auf SQLi
 - [X] Backend prüft auf Passwortbestätigung
 - [X] Backend sanitized (normalisiert) Eingabe bzw. escaped
 - [x] Nur Email-Adressen zulassen
+- [x] Backend ist nicht mehr buchstabensensitiv (es wird nur mit lowercase in den E-Mail Adressen gearbeitet)
 
 ## Account bestätigen
 - [X] Mail an User senden
@@ -55,6 +62,7 @@
 - [x] Check password strength (Length, Charset)
 - [x] Check if mail is correct
 - [x] Use escaped string substitution for parametrized SQL queries
+- [x] Corrected logic flaws in the validation of the password strength
 
 ## Skripte
 
@@ -63,3 +71,4 @@
 ## Changerequests
 - [x] Change method to store the hashtags from the actual to something like: Storing data in database splitted by,
       Read list from db and add # before rendering
+

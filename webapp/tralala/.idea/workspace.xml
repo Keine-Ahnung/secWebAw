@@ -10,8 +10,8 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/tralala$main.coverage" NAME="main Coverage Results" MODIFIED="1512548771570" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/tralala$security_helper.coverage" NAME="security_helper Coverage Results" MODIFIED="1512548766325" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/tralala$main.coverage" NAME="main Coverage Results" MODIFIED="1512553832392" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/tralala$security_helper.coverage" NAME="security_helper Coverage Results" MODIFIED="1512552891522" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/tralala$db_handler.coverage" NAME="db_handler Coverage Results" MODIFIED="1511964921218" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="FileEditorManager">
@@ -19,15 +19,15 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="289">
-              <caret line="17" column="0" lean-forward="true" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+            <state relative-caret-position="258">
+              <caret line="154" column="70" lean-forward="false" selection-start-line="154" selection-start-column="70" selection-end-line="154" selection-end-column="70" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
                 <element signature="e#712#2251#0" expanded="false" />
                 <element signature="e#2317#3973#0" expanded="false" />
                 <element signature="e#4041#4468#0" expanded="false" />
-                <element signature="e#4549#7427#0" expanded="false" />
                 <element signature="e#7488#8556#0" expanded="false" />
+                <element signature="e#8601#9970#0" expanded="false" />
                 <element signature="e#10050#11291#0" expanded="false" />
                 <element signature="e#11330#12332#0" expanded="false" />
                 <element signature="e#12410#13938#0" expanded="false" />
@@ -43,12 +43,12 @@
       <file leaf-file-name="db_handler.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/db_handler.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1009">
-              <caret line="165" column="35" lean-forward="true" selection-start-line="165" selection-start-column="35" selection-end-line="165" selection-end-column="35" />
+            <state relative-caret-position="317">
+              <caret line="243" column="77" lean-forward="true" selection-start-line="243" selection-start-column="77" selection-end-line="243" selection-end-column="77" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
-                <marker date="1512549398063" expanded="true" signature="5141:5419" ph="SELECT trala... tralala_posts" />
-                <marker date="1512549398063" expanded="true" signature="5869:6142" ph="SELECT trala... tralala_posts" />
+                <marker date="1512553790529" expanded="true" signature="5181:5459" ph="SELECT trala... tralala_posts" />
+                <marker date="1512553790529" expanded="true" signature="5909:6182" ph="SELECT trala... tralala_posts" />
               </folding>
             </state>
           </provider>
@@ -57,11 +57,21 @@
       <file leaf-file-name="security_helper.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/security_helper.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="0">
-              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state relative-caret-position="331">
+              <caret line="81" column="0" lean-forward="true" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
               <folding>
                 <element signature="e#0#13#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="sanitizer.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36-32/Lib/site-packages/bleach/sanitizer.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="119">
+              <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -101,6 +111,7 @@
         <option value="$PROJECT_DIR$/templates/admin.html" />
         <option value="$PROJECT_DIR$/templates/base.html" />
         <option value="$PROJECT_DIR$/main.py" />
+        <option value="$PROJECT_DIR$/security_helper.py" />
         <option value="$PROJECT_DIR$/db_handler.py" />
       </list>
     </option>
@@ -111,8 +122,8 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
-    <option name="x" value="-8" />
+  <component name="ProjectFrameBounds" extendedState="7">
+    <option name="x" value="257" />
     <option name="y" value="-8" />
     <option name="width" value="1036" />
     <option name="height" value="733" />
@@ -279,7 +290,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.121875" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
@@ -361,8 +372,8 @@
             <element signature="e#712#2251#0" expanded="false" />
             <element signature="e#2317#3973#0" expanded="false" />
             <element signature="e#4041#4468#0" expanded="false" />
-            <element signature="e#4549#7427#0" expanded="false" />
             <element signature="e#7488#8556#0" expanded="false" />
+            <element signature="e#8601#9970#0" expanded="false" />
             <element signature="e#10050#11291#0" expanded="false" />
             <element signature="e#11330#12332#0" expanded="false" />
             <element signature="e#12410#13938#0" expanded="false" />
@@ -380,8 +391,8 @@
           <caret line="252" column="26" lean-forward="false" selection-start-line="252" selection-start-column="26" selection-end-line="252" selection-end-column="26" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
-            <marker date="1512549398063" expanded="true" signature="5141:5419" ph="SELECT trala... tralala_posts" />
-            <marker date="1512549398063" expanded="true" signature="5869:6142" ph="SELECT trala... tralala_posts" />
+            <marker date="1512553790529" expanded="true" signature="5181:5459" ph="SELECT trala... tralala_posts" />
+            <marker date="1512553790529" expanded="true" signature="5909:6182" ph="SELECT trala... tralala_posts" />
           </folding>
         </state>
       </provider>
@@ -442,8 +453,8 @@
             <element signature="e#712#2251#0" expanded="false" />
             <element signature="e#2317#3973#0" expanded="false" />
             <element signature="e#4041#4468#0" expanded="false" />
-            <element signature="e#4549#7427#0" expanded="false" />
             <element signature="e#7488#8556#0" expanded="false" />
+            <element signature="e#8601#9970#0" expanded="false" />
             <element signature="e#10050#11291#0" expanded="false" />
             <element signature="e#11330#12332#0" expanded="false" />
             <element signature="e#12410#13938#0" expanded="false" />
@@ -461,8 +472,8 @@
           <caret line="252" column="26" lean-forward="false" selection-start-line="252" selection-start-column="26" selection-end-line="252" selection-end-column="26" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
-            <marker date="1512549398063" expanded="true" signature="5141:5419" ph="SELECT trala... tralala_posts" />
-            <marker date="1512549398063" expanded="true" signature="5869:6142" ph="SELECT trala... tralala_posts" />
+            <marker date="1512553790529" expanded="true" signature="5181:5459" ph="SELECT trala... tralala_posts" />
+            <marker date="1512553790529" expanded="true" signature="5909:6182" ph="SELECT trala... tralala_posts" />
           </folding>
         </state>
       </provider>
@@ -523,8 +534,8 @@
             <element signature="e#712#2251#0" expanded="false" />
             <element signature="e#2317#3973#0" expanded="false" />
             <element signature="e#4041#4468#0" expanded="false" />
-            <element signature="e#4549#7427#0" expanded="false" />
             <element signature="e#7488#8556#0" expanded="false" />
+            <element signature="e#8601#9970#0" expanded="false" />
             <element signature="e#10050#11291#0" expanded="false" />
             <element signature="e#11330#12332#0" expanded="false" />
             <element signature="e#12410#13938#0" expanded="false" />
@@ -542,8 +553,8 @@
           <caret line="252" column="26" lean-forward="false" selection-start-line="252" selection-start-column="26" selection-end-line="252" selection-end-column="26" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
-            <marker date="1512549398063" expanded="true" signature="5141:5419" ph="SELECT trala... tralala_posts" />
-            <marker date="1512549398063" expanded="true" signature="5869:6142" ph="SELECT trala... tralala_posts" />
+            <marker date="1512553790529" expanded="true" signature="5181:5459" ph="SELECT trala... tralala_posts" />
+            <marker date="1512553790529" expanded="true" signature="5909:6182" ph="SELECT trala... tralala_posts" />
           </folding>
         </state>
       </provider>
@@ -604,8 +615,8 @@
             <element signature="e#712#2251#0" expanded="false" />
             <element signature="e#2317#3973#0" expanded="false" />
             <element signature="e#4041#4468#0" expanded="false" />
-            <element signature="e#4549#7427#0" expanded="false" />
             <element signature="e#7488#8556#0" expanded="false" />
+            <element signature="e#8601#9970#0" expanded="false" />
             <element signature="e#10050#11291#0" expanded="false" />
             <element signature="e#11330#12332#0" expanded="false" />
             <element signature="e#12410#13938#0" expanded="false" />
@@ -623,8 +634,8 @@
           <caret line="136" column="68" lean-forward="false" selection-start-line="136" selection-start-column="68" selection-end-line="136" selection-end-column="68" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
-            <marker date="1512549398063" expanded="true" signature="5141:5419" ph="SELECT trala... tralala_posts" />
-            <marker date="1512549398063" expanded="true" signature="5869:6142" ph="SELECT trala... tralala_posts" />
+            <marker date="1512553790529" expanded="true" signature="5181:5459" ph="SELECT trala... tralala_posts" />
+            <marker date="1512553790529" expanded="true" signature="5909:6182" ph="SELECT trala... tralala_posts" />
           </folding>
         </state>
       </provider>
@@ -689,13 +700,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/registration_no_success.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="34">
-          <caret line="2" column="68" lean-forward="false" selection-start-line="2" selection-start-column="68" selection-end-line="2" selection-end-column="68" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/static/css/trullastyle.css">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1624">
@@ -751,39 +755,55 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/db_handler.py">
+    <entry file="file://$PROJECT_DIR$/templates/registration_no_success.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1009">
-          <caret line="165" column="35" lean-forward="true" selection-start-line="165" selection-start-column="35" selection-end-line="165" selection-end-column="35" />
-          <folding>
-            <element signature="e#0#23#0" expanded="true" />
-            <marker date="1512549398063" expanded="true" signature="5141:5419" ph="SELECT trala... tralala_posts" />
-            <marker date="1512549398063" expanded="true" signature="5869:6142" ph="SELECT trala... tralala_posts" />
-          </folding>
+        <state relative-caret-position="34">
+          <caret line="2" column="68" lean-forward="false" selection-start-line="2" selection-start-column="68" selection-end-line="2" selection-end-column="68" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Local/Programs/Python/Python36-32/Lib/site-packages/bleach/sanitizer.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="29" column="0" lean-forward="false" selection-start-line="29" selection-start-column="0" selection-end-line="29" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/security_helper.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        <state relative-caret-position="331">
+          <caret line="81" column="0" lean-forward="true" selection-start-line="81" selection-start-column="0" selection-end-line="81" selection-end-column="0" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/db_handler.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="317">
+          <caret line="243" column="77" lean-forward="true" selection-start-line="243" selection-start-column="77" selection-end-line="243" selection-end-column="77" />
+          <folding>
+            <element signature="e#0#23#0" expanded="true" />
+            <marker date="1512553790529" expanded="true" signature="5181:5459" ph="SELECT trala... tralala_posts" />
+            <marker date="1512553790529" expanded="true" signature="5909:6182" ph="SELECT trala... tralala_posts" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="289">
-          <caret line="17" column="0" lean-forward="true" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
+        <state relative-caret-position="258">
+          <caret line="154" column="70" lean-forward="false" selection-start-line="154" selection-start-column="70" selection-end-line="154" selection-end-column="70" />
           <folding>
             <element signature="e#0#13#0" expanded="true" />
             <element signature="e#712#2251#0" expanded="false" />
             <element signature="e#2317#3973#0" expanded="false" />
             <element signature="e#4041#4468#0" expanded="false" />
-            <element signature="e#4549#7427#0" expanded="false" />
             <element signature="e#7488#8556#0" expanded="false" />
+            <element signature="e#8601#9970#0" expanded="false" />
             <element signature="e#10050#11291#0" expanded="false" />
             <element signature="e#11330#12332#0" expanded="false" />
             <element signature="e#12410#13938#0" expanded="false" />

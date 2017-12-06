@@ -39,10 +39,10 @@ class DB_Handler:
         role_id = 1  # unverified
         verified = 0
 
-        record = [email, pw_hash, role_id, verified, verification_token]
+        record = [email.lower(), pw_hash, role_id, verified, verification_token]
 
         # Überprüfe ob User schon existiert
-        cursor.execute("select email from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
+        cursor.execute("select email from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email.lower(),))
         data = cursor.fetchone()
 
         if cursor.rowcount != 0:  # User existiert bereits
@@ -69,7 +69,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         cursor.execute(
-            "select verification_token from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
+            "select verification_token from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email.lower(),))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -110,7 +110,7 @@ class DB_Handler:
 
         try:
             cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1, role_id=4 WHERE email=%s", (email,))
+                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1, role_id=4 WHERE email=%s", (email.lower(),))
             conn.commit()
             conn.close()
             return 1
@@ -127,7 +127,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         cursor.execute(
-            "select email, password, uid, role_id from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email,))
+            "select email, password, uid, role_id from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email.lower(),))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
