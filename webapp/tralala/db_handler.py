@@ -359,9 +359,16 @@ class DB_Handler:
             conn.close()
             return -1
 
-
     def invalidate_session(self, mysql, uid):
         """
         tbd
         """
-        pass
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("DELETE FROM " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + " WHERE uid=%s", (uid,))
+            return 1
+        except Exception as e:
+            conn.close()
+            return -1, e

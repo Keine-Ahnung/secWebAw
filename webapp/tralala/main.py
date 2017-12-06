@@ -291,6 +291,18 @@ def post_message():
     except:
         return render_template("quick_info.html", info_text="Du musst eingeloggt sein, um eine Nachricht zu posten!")
 
+    db_handler = DB_Handler()
+
+    # Session Timeout Handling
+    if session["logged_in"]:
+        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
+            (code, e) = db_handler.invalidate_session(mysql, session["uid"])
+            if code == -1:  # Error Handling beim Löschen der Session aus der Datenbank
+                app.logger.debug(
+                    "Fehler aufgetreten bei check_for_session_state::db_handler.invalidate_session(uid)\n" + str(e))
+            else:
+                return render_template("session_timeout.html", timeout_text="Wir haben dich automatisch ausgeloggt. Bitte melde dich erneut an.")
+
     # Post sanitizen
     message = request.form["post_message"]
     hashtags = request.form["post_hashtags"]
@@ -306,7 +318,6 @@ def post_message():
                                info_text="Du musst deinen Account zuerst bestätigen, bevor du etwas posten kannst.")
 
     # Post in DB schreiben
-    db_handler = DB_Handler()
     success = db_handler.post_message_to_db(mysql, session["uid"], None, message[:279], hashtags)
 
     if success == -1:
@@ -325,6 +336,19 @@ def vote():
 
     /vote_up?post_id=123
     """
+    db_handler = DB_Handler()
+
+    # Session Timeout Handling
+    if session["logged_in"]:
+        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
+            (code, e) = db_handler.invalidate_session(mysql, session["uid"])
+            if code == -1:  # Error Handling beim Löschen der Session aus der Datenbank
+                app.logger.debug(
+                    "Fehler aufgetreten bei check_for_session_state::db_handler.invalidate_session(uid)\n" + str(e))
+            else:
+                return render_template("session_timeout.html",
+                                       timeout_text="Wir haben dich automatisch ausgeloggt. Bitte melde dich erneut an.")
+
     # Lese GET-Parameter
     method = request.args.get("method")
     post_id = request.args.get("post_id")
@@ -332,8 +356,6 @@ def vote():
 
     if post_id == "" or method == "":
         return render_template("quick_info.html", info_text="Ungültige Post ID oder Zugriffsmethode!")
-
-    db_handler = DB_Handler()
 
     (code, data) = db_handler.check_if_already_voted(mysql, post_id, uid)
 
@@ -412,6 +434,23 @@ def finish_vote():
 """
 Hilfsfunktionen, die keine HTTP Requests bearbeiten
 """
+
+
+def check_for_session_state(uid):
+    db_handler = DB_Handler()
+
+    (code, data) = db_handler.check_session_state(mysql, uid)
+
+    # if code == 0:
+    #     return False, render_template("session_timeout.html",
+    #                                   timeout_text="Leider konnten wir keine aktive Session für dich finden. Bitte logge dich erneut ein.")
+
+    if code == 1:
+        return True
+
+    if code == -1:
+        # (code, e) = db_handler.invalidate_session(mysql, uid)
+        return False
 
 
 def generate_verification_token(length):
