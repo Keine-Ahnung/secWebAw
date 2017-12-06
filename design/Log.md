@@ -8,8 +8,8 @@ Posts besser zu designen
 
 ## Zugriff auf die Datenbank
 - [ ] Benutzen von Stored Procedures
-- [ ] Generierung des technischen Benutzers durch das Skript
-- [ ] Rechtevergabe durch SQL-Skript
+- [X] Generierung des technischen Benutzers durch das Skript
+- [X] Rechtevergabe durch SQL-Skript
 
 ## Registrierung
 - [X] User kann ein Account registrieren
@@ -40,7 +40,7 @@ Posts besser zu designen
 - [ ] Nachrichten die reinkopiert werden bekommen keinen Linebreak, Nachrichten, die man schreibt jedoch schon
 
 ## Session
-- [ ] Pollingservice der Sessionstartzeiten ständig überprüft und Benutzer ausloggt, die zu lange inaktiv waren (nicht nötig)
+- [-] Pollingservice der Sessionstartzeiten ständig überprüft und Benutzer ausloggt, die zu lange inaktiv waren (nicht nötig)
 - [ ] Timestamp bei Erstellung der User Session anlegen, nach jedem weiterem Request der selben Session überprüfen, ob inaktiv
 
 ## Postliste
