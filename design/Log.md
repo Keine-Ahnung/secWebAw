@@ -40,7 +40,7 @@ Posts besser zu designen
 - [ ] Nachrichten die reinkopiert werden bekommen keinen Linebreak, Nachrichten, die man schreibt jedoch schon
 
 ## Session
-- [-] Pollingservice der Sessionstartzeiten ständig überprüft und Benutzer ausloggt, die zu lange inaktiv waren (nicht nötig)
+- [ ] Pollingservice der Sessionstartzeiten ständig überprüft und Benutzer ausloggt, die zu lange inaktiv waren (nicht nötig)
 - [ ] Timestamp bei Erstellung der User Session anlegen, nach jedem weiterem Request der selben Session überprüfen, ob inaktiv
 
 ## Postliste
@@ -66,7 +66,7 @@ Posts besser zu designen
 
 ## Skripte
 
-- [ ] Passwörter für Mockdaten durch Webapp generieren lassen, sodass sie im PKCS-Format geschrieben werden können
+- [X] Passwörter für Mockdaten durch Webapp generieren lassen, sodass sie im PKCS-Format geschrieben werden können
 
 ## Changerequests
 - [x] Change method to store the hashtags from the actual to something like: Storing data in database splitted by,
