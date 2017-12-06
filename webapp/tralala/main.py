@@ -25,6 +25,11 @@ mysql = MySQL()
 mysql.init_app(app)
 
 
+@app.route("/test")
+def test():
+    return render_template("base_2.html")
+
+
 @app.route("/")
 def index():
     """
@@ -55,14 +60,17 @@ def index():
         html_trans = ""
         html_trans += "<div class=\"" + colors[color_key] + "\">"
         html_trans += "<div id=\"usr\">" + str(row[1]) + " | " + str(
-            row[2]) + " | <b>Votes: " + str(total_votes) + "</b></div>"
+            row[2]) + " | <b>Votes: " + str(total_votes) + "</b>"
+        html_trans += "&nbsp;&nbsp;&nbsp;<a style=\"font-size: 150%; color: black;\" href=\"" + url_for(
+            "vote") + "?method=upvote&post_id=" + str(
+            row[0]) + "\">+</a>&nbsp;&nbsp;&nbsp;"
+        html_trans += "<a style=\"font-size: 150%; color: black;\" href=\"" + url_for("vote") + "?method=downvote&post_id=" + str(
+            row[0]) + "\">-</a>&nbsp;&nbsp;&nbsp;</div>"
+        html_trans += "</div>"
+        html_trans += "</br>"
         html_trans += "<p>" + row[3] + "<p>"
         html_trans += "</br></br>"
         html_trans += "<div><b>" + hashtags + "</b>&nbsp;&nbsp;&nbsp;"
-        html_trans += "<a class=\"post_vote_up\" href=\"" + url_for("vote") + "?method=upvote&post_id=" + str(
-            row[0]) + "\">+</a>&nbsp;&nbsp;&nbsp;"
-        html_trans += "<a class=\"post_vote_down\" href=\"" + url_for("vote") + "?method=downvote&post_id=" + str(
-            row[0]) + "\">-</a>&nbsp;&nbsp;&nbsp;</div>"
         html_trans += "</div>"
         post_list.append(html_trans)
 
@@ -454,8 +462,6 @@ def change_email():
             delete_user_session()
             return render_template("session_timeout.html",
                                    timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
-
-
 
     return render_template("quick_info.html", info_text="Change Email")
 

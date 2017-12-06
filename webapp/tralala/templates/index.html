@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_2.html" %}
 
 {% block title %} Tralala! Hier wird nicht gejodelt! {% endblock %}
 
@@ -9,7 +9,10 @@
 {% else %}
 
 {% for post in post_list %}
-{{ post|safe }}
+<div class="col-md-5 col-md-offset-3" style="float: none; margin: 0 auto; background-color: white;">
+    {{ post|safe }}
+</div>
+</br>
 {% endfor %}
 
 {% endif %}

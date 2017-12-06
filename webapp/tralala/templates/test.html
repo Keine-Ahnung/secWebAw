@@ -1,10 +1,93 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+    <meta charset="utf-8">
+    <title>Blabla</title>
 
+    <!-- Styles -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Satisfy" rel="stylesheet">
+</head>
+
+<body style="font-family: 'Raleway', sans-serif; background-color: whitesmoke;" onload="clickBtn()">
+<!-- Navigation -->
+<header>
+    <div class="container" style="padding-top: 10px;">
+        <nav class="navbar navbar-default" role="navigation"
+             style="position: relative; border-radius: 0; border-width: 3px; border-color: black;">
+            <div class="navbar-header" style="float: left; padding: 15px; text-align: center; width: 100%">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#topNavBar">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#"
+                   style="font-family: 'Satisfy', cursive; font-size: 30px; position: absolute; left: 50%; margin-left: -50px !important; display: block; color: black;">Tracker</a>
+            </div>
+            <div class="navbar-collapse collapse" id="topNavBar">
+
+                <ul class="nav navbar-nav navbar-left" style="font-size: 20px; font-weight: bold;">
+                    <li class="{% block home_active %}inactive{% endblock %}"><a href="#"
+                                                                                 style="color: black;">HOME</a></li>
+                    <li class="{% block tracker_active %}inactive{% endblock %}"><a
+                            href="#" style="color: black;">TRACKER</a>
+                    </li>
+                </ul>
+
+                <ul class="nav navbar-nav navbar-right"
+                    style="font-size: 20px; font-weight: bold; padding-right: 15px;">
+                    <li class="active"><a
+                            href="#"
+                            style="color: black;">Username</a>
+                    </li>
+                    <li class="inactive"><a href="#"
+                                            style="color: black;">LOGOUT</a>
+                    </li>
+                    <li class="inactive"><a
+                            href="#"
+                            style="color: black;">REGISTER</a>
+                    </li>
+                    <li class="#"><a href="#"
+                                     style="color: black;">LOGIN</a>
+                    </li>
+                </ul>
+
+            </div>
+        </nav>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <h1>Blabla</h1>
+    </div>
+</main>
+
+
+<div class="container">
+    <div class="footer">
+        <div style="padding: 12px; background: #f5f5f5">
+            <br><br><br><br><br><br><br>
+            <div class="row">
+                <div class="col-xs-12" align="center">
+                    <span align="center" id="footer-copyright">Copyright (c) 2017 by Marc Friedrich</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+        integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+        crossorigin="anonymous"></script>
 </body>
+
 </html>

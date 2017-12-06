@@ -13,7 +13,7 @@ class DB_Handler:
     DB_TABLE_TRALALA_POST_VOTES = "tralala_post_votes"
     DB_TABLE_TRALALA_ACTIVE_SESSIONS = "tralala_active_sessions"
 
-    MAX_SESSION_TIME = 1  # Minuten
+    MAX_SESSION_TIME = 60  # Minuten
 
     def __init__(self):
         self.db_connection_data = None
