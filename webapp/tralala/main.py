@@ -50,8 +50,7 @@ def index():
 
         hashtags = ''
         for hashtag in row[4].split(','):
-             hashtags = hashtags + '#' + hashtag + ' '  #space at the end
-
+            hashtags = hashtags + '#' + hashtag + ' '  # space at the end
 
         html_trans = ""
         html_trans += "<div class=\"" + colors[color_key] + "\">"
@@ -104,7 +103,8 @@ def login():
     if code == -1:
         return render_template("quick_info.html", info_text="Passwort und/oder Benutzername sind inkorrekt!")
     elif code == -2:
-        return render_template("quick_info.html", info_text="Du musst deinen Account bestätigen, bevor du dich einloggen kannst.")
+        return render_template("quick_info.html",
+                               info_text="Du musst deinen Account bestätigen, bevor du dich einloggen kannst.")
     app.logger.debug("user found=" + data["email"] + ":" + data["password"])
 
     # UeberprUefe gehashte Passwoerter
@@ -120,6 +120,8 @@ def login():
             session["verified"] = True
         else:
             session["verified"] = False
+        # Starte Timeout Timer
+        db_handler.start_session(mysql, data["uid"])
         return render_template("quick_info.html",
                                info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
 
@@ -137,6 +139,10 @@ def logout():
 
     session.pop("logged_in", None)
     session.pop("user", None)
+    session.pop("uid", None)
+    session.pop("role_id", None)
+    session.pop("verified", None)
+
     return render_template("quick_info.html", info_text="Du wurdest erfolgreich ausgeloggt!")
 
 
@@ -254,7 +260,8 @@ def confirm():
     db_handler = DB_Handler()
     (success, email) = db_handler.get_user_for_token(mysql, token)
     if success == -1:
-        app.logger.error("Es konnte kein User for das Token '" + token + "' zurUeckgeliefert werden (ungUeltiges Token)")
+        app.logger.error(
+            "Es konnte kein User for das Token '" + token + "' zurUeckgeliefert werden (ungUeltiges Token)")
         return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestaetigt werden!")
 
     if success == 2:
@@ -295,7 +302,8 @@ def post_message():
 
     # Nur bestätigte Benutzer dürfen voten
     if not session["verified"]:
-        return render_template("quick_info.html", info_text="Du musst deinen Account zuerst bestätigen, bevor du etwas posten kannst.")
+        return render_template("quick_info.html",
+                               info_text="Du musst deinen Account zuerst bestätigen, bevor du etwas posten kannst.")
 
     # Post in DB schreiben
     db_handler = DB_Handler()
@@ -360,7 +368,6 @@ def finish_vote():
     input_csrf = request.form["vote_code"]
     uid = session["uid"]
 
-
     try:
         post_id_int = int(post_id)
     except:
@@ -375,7 +382,6 @@ def finish_vote():
 
     # Persistiere Vote
     db_handler = DB_Handler()
-
 
     (code, data) = db_handler.check_if_already_voted(mysql, post_id, uid)
 
@@ -495,5 +501,5 @@ def register_new_account(mysql, email, pw_hash, verification_token):
 
 
 if __name__ == '__main__':
-    app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig fUer Sessions, da Cookies durch diesen Key signiert sind!
+    app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
     app.run(debug=True)

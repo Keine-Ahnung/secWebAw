@@ -17,7 +17,7 @@ INSERT INTO tralala.tralala_users (email, password, role_id, verified) VALUES ('
 
 INSERT INTO tralala.tralala_users (email, password, role_id, verified) VALUES ('markus.meier@hans-maier.de',
                                   'pbkdf2:sha256:50000$JqsE2loF$eade84bd6c5fde737aac98aab215a7360ff56c87030338cbb8d44a6d4d6e03e5',
-                                  4, 0); 
+                                  4, 1); 
 
 INSERT INTO tralala.tralala_users (email, password, role_id, verified) VALUES ('hans.meier@hans-maier.de',
                                   'pbkdf2:sha256:50000$Aro4mlqB$1d436f29129578be8b07ba5e4598510c3758453a5c5c8c9111b7f555d5a044d3',

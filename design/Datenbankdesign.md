@@ -24,10 +24,16 @@
 ## tralala_post_votes
 * vote_id:`int` (PK)
 * uid:`int` (FK -> tralala_users.uid)
-* vote_time:`datetime`
+* vote_date:`datetime`
 * post_id`int` (FK -> tralala_posts.post_id)
 * was_upvote:`boolean`
 * was_downvote:`boolean`
+
+## tralala_active_sessions
+* session_id:`int` (PK)
+* uid:`int` (FK -> tralala_user.uid)
+* session_start:`datetime`
+* session_max_alive:`datetime`
 
 # Constraints
 ## tralala_users -> tralala_profiles

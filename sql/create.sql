@@ -42,6 +42,13 @@ CREATE TABLE tralala.tralala_post_votes(
 	PRIMARY KEY (vote_id)
 ) ENGINE=INNODB;
 
+CREATE TABLE tralala.tralala_active_sessions(
+	session_id INT NOT NULL AUTO_INCREMENT,
+	uid INT,
+	session_start DATETIME NOT NULL,
+	session_max_alive DATETIME NOT NULL,
+	PRIMARY KEY (session_id)
+) ENGINE=INNODB;
 
 DROP USER IF EXISTS 'db_admin_tralala'@'localhost', 'db_admin_tralala'@'%';
 FLUSH PRIVILEGES;

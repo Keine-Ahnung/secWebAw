@@ -61,6 +61,7 @@ Posts besser zu designen
 - [x] Check if mail is correct
 - [x] Use escaped string substitution for parametrized SQL queries
 - [x] Corrected logic flaws in the validation of the password strength
+- [x] Set HttpOnly und Secure Flags
 
 ## Skripte
 - [X] Generierung des technischen Benutzers durch das Skript

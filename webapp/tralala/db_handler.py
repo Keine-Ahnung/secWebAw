@@ -1,6 +1,7 @@
 from flask import Flask
 from flaskext.mysql import MySQL
 import time
+import datetime
 import security_helper
 import traceback
 
@@ -10,6 +11,9 @@ class DB_Handler:
     DB_TABLE_TRALALA_USERS = "tralala_users"
     DB_TABLE_TRALALA_POSTS = "tralala_posts"
     DB_TABLE_TRALALA_POST_VOTES = "tralala_post_votes"
+    DB_TABLE_TRALALA_ACTIVE_SESSIONS = "tralala_active_sessions"
+
+    MAX_SESSION_TIME = 60  # Minuten
 
     def __init__(self):
         self.db_connection_data = None
@@ -297,3 +301,67 @@ class DB_Handler:
         except Exception as e:
             conn.close()
             return -1
+
+    def start_session(self, mysql, uid):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        session_start = datetime.datetime.now()
+        session_max_alive = session_start + datetime.timedelta(minutes=self.MAX_SESSION_TIME)
+
+        record = [uid, session_start, session_max_alive]
+
+        try:
+            cursor.execute(
+                "INSERT INTO " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + " (uid, session_start, session_max_alive) VALUES (%s, %s, %s)",
+                record)
+
+            conn.commit()
+            conn.close()
+            return 1
+        except Exception as e:
+            conn.close()
+            return -1
+
+    def check_session_state(self, mysql, uid):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        current_time = datetime.datetime.now()
+
+        try:
+            cursor.execute(
+                "SELECT uid, session_max_alive FROM " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + "WHERE uid=%s", (uid,))
+            data = cursor.fetchone()
+
+            if cursor.rowcount == 0:
+                conn.commit()
+                conn.close()
+                return 0, "no_active_session_found_for_uid"
+            else:
+                session_max_alive = data[1]
+
+            if current_time < session_max_alive:
+                conn.commit()
+                conn.close()
+                return 1, "session_still_active"
+            else:
+                conn.commit()
+                conn.close()
+                return -1, "session_timeout"
+        except Exception as e:
+            conn.close()
+            return -1
+
+
+    def invalidate_session(self, mysql, uid):
+        """
+        tbd
+        """
+        pass
