@@ -8,6 +8,7 @@ import json
 import time
 import smtplib
 import security_helper
+import function_helper
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import random
@@ -519,31 +520,12 @@ def send_verification_email(reg_email):
     if success == -1:
         return -1
 
-    # Sende Bestaetigungsemail mit Token
-    sender = "verification_tralala@gmx.de"
-    password = "sichwebapp_2017"
-
-    msg = MIMEMultipart()
-    msg["From"] = sender
-    msg["To"] = reg_email
-    msg["Subject"] = "Bestaetige deinen Account bei Tralala!"
-
-    msg.attach(MIMEText(u"Hallo " + reg_email + "!</br>" \
-                                                "Benutze den folgenden Link, um deinen Account zu bestaetigen. Du musst diesen in die Adresszeile deines Browsers kopieren.</br></br>" \
-                                                "<a href=\"localhost:5000" + url_for(
-        "confirm") + "?token=" + token + "\">" + "localhost:5000" + url_for(
-        "confirm") + "?token=" + token + "</a>",
-                        "html"))
-
     try:
-        server = smtplib.SMTP("mail.gmx.net", 587)
-        server.starttls()
-        server.login(sender, password)
-
-        server.sendmail(sender, reg_email, msg.as_string())
-        server.quit()
+        url = 'localhost:5000' + url_for('confirm') + '?token=' + token
+        function_helper.send_verification_mail(reg_email, url)
     except Exception as e:
-        app.logger.error("Fehler beim Senden der Bestaetigungsmail...\n" + str(e))
+        app.logger.error("Fehler beim Senden der Bestaetigungsmail."
+                         "..\n" + str(e))
         return -1
 
     app.logger.debug("Bestaetigungsemail gesendet an '" + reg_email + "' ...")
@@ -553,7 +535,8 @@ def send_verification_email(reg_email):
 def prepare_info_json(affected_url, info_text, additions):
     """
         Gebe eine Info- bzw. Fehlermeldung im JSON-Format zurUeck.
-        Dictionary akzeptiert keine additions, falls folgende Keys in den additions existieren:
+        Dictionary akzeptiert keine additions, falls folgende Keys in den
+        additions existieren:
             1. called_url
             2. timestamp
             3. info_text
