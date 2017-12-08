@@ -66,6 +66,12 @@ Posts besser zu designen
 - [x] Corrected logic flaws in the validation of the password strength
 - [x] Set HttpOnly und Secure Flags
 
+## Password reset
+- [] Build method to reset the password (Check mail + security question + answer, send mail if ok, no mail if not)
+- [] Add security- question to sign up
+- [] Build html page to inser tthe mail, captcha, security-question
+
+
 ## Skripte
 - [X] Generierung des technischen Benutzers durch das Skript
 - [X] Rechtevergabe durch SQL-Skript
