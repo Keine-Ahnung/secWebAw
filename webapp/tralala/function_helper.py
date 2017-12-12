@@ -1,4 +1,8 @@
+import random
 import smtplib
+import string
+
+import db_handler
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -60,3 +64,51 @@ def send_verification_mail(to, confirm_url):
 
     return success
 
+'''
+Method to send the reset mail to an user.
+'''
+
+
+def send_reset_mail(to, uid, token, url):
+    mail_body_plain = "Your password reset request was confirmed.\n" \
+                      "Click the following link to reset the password\n\n"
+    + url + "/?token=" + token + "&uid=" + uid
+
+    try:
+        send_mail_basic(to, "Password reset", text_mail_body=mail_body_plain,
+                    html_mail_body=None )
+        return True
+    except Exception as e:
+        return False
+
+
+'''
+Method to reset the password of an existing user, by sending a mail to the 
+mailaddress stored in the database
+'''
+
+
+def reset_password(mysql: db_handler.DB_Handler, mail: str, url: str):
+
+    success, data = mysql.check_for_existence(mysql=mysql, email=mail)
+    if success != 1:
+        return False
+    else:
+        token = generate_verification_token(99)
+        mysql.set_reset_token(mysql, token, data["uid"])
+        mail_sended = send_reset_mail(data["email"], data["uid"], token, url)
+
+    return mail_sended
+
+def generate_verification_token(length):
+    return ''.join(random.choice(string.ascii_lowercase + string.digits)
+                   for _ in range(length))
+
+
+def compare_reset_token(mysql: db_handler.DB_Handler, userid: int, token: str):
+    token_database = mysql.get_reset_token(mysql=mysql, userid=userid)
+
+    if token == token_database:
+        return True
+    else:
+        return False

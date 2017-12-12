@@ -372,3 +372,47 @@ class DB_Handler:
         except Exception as e:
             conn.close()
             return -1, e
+
+    '''
+    Method to set the reset token into the database
+    '''
+    @staticmethod
+    def set_reset_token(mysql, token, uid):
+
+        ts = time.time()
+        timestamp = datetime.datetime.fromtimestamp(ts).strftime(
+            '%Y-%m-%d %H:%M:%S')
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""INSERT INTO tralala_reset_password VALUES 
+            (%s,%s,%s)""", (uid, token, timestamp))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            conn.close()
+
+    '''
+    Method to get the token from the database.
+    '''
+    @staticmethod
+    def get_reset_token(mysql, userid):
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""SELECT token FROM tralala_reset_password 
+                               WHERE uid=(%s)""", userid)
+            data = cursor.fetchall()
+            cursor.close()
+            conn.close()
+            return data[0]
+        except Exception:
+            conn.close()
+            return ''
+
+
+
+
+
+

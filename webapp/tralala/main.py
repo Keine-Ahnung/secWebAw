@@ -1,19 +1,15 @@
+import json
 import random
-import string
+import time
 
 from flask import Flask, request, session, url_for, redirect, render_template
-from db_handler import DB_Handler
 from flaskext.mysql import MySQL
-import json
-import time
-import smtplib
-import security_helper
-import function_helper
-from email.mime.multipart import MIMEMultipart
-from email.mime.text import MIMEText
-import random
-
 from werkzeug.security import generate_password_hash, check_password_hash
+
+import function_helper
+import security_helper
+from db_handler import DB_Handler
+from function_helper import generate_verification_token
 
 app = Flask(__name__)
 
@@ -24,6 +20,8 @@ app.config["MYSQL_DATABASE_HOST"] = "localhost"
 
 mysql = MySQL()
 mysql.init_app(app)
+
+
 
 
 @app.route("/test")
@@ -76,6 +74,41 @@ def index():
         post_list.append(html_trans)
 
     return render_template("index.html", post_list=post_list)
+
+
+@app.route("/reset_password", methods=["GET", "POST"])
+def reset_password():
+
+    if request.method == "GET":
+        return_info = {}
+        return_info["invalid_method"] = "GET"
+
+        return prepare_info_json(url_for("post_user"),
+                                 "GET ist unzulaessig fUer den Login",
+                                 return_info)
+    elif request.method == "POST":
+        reset_email = request.form["reset_email"]
+
+        if reset_email is not None or not reset_email == "":
+            function_helper.reset_password(mysql=mysql, mail=reset_email,
+                                        url=url_for('/reset_password/action'))
+
+
+'''
+Method receiving the token to perform the recheck and the password reset
+'''
+
+
+@app.route("/reset_password/action", methods=["GET", "POST"])
+def reset_password_action():
+    token = request.form["token"]
+    uid = request.form["uid"]
+    token_check = function_helper.compare_reset_token(mysql, uid, token)
+
+    if token_check:
+        return render_template()
+    else:
+        return render_template()
 
 
 @app.route("/login", methods=["POST", "GET"])
@@ -500,10 +533,6 @@ def check_for_session_state(uid):
     if code == -1:
         app.logger.debug(data)
         return False
-
-
-def generate_verification_token(length):
-    return ''.join(random.choice(string.ascii_lowercase + string.digits) for _ in range(length))
 
 
 def send_verification_email(reg_email):
