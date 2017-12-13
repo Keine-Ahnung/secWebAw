@@ -188,7 +188,7 @@ def post_user():
         return_info = {}
         return_info["invalid_method"] = "GET"
 
-        return prepare_info_json(url_for("post_user"), "GET ist unzulaessig fUer die Registration", return_info)
+        return prepare_info_json(url_for("post_user"), "GET ist unzulaessig für die Registration", return_info)
 
     else:
         reg_email = request.form["reg_email"]
@@ -202,33 +202,33 @@ def post_user():
 
         if not security_helper.check_mail(reg_email):
             app.logger.error("Mailadresse nicht valide")
-            return render_template("registration_no_success.html", code=5)
+            return render_template("registration_no_success.html", info_danger=True, code=5)
 
         # UeberprUefe, ob Password und Passwordwiederholung übereinstimmen
         if not reg_password == reg_password_repeat:
             app.logger.error("Passwort wurde nicht korrekt wiederholt")
-            return render_template("registration_no_success.html", code=2)
+            return render_template("registration_no_success.html", info_danger=True, code=2)
 
         passed, comment = security_helper.check_password_strength(reg_password)
         if not passed:
             app.logger.error("Passwort nicht stark genug")
-            return render_template("registration_no_success.html", code=4, comment=comment)
+            return render_template("registration_no_success.html", info_danger=True, code=4, comment=comment)
 
         # UeberprUefe, ob User schon existiert
         success = register_new_account(mysql, reg_email, generate_password_hash(reg_password),
                                        generate_verification_token(50))
         if success == -1:
             app.logger.error("Neuer Benutzer konnte nicht in die Datenbank geschrieben werden. Versuche es erneut")
-            return render_template("registration_no_success.html", code=-1)
+            return render_template("registration_no_success.html", info_danger=True, code=-1)
         elif success == 0:
             app.logger.error("Benutzer existiert bereits")
-            return render_template("registration_no_success.html", code=0, reg_email=reg_email)
+            return render_template("registration_no_success.html", info_danger=True, code=0, reg_email=reg_email)
 
         app.logger.debug("Registrierung war erfolgreich. Benutzer wurde in die DB geschrieben (und Verification Token)")
         success = send_verification_email(reg_email)
 
         if success == -1:
-            return render_template("registration_no_success.html", code=3, reg_email=reg_email)
+            return render_template("registration_no_success.html", info_danger=True, code=3, reg_email=reg_email)
 
         return render_template("registration_success.html", reg_email=reg_email)
 
@@ -511,10 +511,9 @@ def reset_password():
 def delete_user():
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
-        session[SESSIONID_ROLE_ADMIN]
     except:
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du musst Administrator sein, um diese Aktion durchführen zu dürfen")
+                               info_text="Du musst Administrator und eingeloggt sein, um diese Aktion durchführen zu dürfen")
 
     uid = request.args.get("uid")
 
@@ -525,16 +524,19 @@ def delete_user():
                                info_text="User ID muss ein INT sein.")
 
     db_handler = DB_Handler()
-    code = db_handler.delete_user(mysql, int(uid))
+    (code, e) = db_handler.delete_user(mysql, int(uid))
 
     if code == -1:
+        app.logger.debug("Fehler beim Löschen eines Benutzers:\n" + str(e))
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Benutzer konnte nicht gelöscht werden. Bitte versuche es erneut.")
-    else:
+                               info_text="Ein unerwarteter Fehler ist aufgetreten.")
+    elif code == 1:
         return render_template("quick_info.html", info_success=True,
-                               info_text="Benutzer (UID: " + str(uid) + " wurde gelöscht.")
-
-    return redirect(url_for("admin_dashboard"))
+                               info_text="Benutzer (UID: " + str(uid) + ") wurde gelöscht.")
+    else:
+        app.logger.debug("Fehler beim Löschen eines Benutzers:\n" + str(e))
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Ein unerwarteter Fehler ist aufgetreten.")
 
 
 '''

@@ -1,4 +1,4 @@
-ALTER TABLE tralala.tralala_posts ADD FOREIGN KEY (uid) REFERENCES tralala.tralala_users(uid) ON DELETE NO ACTION;
+ALTER TABLE tralala.tralala_posts ADD FOREIGN KEY (uid) REFERENCES tralala.tralala_users(uid) ON DELETE CASCADE;
 ALTER TABLE tralala.tralala_users ADD FOREIGN KEY (role_id) REFERENCES tralala.tralala_roles(role_id) ON DELETE NO ACTION;
 ALTER TABLE tralala.tralala_post_votes ADD FOREIGN KEY (uid) REFERENCES tralala.tralala_users(uid) ON DELETE NO ACTION;
 ALTER TABLE tralala.tralala_post_votes ADD FOREIGN KEY (post_id) REFERENCES tralala.tralala_posts(post_id) ON DELETE NO ACTION;

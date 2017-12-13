@@ -8,7 +8,7 @@ Posts besser zu designen
 
 ## Allgemein
 - [ ] Dokumentation der Funktionen im Code
-- [ ] Stelle Funktionalität auf neues Design um
+- [X] Stelle Funktionalität auf neues Design um
 
 ## Zugriff auf die Datenbank
 - [ ] Benutzen von Stored Procedures
@@ -56,7 +56,13 @@ Posts besser zu designen
 - [ ] Wenn Benutzer gelöscht wurde, zeige OP als unbekannt an
 
 ## Voting
-- [ ] Ungültige Formen von Parametern: IDs als Text, IDs negativ oder zu groß, ...
+- [X] Ungültige Formen von Parametern: IDs als Text, IDs negativ oder zu groß, ...
+
+## Dashboard
+- [X] Dynamische Generierung von Admin Dashboard-Einträgen
+- [X] Darstellung der Rollen
+- [ ] Löschen von Benutzer (erfordert erneute Anmeldung für Wirksamkeit)
+- [ ] Ändern der Rolle eines Benutzers (erfordert erneute Anmeldung für Wirksamkeit)
 
 ## Security
 - [x] Implemented a method to strip down html from messagebox

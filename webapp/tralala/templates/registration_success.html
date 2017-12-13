@@ -1,8 +1,11 @@
-{% extends "base.html" %}
+{% extends "base_2.html" %}
 
 {% block title %} Registrierung war erfolgreich!{% endblock %}
 
 
 {% block body %}
-<p> Vielen Dank für deine Registrierung. Wir haben eine Bestätigungsmail an <b>{{ reg_email }}</b> gesendet.</p>
+
+<div class="alert alert-success" role="alert">
+    <p> Vielen Dank für deine Registrierung. Wir haben eine Bestätigungsmail an <b>{{ reg_email }}</b> gesendet.</p>
+</div>
 {% endblock %}
