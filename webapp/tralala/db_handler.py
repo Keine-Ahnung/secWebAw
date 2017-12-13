@@ -12,6 +12,7 @@ class DB_Handler:
     DB_TABLE_TRALALA_POSTS = "tralala_posts"
     DB_TABLE_TRALALA_POST_VOTES = "tralala_post_votes"
     DB_TABLE_TRALALA_ACTIVE_SESSIONS = "tralala_active_sessions"
+    DB_TABLE_TRALALA_ROLES = "tralala_roles"
 
     MAX_SESSION_TIME = 60  # Minuten
 
@@ -27,7 +28,6 @@ class DB_Handler:
     #
     # else:
     #     self.db_connection_data = db_connection_data
-
 
     def add_new_user(self, mysql, email, pw_hash, verification_token):
         """
@@ -243,8 +243,8 @@ class DB_Handler:
 
     def get_all_users(self, mysql):
         """
-                tbd
-                """
+        tbd
+        """
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -255,6 +255,27 @@ class DB_Handler:
         if cursor.rowcount == 0:
             conn.close()
             return -1, "no_user"
+        else:
+            conn.close()
+            return 1, data
+
+    def get_all_roles(self, mysql):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                "select role_id, role_name, del_user, set_role from " + self.DB_TABLE_TRALALA_ROLES)
+            data = cursor.fetchall()
+        except Exception as e:
+            print(str(e))
+
+        if cursor.rowcount == 0:
+            conn.close()
+            return -1, "no_roles"
         else:
             conn.close()
             return 1, data
@@ -373,9 +394,26 @@ class DB_Handler:
             conn.close()
             return -1, e
 
+    def delete_user(self, mysql, uid):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("DELETE FROM " + self.DB_TABLE_TRALALA_USERS + " WHERE uid=%s", (uid,))
+            conn.commit()
+            conn.close()
+            return 1, None
+        except Exception as e:
+            conn.close()
+            return -1, e
+
     '''
     Method to set the reset token into the database
     '''
+
     @staticmethod
     def set_reset_token(mysql, token, uid):
 
@@ -386,8 +424,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("""INSERT INTO tralala_reset_password VALUES 
-            (%s,%s,%s)""", (uid, token, timestamp))
+            cursor.execute("INSERT INTO tralala_reset_password VALUES (%s,%s,%s)", (uid, token, timestamp,))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -396,6 +433,7 @@ class DB_Handler:
     '''
     Method to get the token from the database.
     '''
+
     @staticmethod
     def get_reset_token(mysql, userid):
         conn = mysql.connect()
@@ -410,9 +448,3 @@ class DB_Handler:
         except Exception:
             conn.close()
             return ''
-
-
-
-
-
-

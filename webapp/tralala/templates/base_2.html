@@ -40,14 +40,22 @@
 
                 <ul class="nav navbar-nav navbar-right dropdown">
                     {% if session["logged_in"] %}
+                    <li class="{% if new_post_active %}{{ new_post_active }}{% endif %}"><a
+                            href="{{ url_for('write_post') }}">Neuer Post</a>
+                    </li>
+                    {% if session["is_admin"] %}
+                    <li class="{% if admin_active %}{{ admin_active }}{% endif %}"><a
+                            href="{{ url_for('admin_dashboard') }}">Dashboard</a>
+                    </li>
+                    {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             Control Panel
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <a class="dropdown-item" href="#">Change Email</a></br>
-                            <a class="dropdown-item" href="#">Change Password</a>
+                            <a class="dropdown-item" href="#">E-Mail ändern</a></br>
+                            <a class="dropdown-item" href="#">Passwort ändern</a>
                         </div>
                     </li>
                     <li class="inactive"><a href="{{ url_for('logout') }}">Logout</a>
@@ -87,33 +95,36 @@
     </div>
 </div>
 
+<!--Login Modal-->
 <div class="modal fade" id="login-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
      style="display: none;">
     <div class="modal-dialog">
         <div class="loginmodal-container">
             <h1>Anmelden</h1><br>
-            <form>
-                <input type="text" name="user" placeholder="Email">
-                <input type="password" name="pass" placeholder="Passwort">
+            <form method="POST" action="{{ url_for('login') }}">
+                <input type="email" name="login_email" id="login_email" placeholder="Email" required>
+                <input type="password" name="login_password" id="login_password" placeholder="Passwort" required>
                 <input type="submit" name="login" class="login loginmodal-submit" value="Anmelden">
             </form>
 
             <div class="login-help">
-                <a href="#">Forgot Password</a>
+                <a href="#">Passwort vergessen?</a>
             </div>
         </div>
     </div>
 </div>
 
+<!--Register Modal-->
 <div class="modal fade" id="register-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
      aria-hidden="true" style="display: none;">
     <div class="modal-dialog">
         <div class="loginmodal-container">
             <h1>Registrierung</h1><br>
-            <form>
-                <input type="text" name="user" placeholder="Email">
-                <input type="password" name="pass" placeholder="Passwort">
-                <input type="password" name="pass" placeholder="Passwort bestätigen">
+            <form method="POST" action="{{ url_for('post_user') }}">
+                <input type="email" name="reg_email" id="reg_email" placeholder="Email" required>
+                <input type="password" name="reg_password" id="reg_password" placeholder="Passwort" required>
+                <input type="password" name="reg_password_repeat" id="reg_password_repeat"
+                       placeholder="Passwort bestätigen" required>
                 <input type="submit" name="login" class="login loginmodal-submit" value="Registrieren">
             </form>
         </div>

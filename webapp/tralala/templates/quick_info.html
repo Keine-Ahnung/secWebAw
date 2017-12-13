@@ -6,19 +6,19 @@
 
 {% if info_danger %}
 <div class="alert alert-danger" role="alert">
-    {{ info_text }}
+    {{ info_text|safe }}
 </div>
 {% endif %}
 
 {% if info_warning %}
 <div class="alert alert-warning" role="alert">
-    {{ info_text }}
+    {{ info_text|safe }}
 </div>
 {% endif %}
 
 {% if info_success %}
 <div class="alert alert-success" role="alert">
-    {{ info_text }}
+    {{ info_text|safe }}
 </div>
 {% endif %}
 

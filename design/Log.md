@@ -8,6 +8,7 @@ Posts besser zu designen
 
 ## Allgemein
 - [ ] Dokumentation der Funktionen im Code
+- [ ] Stelle Funktionalität auf neues Design um
 
 ## Zugriff auf die Datenbank
 - [ ] Benutzen von Stored Procedures
@@ -67,9 +68,9 @@ Posts besser zu designen
 - [x] Set HttpOnly und Secure Flags
 
 ## Password reset
-- [] Build method to reset the password (Check mail + security question + answer, send mail if ok, no mail if not)
-- [] Add security- question to sign up
-- [] Build html page to inser tthe mail, captcha, security-question
+- [ ] Build method to reset the password (Check mail + security question + answer, send mail if ok, no mail if not)
+- [ ] Add security- question to sign up
+- [ ] Build html page to insert the mail, captcha, security-question
 
 
 ## Skripte

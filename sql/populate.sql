@@ -24,7 +24,7 @@ INSERT INTO tralala.tralala_users (email, password, role_id, verified) VALUES ('
                                   4, 1);
 
 -- Insert some random useless posts
-INSERT INTO tralala.tralala_posts (uid, post_date, post_text, hashtags, upvotes, downvotes) VALUES (1, '2017-12-05 12:34:11', 'Ich hab nichts gemacht, das war schon so!', '#Kinder #stolen',
+INSERT INTO tralala.tralala_posts (uid, post_date, post_text, hashtags, upvotes, downvotes) VALUES (1, '2017-12-05 12:34:11', 'Ich hab nichts gemacht, das war schon so!', 'Kinder,stolen',
                                   10, 20);
 
-INSERT INTO tralala.tralala_posts (uid, post_date, post_text, hashtags, upvotes, downvotes) VALUES (7, '2017-12-04 19:21:33', 'Sie sehen krank aus. Ich verschreibe Ihnen eine Pizza ', '#Essen #stolen', 400, 300);
+INSERT INTO tralala.tralala_posts (uid, post_date, post_text, hashtags, upvotes, downvotes) VALUES (5, '2017-12-04 19:21:33', 'Sie sehen krank aus. Ich verschreibe Ihnen eine Pizza ', 'Essen,stolen', 400, 300);

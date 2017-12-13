@@ -21,12 +21,19 @@ app.config["MYSQL_DATABASE_HOST"] = "localhost"
 mysql = MySQL()
 mysql.init_app(app)
 
+"""
+    Sessionvariablen hier übersichtlich ordnen
+"""
+SESSIONV_LOGGED_IN = "logged_in"
+SESSIONV_USER = "user"
+SESSIONV_UID = "uid"
+SESSIONV_ROLE_ID = "role_id"
+SESSIONV_VERIFIED = "verified"
+SESSIONV_ADMIN = "is_admin"
 
+SESSIONV_ITER = [SESSIONV_LOGGED_IN, SESSIONV_USER, SESSIONV_UID, SESSIONV_ROLE_ID, SESSIONV_VERIFIED]
 
-
-@app.route("/test")
-def test():
-    return render_template("base_2.html")
+SESSIONID_ROLE_ADMIN = 5
 
 
 @app.route("/")
@@ -63,7 +70,8 @@ def index():
         html_trans += "&nbsp;&nbsp;&nbsp;<a style=\"font-size: 150%; color: black;\" href=\"" + url_for(
             "vote") + "?method=upvote&post_id=" + str(
             row[0]) + "\">+</a>&nbsp;&nbsp;&nbsp;"
-        html_trans += "<a style=\"font-size: 150%; color: black;\" href=\"" + url_for("vote") + "?method=downvote&post_id=" + str(
+        html_trans += "<a style=\"font-size: 150%; color: black;\" href=\"" + url_for(
+            "vote") + "?method=downvote&post_id=" + str(
             row[0]) + "\">-</a>&nbsp;&nbsp;&nbsp;</div>"
         html_trans += "</div>"
         html_trans += "</br>"
@@ -74,41 +82,6 @@ def index():
         post_list.append(html_trans)
 
     return render_template("index.html", post_list=post_list)
-
-
-@app.route("/reset_password", methods=["GET", "POST"])
-def reset_password():
-
-    if request.method == "GET":
-        return_info = {}
-        return_info["invalid_method"] = "GET"
-
-        return prepare_info_json(url_for("post_user"),
-                                 "GET ist unzulaessig fUer den Login",
-                                 return_info)
-    elif request.method == "POST":
-        reset_email = request.form["reset_email"]
-
-        if reset_email is not None or not reset_email == "":
-            function_helper.reset_password(mysql=mysql, mail=reset_email,
-                                        url=url_for('/reset_password/action'))
-
-
-'''
-Method receiving the token to perform the recheck and the password reset
-'''
-
-
-@app.route("/reset_password/action", methods=["GET", "POST"])
-def reset_password_action():
-    token = request.form["token"]
-    uid = request.form["uid"]
-    token_check = function_helper.compare_reset_token(mysql, uid, token)
-
-    if token_check:
-        return render_template()
-    else:
-        return render_template()
 
 
 @app.route("/login", methods=["POST", "GET"])
@@ -143,15 +116,17 @@ def login():
     db_handler = DB_Handler()
     (code, data) = db_handler.check_for_existence(mysql, login_email)
     if code == -1:
-        return render_template("quick_info.html", info_text="Passwort und/oder Benutzername sind inkorrekt!")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Benutzername und/oder Passwort sind inkorrekt!")
     elif code == -2:
-        return render_template("quick_info.html",
+        return render_template("quick_info.html", info_danger=True,
                                info_text="Du musst deinen Account bestätigen, bevor du dich einloggen kannst.")
     app.logger.debug("user found=" + data["email"] + ":" + data["password"])
 
     # UeberprUefe gehashte Passwoerter
     if not check_password_hash(data["password"], login_password):
-        return render_template("quick_info.html", info_text="Benutzername und/oder Passwort sind inkorrekt!")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Benutzername und/oder Passwort sind inkorrekt!")
     else:
         # Setze Sessionvariable
         session["logged_in"] = True
@@ -162,13 +137,19 @@ def login():
             session["verified"] = True
         else:
             session["verified"] = False
+
+        if data["role_id"] == SESSIONID_ROLE_ADMIN:
+            session[SESSIONV_ADMIN] = True
+        else:
+            session[SESSIONV_ADMIN] = False
         # Starte Timeout Timer
         db_handler.start_session(mysql, data["uid"])
         app.logger.debug("uid=" + str(session["uid"]))
-        return render_template("quick_info.html",
+        return render_template("quick_info.html", info_success=True,
                                info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
 
 
+@app.route("/auth/logout", methods=["POST", "GET"])
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
     """
@@ -178,18 +159,15 @@ def logout():
         # Zugriff auf die Session Variable wirft einen KeyError. Durch den Catch wird das Template gerendert
         session["logged_in"]
     except:
-        return render_template("quick_info.html", info_text="Du bist nicht eingeloggt!")
+        return render_template("quick_info.html", info_warning=True, info_text="Du bist nicht eingeloggt!")
 
     db_handler = DB_Handler()
     db_handler.invalidate_session(mysql, session["uid"])
 
-    session.pop("logged_in", None)
-    session.pop("user", None)
-    session.pop("uid", None)
-    session.pop("role_id", None)
-    session.pop("verified", None)
+    for sessionv in SESSIONV_ITER:
+        session.pop(sessionv, None)
 
-    return render_template("quick_info.html", info_text="Du wurdest erfolgreich ausgeloggt!")
+    return render_template("quick_info.html", info_success=True, info_text="Du wurdest erfolgreich ausgeloggt!")
 
 
 @app.route("/signup/post_user", methods=["POST", "GET"])
@@ -255,44 +233,33 @@ def post_user():
         return render_template("registration_success.html", reg_email=reg_email)
 
 
-@app.route("/admin/dashboard")
+@app.route("/auth/admin/dashboard")
+@app.route("/auth/dashboard")
 def admin_dashboard():
     """
     tbd
     """
+    try:
+        session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst eingeloggt und Administrator sein, um diese Aktion durchführen zu dürfen")
+
+    if not session[SESSIONV_ADMIN]:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst Administrator sein, um diese Aktion durchführen zu dürfen")
+
     # Benutzerdaten holen
     db_handler = DB_Handler()
-    (code, data) = db_handler.get_all_users(mysql)
+    (code_users, users) = db_handler.get_all_users(mysql)
+    (code_roles, roles) = db_handler.get_all_roles(mysql)
 
-    if not code == 1:
+    if code_users == -1 or code_roles == -1:
         return render_template("admin.html",
-                               error="Admin Dashboard konnte nicht geladen werden. Versuche es spaeter noch einmal.")
-
-    admin_table = ""
-    admin_table += "<table>"
-    admin_table += "<tr>" \
-                   "<th>ID</th>" \
-                   "<th>E-Mail</th>" \
-                   "<th>Benutzer loeschen</th>" \
-                   "<th>Rolle aendern</th>" \
-                   "</tr>"
-
-    for row in data:
-        admin_table += "<tr>"
-        admin_table += "<td>" + str(row[1]) + "</td>"
-        admin_table += "<td>" + str(row[0]) + "</td>"
-        admin_table += "<td>" + "Benutzer loeschen" + "</td>"
-        admin_table += "<td>" + "Rolle aendern" + "</td>"
-        admin_table += "</tr>"
-
-    admin_table += "</table>"
-
-    return render_template("admin.html", dashboard=admin_table)
+                               error="Admin Dashboard konnte nicht geladen werden. Versuche es später noch einmal.")
 
     # In Dashboard eintragen
-
-
-    return render_template("admin.html")
+    return render_template("admin.html", admin_active="active", users=users, roles=roles)
 
 
 @app.route("/confirm")
@@ -307,35 +274,43 @@ def confirm():
     (success, email) = db_handler.get_user_for_token(mysql, token)
     if success == -1:
         app.logger.error(
-            "Es konnte kein User for das Token '" + token + "' zurUeckgeliefert werden (ungUeltiges Token)")
-        return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestaetigt werden!")
+            "Es konnte kein User for das Token '" + token + "' zurückgeliefert werden (ungültiges Token)")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Der Benutzer konnte nicht bestaetigt werden!")
 
     if success == 2:
         app.logger.debug("Benutzer ist bereits bestaetigt!")
-        return render_template("quick_info.html", info_text="Der Benutzer wurde bereits bestaetigt!")
+        return render_template("quick_info.html", info_warning=True, info_text="Der Benutzer wurde bereits bestaetigt!")
 
     if success == 1:
-        app.logger.debug("Account bestaetigt fUer Benutzer '" + email + "' fUer Token '" + token + "'")
+        app.logger.debug("Account bestaetigt für Benutzer '" + email + "' fUer Token '" + token + "'")
 
     # Setze Token auf Defaultwert und setze verified auf 1
     success = db_handler.user_successful_verify(mysql, email)
 
     if success == -1:
         app.logger.error("User konnte nicht bestaetigt werden (Benutzer konnte in der DB nicht bestaetigt werden)")
-        return render_template("quick_info.html", info_text="Der Benutzer konnte nicht bestaetigt werden!")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Der Benutzer konnte nicht bestätigt werden!")
 
     if success == 1:
         app.logger.debug("User wurde bestaetigt")
-        return render_template("quick_info.html",
+        return render_template("quick_info.html", info_success=True,
                                info_text="Der Benutzer wurde erfolgreich bestaetigt. Du kannst dich nun einloggen.")
 
 
-@app.route("/post_message", methods=["POST", "GET"])
+@app.route("/auth/write_post")
+def write_post():
+    return render_template("new_post.html", new_post_active="active")
+
+
+@app.route("/auth/post_message", methods=["POST", "GET"])
 def post_message():
     try:
-        session["logged_in"]  # Nur eingeloggte Benutzer dUerfen Nachrichten posten
+        session["logged_in"]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except:
-        return render_template("quick_info.html", info_text="Du musst eingeloggt sein, um eine Nachricht zu posten!")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst eingeloggt sein, um eine Nachricht zu posten!")
 
     db_handler = DB_Handler()
 
@@ -344,37 +319,37 @@ def post_message():
         if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
             db_handler.invalidate_session(mysql, session["uid"])
             delete_user_session()
-            return render_template("session_timeout.html",
-                                   timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+            return render_template("quick_info.html", info_warning=True,
+                                   info_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
     # Post sanitizen
     message = request.form["post_message"]
     hashtags = request.form["post_hashtags"]
 
     if message == "":
-        return render_template("quick_info.html",
+        return render_template("quick_info.html", info_danger=True,
                                info_text="Leider konnte deine Nachricht nicht gepostet werden, da du keine Nachricht"
                                          " angegeben hast. Versuche es bitte erneut!")
 
     # Nur bestätigte Benutzer dürfen voten
     if not session["verified"]:
-        return render_template("quick_info.html",
+        return render_template("quick_info.html", info_danger=True,
                                info_text="Du musst deinen Account zuerst bestätigen, bevor du etwas posten kannst.")
 
     # Post in DB schreiben
     success = db_handler.post_message_to_db(mysql, session["uid"], None, message[:279], hashtags)
 
     if success == -1:
-        return render_template("quick_info.html",
+        return render_template("quick_info.html", info_danger=True,
                                info_text="Deine Nachricht konnte nicht geposted werden. Versuche es erneut!")
     elif success == 1:
-        return render_template("quick_info.html",
+        return render_template("quick_info.html", info_success=True,
                                info_text="Deine Nachricht wurde geposted. Du kannst sie auf der Postseite nun sehen!")
 
     return "post message uid=" + str(session["uid"]) + " message=" + message + " hashtags=" + hashtags
 
 
-@app.route("/vote")
+@app.route("/auth/vote")
 def vote():
     """
 
@@ -385,7 +360,7 @@ def vote():
     try:
         session["logged_in"]  # Nur eingeloggte Benutzer dUerfen Nachrichten posten
     except:
-        return render_template("quick_info.html", info_text="Du musst eingeloggt sein, um zu voten!")
+        return render_template("quick_info.html", info_danger=True, info_text="Du musst eingeloggt sein, um zu voten!")
 
     # Session Timeout Handling
     if session["logged_in"]:
@@ -401,18 +376,19 @@ def vote():
     uid = session["uid"]
 
     if post_id == "" or method == "":
-        return render_template("quick_info.html", info_text="Ungültige Post ID oder Zugriffsmethode!")
+        return render_template("quick_info.html", info_danger=True, info_text="Ungültige Post ID oder Zugriffsmethode!")
 
     (code, data) = db_handler.check_if_already_voted(mysql, post_id, uid)
 
     if code == -1:
-        return render_template("quick_info.html", info_text="Du hast bereits für diesen Post gevoted.")
+        return render_template("quick_info.html", info_warning=True,
+                               info_text="Du hast bereits für diesen Post gevoted.")
 
     # Hole Post aus DB
     (code, data) = db_handler.get_post_by_pid(mysql, post_id)
 
     if code == -1:
-        return render_template("quick_info.html",
+        return render_template("quick_info.html", info_danger=True,
                                info_text="Wir konnten leider keinen Post mit der ID " + str(post_id) + " finden!")
 
     method_labels = {"upvote": "Upvote", "downvote": "Downvote"}
@@ -424,7 +400,7 @@ def vote():
                            method_label=method_labels[method])
 
 
-@app.route("/finish_vote", methods=["GET", "POST"])
+@app.route("/auth/finish_vote", methods=["GET", "POST"])
 def finish_vote():
     """
     tbd
@@ -439,13 +415,15 @@ def finish_vote():
     try:
         post_id_int = int(post_id)
     except:
-        return render_template("quick_info.html", info_text="Deine Anfrage war ungUeltig. Bitte versuche es erneut!")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Deine Anfrage war ungültig. Bitte versuche es erneut!")
 
     if input_csrf == "" or csrf_token == "" or post_id == "" or post_id_int < 0 or not method in ["upvote", "downvote"]:
-        return render_template("quick_info.html", info_text="Deine Anfrage war ungUeltig. Bitte versuche es erneut!")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Deine Anfrage war ungültig. Bitte versuche es erneut!")
     # Ueberprüfe csrf_seq
     if not csrf_token == input_csrf:
-        return render_template("quick_info.html",
+        return render_template("quick_info.html", info_danger=True,
                                info_text="Der eingegebene Code war leider falsch. Bitte versuche es erneut!")
 
     # Persistiere Vote
@@ -454,7 +432,8 @@ def finish_vote():
     (code, data) = db_handler.check_if_already_voted(mysql, post_id, uid)
 
     if code == -1:
-        return render_template("quick_info.html", info_text="Du hast bereits für diesen Post gevoted.")
+        return render_template("quick_info.html", info_warning=True,
+                               info_text="Du hast bereits für diesen Post gevoted.")
 
     if method == "upvote":
         # Registriere Upvote
@@ -463,8 +442,9 @@ def finish_vote():
         # Poste Upvote
         success = db_handler.do_upvote(mysql, post_id)
         if success == -1 or success_register == -1:
-            return render_template("quick_info.html", info_text="Etwas ist schiefgelaufen! Versuche es erneut!")
-        return render_template("quick_info.html", info_text="Upvote erfolgreich!")
+            return render_template("quick_info.html", info_danger=True,
+                                   info_text="Etwas ist schiefgelaufen! Versuche es erneut!")
+        return render_template("quick_info.html", info_success=True, info_text="Upvote erfolgreich!")
 
     elif method == "downvote":
         # Registriere Downvote
@@ -473,11 +453,12 @@ def finish_vote():
         # Poste Downvote
         success = db_handler.do_downvote(mysql, post_id)
         if success == -1 or success_register == -1:
-            return render_template("quick_info.html", info_text="Etwas ist schiefgelaufen! Versuche es erneut!")
-        return render_template("quick_info.html", info_text="Downvote erfolgreich!")
+            return render_template("quick_info.html", info_danger=True,
+                                   info_text="Etwas ist schiefgelaufen! Versuche es erneut!")
+        return render_template("quick_info.html", info_success=True, info_text="Downvote erfolgreich!")
 
 
-@app.route("/controlpanel/change-email")
+@app.route("/auth/controlpanel/change-email")
 def change_email():
     """
     tbd
@@ -485,7 +466,8 @@ def change_email():
     try:
         session["logged_in"]  # Nur eingeloggte Benutzer dUerfen Nachrichten posten
     except:
-        return render_template("quick_info.html", info_text="Du musst eingeloggt sein, um deine Email zu ändern.")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst eingeloggt sein, um deine Email zu ändern.")
 
     db_handler = DB_Handler()
 
@@ -497,15 +479,79 @@ def change_email():
             return render_template("session_timeout.html",
                                    timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
-    return render_template("quick_info.html", info_text="Change Email")
+    return render_template("quick_info.html", info_success=True, info_text="Email ändern")
 
 
-@app.route("/controlpanel/change-password")
+@app.route("/auth/controlpanel/change-password")
 def change_password():
     """
     tbd
     """
-    return render_template("quick_info.html", info_text="Change Password")
+    return render_template("quick_info.html", info_success=True, info_text="Passwort ändern")
+
+
+@app.route("/reset_password", methods=["GET", "POST"])
+def reset_password():
+    if request.method == "GET":
+        return_info = {}
+        return_info["invalid_method"] = "GET"
+
+        return prepare_info_json(url_for("post_user"),
+                                 "GET ist unzulaessig fUer den Login",
+                                 return_info)
+    elif request.method == "POST":
+        reset_email = request.form["reset_email"]
+
+        if reset_email is not None or not reset_email == "":
+            function_helper.reset_password(mysql=mysql, mail=reset_email,
+                                           url=url_for('/reset_password/action'))
+
+
+@app.route("/auth/admin/delete_user")
+def delete_user():
+    try:
+        session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+        session[SESSIONID_ROLE_ADMIN]
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst Administrator sein, um diese Aktion durchführen zu dürfen")
+
+    uid = request.args.get("uid")
+
+    try:
+        int(uid)
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="User ID muss ein INT sein.")
+
+    db_handler = DB_Handler()
+    code = db_handler.delete_user(mysql, int(uid))
+
+    if code == -1:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Benutzer konnte nicht gelöscht werden. Bitte versuche es erneut.")
+    else:
+        return render_template("quick_info.html", info_success=True,
+                               info_text="Benutzer (UID: " + str(uid) + " wurde gelöscht.")
+
+    return redirect(url_for("admin_dashboard"))
+
+
+'''
+Method receiving the token to perform the recheck and the password reset
+'''
+
+
+@app.route("/reset_password/action", methods=["GET", "POST"])
+def reset_password_action():
+    token = request.form["token"]
+    uid = request.form["uid"]
+    token_check = function_helper.compare_reset_token(mysql, uid, token)
+
+    if token_check:
+        return render_template()
+    else:
+        return render_template()
 
 
 """
