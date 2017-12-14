@@ -18,7 +18,6 @@
         <th class="text-left">UID</th>
         <th class="text-left">E-Mail</th>
         <th class="text-left">Löschen?</th>
-        <th class="text-left">Rolle</th>
     </tr>
     </thead>
     <tbody class="table-hover">
@@ -26,11 +25,7 @@
     <tr>
         <td class="text-left">{{ row[1] }}</td>
         <td class="text-left">{{ row[0] }}</td>
-        <td class="text-left"><a style="color: black;" href="{{ url_for('delete_user') }}?uid={{ row[1] }}">Löschen</a></td>
-        <td class="text-left">
-            <form>Rolle:<input style="color: black;" type="text" size="5"><input style="color: black;" type="submit"
-                                                                                 value="OK">
-            </form>
+        <td class="text-left"><a style="color: black;" href="{{ url_for('delete_user') }}?uid={{ row[1] }}">Löschen</a>
         </td>
     </tr>
     {% endfor %}

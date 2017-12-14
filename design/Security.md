@@ -11,6 +11,10 @@ Welche Schwachstellen sollen überprüft und sanitized werden?
 1. User Enumeration über das Verification Token
 1. Session Tampering
 1. Clientseitige Überprüfung
+1. Trennung der Email durch Semikolon (mehrere Emails). Die Bestätigungsemail wird dennoch an die erste Email-Adresse gesendet.
+1. Serverseitige Überprüfung
+1. Serverzeit
+
 
 # Mitigation
 ## SQL Injection
@@ -41,3 +45,38 @@ Alles, was clientseitig durch JavaScript überprüft wird, muss ebenfalls server
 * Sind alle Eingabefelder ausgefüllt?
 * Sind alle Eingabefelder im richtigen Format?
 * ...
+
+## Trennung der Email durch Semikolon (mehrere Emails). Die Bestätigungsemail wird dennoch an die erste Email-Adresse gesendet.
+
+Überprüfung im Backend auf Email Format mit Regex.
+
+## Serverseitige Überprüfung
+
+### Eingabestärke
+
+Mit W3-Code das Passwort auf dessen Stärke während der Eingabe überprüfen. Implementierung W3Schools Password Validation im Frontend als auch im Backend (siehe Regex die von diesem Code bereitgestellt wird).
+
+### Registrierungsmail
+
+Überprüfung, ob E-Mail bei der Registrierung schon bekannt ist.
+
+#### Posts
+
+- XSS in Nachricht und Hashtags
+- Hashtags nur mit Komma eingeben
+- HTML Entity Injection (HTML darf nicht gerendert werden)
+
+Lösungen:
+- HTTP-Only und Secury Flag
+- Nachrichtenlänge im Frontend auf 280 Zeichen beschränken in HTML Tag
+- Prüfung der Hashtagliste im Frontend (durch Kommatrennung)
+
+
+## Serverzeit
+
+**TODO** Serverzeit nicht synchron (-1 h).
+
+## Cross Site Request Forgery (CSRF)
+
+**TODO** Muss überarbeitet werden.
+

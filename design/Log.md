@@ -9,6 +9,7 @@ Posts besser zu designen
 ## Allgemein
 - [ ] Dokumentation der Funktionen im Code
 - [X] Stelle Funktionalität auf neues Design um
+- [ ] Überprüfe alle Texeingaben (z.B.) E-Mail mit den implementierten Funktionen aus dem Backend
 
 ## Zugriff auf die Datenbank
 - [ ] Benutzen von Stored Procedures
@@ -61,8 +62,7 @@ Posts besser zu designen
 ## Dashboard
 - [X] Dynamische Generierung von Admin Dashboard-Einträgen
 - [X] Darstellung der Rollen
-- [ ] Löschen von Benutzer (erfordert erneute Anmeldung für Wirksamkeit)
-- [ ] Ändern der Rolle eines Benutzers (erfordert erneute Anmeldung für Wirksamkeit)
+- [X] Löschen von Benutzer (erfordert erneute Anmeldung für Wirksamkeit)
 
 ## Security
 - [x] Implemented a method to strip down html from messagebox
