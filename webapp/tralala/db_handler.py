@@ -470,7 +470,9 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
         try:
-            cursor.execute("SELECT token FROM tralala_reset_password WHERE uid=%s ORDER BY requesttime DESC", (userid,))
+            cursor.execute(
+                "SELECT userid, token FROM " + self.DB_TABLE_TRALALA_RESET_PASSWORD + " WHERE userid=%s ORDER BY requesttime DESC",
+                (userid,))
             data = cursor.fetchall()
 
             if cursor.rowcount == 0:
@@ -478,7 +480,7 @@ class DB_Handler:
                 conn.close()
                 return None
 
-            return data[0]
+            return data[0][1]
 
         except Exception:
             conn.close()

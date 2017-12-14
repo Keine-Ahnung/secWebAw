@@ -22,8 +22,8 @@
             <file leaf-file-name="db_handler.py" pinned="false" current-in-tab="true">
               <entry file="file://$PROJECT_DIR$/db_handler.py">
                 <provider selected="true" editor-type-id="text-editor">
-                  <state relative-caret-position="679">
-                    <caret line="472" column="107" lean-forward="false" selection-start-line="472" selection-start-column="107" selection-end-line="472" selection-end-column="107" />
+                  <state relative-caret-position="730">
+                    <caret line="482" column="29" lean-forward="false" selection-start-line="482" selection-start-column="29" selection-end-line="482" selection-end-column="29" />
                     <folding>
                       <element signature="e#0#23#0" expanded="true" />
                       <element signature="e#1235#2358#0" expanded="false" />
@@ -46,12 +46,11 @@
                       <element signature="e#12725#13138#0" expanded="false" />
                       <element signature="e#13204#13694#0" expanded="false" />
                       <element signature="e#13759#14289#0" expanded="false" />
-                      <marker date="1513265429421" expanded="true" signature="14440:14480" ph="SELECT token... tralala_reset_password" />
-                      <marker date="1513265429421" expanded="true" signature="14440:14486" ph="SELECT token... tralala_reset_password" />
-                      <marker date="1513265429421" expanded="true" signature="14440:14493" ph="SELECT token... tralala_reset_password" />
-                      <marker date="1513265429421" expanded="true" signature="14440:14519" ph="SELECT token... tralala_reset_password" />
-                      <marker date="1513265429421" expanded="true" signature="14440:14532" ph="SELECT token... tralala_reset_password" />
-                      <marker date="1513265429421" expanded="true" signature="14440:14795" ph="SELECT token... tralala_reset_password" />
+                      <marker date="1513266880283" expanded="true" signature="14457:14526" ph="SELECT token... tralala_reset_password" />
+                      <marker date="1513266880283" expanded="true" signature="14457:14533" ph="SELECT token... tralala_reset_password" />
+                      <marker date="1513266880283" expanded="true" signature="14457:14543" ph="SELECT token... tralala_reset_password" />
+                      <marker date="1513266880283" expanded="true" signature="14457:14598" ph="SELECT token... tralala_reset_password" />
+                      <marker date="1513266880283" expanded="true" signature="14457:14864" ph="SELECT token... tralala_reset_password" />
                     </folding>
                   </state>
                 </provider>
@@ -93,8 +92,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="519">
-              <caret line="656" column="61" lean-forward="false" selection-start-line="656" selection-start-column="61" selection-end-line="656" selection-end-column="61" />
+            <state relative-caret-position="502">
+              <caret line="661" column="76" lean-forward="false" selection-start-line="661" selection-start-column="76" selection-end-line="661" selection-end-column="76" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
                 <element signature="e#1015#2686#0" expanded="false" />
@@ -114,21 +113,21 @@
                 <element signature="e#22532#23564#0" expanded="false" />
                 <element signature="e#23623#23668#0" expanded="false" />
                 <element signature="e#23759#25759#0" expanded="false" />
-                <element signature="e#27828#27984#0" expanded="false" />
-                <element signature="e#28025#28255#0" expanded="false" />
-                <element signature="e#28302#28997#0" expanded="false" />
-                <element signature="e#29063#29723#0" expanded="false" />
-                <element signature="e#29858#29984#0" expanded="false" />
+                <element signature="e#27765#27921#0" expanded="false" />
+                <element signature="e#27962#28192#0" expanded="false" />
+                <element signature="e#28239#28934#0" expanded="false" />
+                <element signature="e#29000#29660#0" expanded="false" />
+                <element signature="e#29795#29921#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="reset_password.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/templates/reset_password.html">
+      <file leaf-file-name="password_reset_change.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/templates/password_reset_change.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="153">
-              <caret line="9" column="69" lean-forward="false" selection-start-line="9" selection-start-column="69" selection-end-line="9" selection-end-column="69" />
+            <state relative-caret-position="238">
+              <caret line="14" column="6" lean-forward="true" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -137,8 +136,8 @@
       <file leaf-file-name="quick_info.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/templates/quick_info.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="272">
-              <caret line="16" column="11" lean-forward="false" selection-start-line="16" selection-start-column="11" selection-end-line="16" selection-end-column="11" />
+            <state relative-caret-position="136">
+              <caret line="8" column="24" lean-forward="true" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
               <folding />
             </state>
           </provider>
@@ -213,6 +212,8 @@
         <option value="$PROJECT_DIR$/templates/reset_password.html" />
         <option value="$PROJECT_DIR$/function_helper.py" />
         <option value="$PROJECT_DIR$/db_handler.py" />
+        <option value="$PROJECT_DIR$/templates/password_request_change.html" />
+        <option value="$PROJECT_DIR$/templates/password_reset_change.html" />
         <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
@@ -223,7 +224,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="307" />
     <option name="y" value="492" />
     <option name="width" value="1936" />
@@ -383,7 +384,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1056" extended-state="7" />
     <editor active="true" />
     <layout>
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -506,13 +507,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/templates/index.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="7" column="17" lean-forward="false" selection-start-line="7" selection-start-column="17" selection-end-line="7" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/vote.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="238">
@@ -565,11 +559,11 @@
             <element signature="e#22532#23564#0" expanded="false" />
             <element signature="e#23623#23668#0" expanded="false" />
             <element signature="e#23759#25759#0" expanded="false" />
-            <element signature="e#27828#27984#0" expanded="false" />
-            <element signature="e#28025#28255#0" expanded="false" />
-            <element signature="e#28302#28997#0" expanded="false" />
-            <element signature="e#29063#29723#0" expanded="false" />
-            <element signature="e#29858#29984#0" expanded="false" />
+            <element signature="e#27765#27921#0" expanded="false" />
+            <element signature="e#27962#28192#0" expanded="false" />
+            <element signature="e#28239#28934#0" expanded="false" />
+            <element signature="e#29000#29660#0" expanded="false" />
+            <element signature="e#29795#29921#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -600,12 +594,11 @@
             <element signature="e#12725#13138#0" expanded="false" />
             <element signature="e#13204#13694#0" expanded="false" />
             <element signature="e#13759#14289#0" expanded="false" />
-            <marker date="1513265429421" expanded="true" signature="14440:14480" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14486" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14493" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14519" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14532" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14795" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14526" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14533" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14543" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14598" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14864" ph="SELECT token... tralala_reset_password" />
           </folding>
         </state>
       </provider>
@@ -669,11 +662,11 @@
             <element signature="e#22532#23564#0" expanded="false" />
             <element signature="e#23623#23668#0" expanded="false" />
             <element signature="e#23759#25759#0" expanded="false" />
-            <element signature="e#27828#27984#0" expanded="false" />
-            <element signature="e#28025#28255#0" expanded="false" />
-            <element signature="e#28302#28997#0" expanded="false" />
-            <element signature="e#29063#29723#0" expanded="false" />
-            <element signature="e#29858#29984#0" expanded="false" />
+            <element signature="e#27765#27921#0" expanded="false" />
+            <element signature="e#27962#28192#0" expanded="false" />
+            <element signature="e#28239#28934#0" expanded="false" />
+            <element signature="e#29000#29660#0" expanded="false" />
+            <element signature="e#29795#29921#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -704,12 +697,11 @@
             <element signature="e#12725#13138#0" expanded="false" />
             <element signature="e#13204#13694#0" expanded="false" />
             <element signature="e#13759#14289#0" expanded="false" />
-            <marker date="1513265429421" expanded="true" signature="14440:14480" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14486" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14493" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14519" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14532" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14795" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14526" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14533" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14543" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14598" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14864" ph="SELECT token... tralala_reset_password" />
           </folding>
         </state>
       </provider>
@@ -773,11 +765,11 @@
             <element signature="e#22532#23564#0" expanded="false" />
             <element signature="e#23623#23668#0" expanded="false" />
             <element signature="e#23759#25759#0" expanded="false" />
-            <element signature="e#27828#27984#0" expanded="false" />
-            <element signature="e#28025#28255#0" expanded="false" />
-            <element signature="e#28302#28997#0" expanded="false" />
-            <element signature="e#29063#29723#0" expanded="false" />
-            <element signature="e#29858#29984#0" expanded="false" />
+            <element signature="e#27765#27921#0" expanded="false" />
+            <element signature="e#27962#28192#0" expanded="false" />
+            <element signature="e#28239#28934#0" expanded="false" />
+            <element signature="e#29000#29660#0" expanded="false" />
+            <element signature="e#29795#29921#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -808,12 +800,11 @@
             <element signature="e#12725#13138#0" expanded="false" />
             <element signature="e#13204#13694#0" expanded="false" />
             <element signature="e#13759#14289#0" expanded="false" />
-            <marker date="1513265429421" expanded="true" signature="14440:14480" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14486" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14493" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14519" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14532" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14795" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14526" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14533" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14543" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14598" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14864" ph="SELECT token... tralala_reset_password" />
           </folding>
         </state>
       </provider>
@@ -981,14 +972,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/templates/quick_info.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="272">
-          <caret line="16" column="11" lean-forward="false" selection-start-line="16" selection-start-column="11" selection-end-line="16" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/templates/confirm_admin.html">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="136">
@@ -1003,14 +986,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="17">
           <caret line="2" column="0" lean-forward="false" selection-start-line="2" selection-start-column="0" selection-end-line="2" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/templates/reset_password.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="153">
-          <caret line="9" column="69" lean-forward="false" selection-start-line="9" selection-start-column="69" selection-end-line="9" selection-end-column="69" />
           <folding />
         </state>
       </provider>
@@ -1031,8 +1006,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/db_handler.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="679">
-          <caret line="472" column="107" lean-forward="false" selection-start-line="472" selection-start-column="107" selection-end-line="472" selection-end-column="107" />
+        <state relative-caret-position="730">
+          <caret line="482" column="29" lean-forward="false" selection-start-line="482" selection-start-column="29" selection-end-line="482" selection-end-column="29" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
             <element signature="e#1235#2358#0" expanded="false" />
@@ -1055,20 +1030,43 @@
             <element signature="e#12725#13138#0" expanded="false" />
             <element signature="e#13204#13694#0" expanded="false" />
             <element signature="e#13759#14289#0" expanded="false" />
-            <marker date="1513265429421" expanded="true" signature="14440:14480" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14486" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14493" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14519" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14532" ph="SELECT token... tralala_reset_password" />
-            <marker date="1513265429421" expanded="true" signature="14440:14795" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14526" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14533" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14543" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14598" ph="SELECT token... tralala_reset_password" />
+            <marker date="1513266880283" expanded="true" signature="14457:14864" ph="SELECT token... tralala_reset_password" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/quick_info.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="24" lean-forward="true" selection-start-line="8" selection-start-column="24" selection-end-line="8" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/reset_password.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="8" column="18" lean-forward="true" selection-start-line="8" selection-start-column="18" selection-end-line="8" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/templates/password_reset_change.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="238">
+          <caret line="14" column="6" lean-forward="true" selection-start-line="14" selection-start-column="6" selection-end-line="14" selection-end-column="6" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="519">
-          <caret line="656" column="61" lean-forward="false" selection-start-line="656" selection-start-column="61" selection-end-line="656" selection-end-column="61" />
+        <state relative-caret-position="502">
+          <caret line="661" column="76" lean-forward="false" selection-start-line="661" selection-start-column="76" selection-end-line="661" selection-end-column="76" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
             <element signature="e#1015#2686#0" expanded="false" />
@@ -1088,11 +1086,11 @@
             <element signature="e#22532#23564#0" expanded="false" />
             <element signature="e#23623#23668#0" expanded="false" />
             <element signature="e#23759#25759#0" expanded="false" />
-            <element signature="e#27828#27984#0" expanded="false" />
-            <element signature="e#28025#28255#0" expanded="false" />
-            <element signature="e#28302#28997#0" expanded="false" />
-            <element signature="e#29063#29723#0" expanded="false" />
-            <element signature="e#29858#29984#0" expanded="false" />
+            <element signature="e#27765#27921#0" expanded="false" />
+            <element signature="e#27962#28192#0" expanded="false" />
+            <element signature="e#28239#28934#0" expanded="false" />
+            <element signature="e#29000#29660#0" expanded="false" />
+            <element signature="e#29795#29921#0" expanded="false" />
           </folding>
         </state>
       </provider>

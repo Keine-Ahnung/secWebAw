@@ -653,17 +653,20 @@ def confirm_password_reset():
 
     db_handler = DB_Handler()
     ref_token = db_handler.get_reset_token(mysql, uid)
-    if ref_token == None:
+
+    if ref_token is None:
         return render_template("quick_info.html", info_danger=True,
                                info_text="Es wurde kein zugehöriger Passwort Request in unserem System gefunden. Bitte versuche es erneut.")
-    app.logger.debug("ref_token=" + ref_token)
 
     if token == ref_token:
-        return render_template("quick_info.html", info_success=True,
-                               info_text="Token stimmen überein. Passwort darf geändert werden.")
+        return render_template("password_reset_change.html", hidden_field="")
     else:
         return render_template("quick_info.html", info_danger=True,
                                info_text="Token stimmen nicht überein.")
+
+@app.route("/reset/password/set_new")
+def set_new_password():
+    pass
 
 
 '''
