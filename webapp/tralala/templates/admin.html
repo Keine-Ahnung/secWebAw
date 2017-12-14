@@ -25,7 +25,7 @@
     <tr>
         <td class="text-left">{{ row[1] }}</td>
         <td class="text-left">{{ row[0] }}</td>
-        <td class="text-left"><a style="color: black;" href="{{ url_for('delete_user') }}?uid={{ row[1] }}">Löschen</a>
+        <td class="text-left"><a style="color: black;" href="{{ url_for('admin_confirm') }}?method=delete&obj={{ row[1] }}">Löschen</a>
         </td>
     </tr>
     {% endfor %}

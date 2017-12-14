@@ -3,6 +3,7 @@ import smtplib
 import string
 
 import db_handler
+import security_helper
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
@@ -64,19 +65,21 @@ def send_verification_mail(to, confirm_url):
 
     return success
 
+
 '''
 Method to send the reset mail to an user.
 '''
 
 
-def send_reset_mail(to, uid, token, url):
-    mail_body_plain = "Your password reset request was confirmed.\n" \
-                      "Click the following link to reset the password\n\n"
-    + url + "/?token=" + token + "&uid=" + uid
+def send_reset_mail(to, uid, token, url, app):
+    mail_body_plain = "Wir haben dein Passwortanfrage erhalten.\n" \
+                      "Bitte besuche den untenstehenden Link, um dein Passwort zurückzusetzen\n\n" + "http://localhost:5000" + str(
+        url) + "?token=" + str(token) + "&uid=" + str(uid)
 
     try:
-        send_mail_basic(to, "Password reset", text_mail_body=mail_body_plain,
-                    html_mail_body=None )
+        send_mail_basic(to, "Tralala - Passwort zurücksetzen", text_mail_body=mail_body_plain,
+                        html_mail_body=None)
+        app.logger.debug("Passwort Reset Mail gesendet an " + to + " mit Token " + token)
         return True
     except Exception as e:
         return False
@@ -89,7 +92,6 @@ mailaddress stored in the database
 
 
 def reset_password(mysql: db_handler.DB_Handler, mail: str, url: str):
-
     success, data = mysql.check_for_existence(mysql=mysql, email=mail)
     if success != 1:
         return False
@@ -99,6 +101,7 @@ def reset_password(mysql: db_handler.DB_Handler, mail: str, url: str):
         mail_sended = send_reset_mail(data["email"], data["uid"], token, url)
 
     return mail_sended
+
 
 def generate_verification_token(length):
     return ''.join(random.choice(string.ascii_lowercase + string.digits)
@@ -112,3 +115,37 @@ def compare_reset_token(mysql: db_handler.DB_Handler, userid: int, token: str):
         return True
     else:
         return False
+
+
+def check_params(type, param):
+    if type == "email":
+        if not param:
+            return False
+
+        if not security_helper.check_mail(param):
+            return False
+
+        return True
+
+    elif type == "id":
+        if not param:
+            return False
+
+        try:
+            int_p = int(param)
+        except:
+            return False
+
+        if int_p < 0:
+            return False
+
+        return True
+
+    elif type == "text":
+        if not param:
+            return False
+
+        if param == "":
+            return False
+
+        return True

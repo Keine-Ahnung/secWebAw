@@ -1,0 +1,20 @@
+{% extends "base_2.html" %}
+
+{% block title %} Bitte bestätige die Aktion!{% endblock %}
+
+{% block body %}
+
+{% if method == "delete" %}
+<p><b>Aktion: </b>{{ method }}</p>
+<p><b>Objekt: </b>{{ obj }}</p>
+</br>
+
+
+<form method="POST" action="{{ url_for('delete_user') }}?uid={{ obj }}">
+    <input style="color: black; width: 200px;" type="password" name="password" id="password" placeholder="Passwort..." required>
+    </br>
+    <input type="submit" name="login">
+</form>
+{% endif %}
+
+{% endblock %}

@@ -14,6 +14,7 @@ Welche Schwachstellen sollen überprüft und sanitized werden?
 1. Trennung der Email durch Semikolon (mehrere Emails). Die Bestätigungsemail wird dennoch an die erste Email-Adresse gesendet.
 1. Serverseitige Überprüfung
 1. Serverzeit
+1. Cross Site Request Forgery (CSRF)
 
 
 # Mitigation

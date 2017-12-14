@@ -127,16 +127,17 @@ def login():
     if not check_password_hash(data["password"], login_password):
         return render_template("quick_info.html", info_danger=True,
                                info_text="Benutzername und/oder Passwort sind inkorrekt!")
+
     else:
         # Setze Sessionvariable
-        session["logged_in"] = True
-        session["user"] = login_email
-        session["uid"] = data["uid"]
-        session["role_id"] = data["role_id"]
+        session[SESSIONV_LOGGED_IN] = True
+        session[SESSIONV_USER] = login_email
+        session[SESSIONV_UID] = data["uid"]
+        session[SESSIONV_ROLE_ID] = data["role_id"]
         if data["verified"] == 1:
-            session["verified"] = True
+            session[SESSIONV_VERIFIED] = True
         else:
-            session["verified"] = False
+            session[SESSIONV_VERIFIED] = False
 
         if data["role_id"] == SESSIONID_ROLE_ADMIN:
             session[SESSIONV_ADMIN] = True
@@ -490,8 +491,8 @@ def change_password():
     return render_template("quick_info.html", info_success=True, info_text="Passwort ändern")
 
 
-@app.route("/reset_password", methods=["GET", "POST"])
-def reset_password():
+@app.route("/reset_password1", methods=["GET", "POST"])
+def reset_password1():
     if request.method == "GET":
         return_info = {}
         return_info["invalid_method"] = "GET"
@@ -507,7 +508,7 @@ def reset_password():
                                            url=url_for('/reset_password/action'))
 
 
-@app.route("/auth/admin/delete_user")
+@app.route("/auth/admin/delete_user", methods=["POST", "GET"])
 def delete_user():
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
@@ -515,7 +516,12 @@ def delete_user():
         return render_template("quick_info.html", info_danger=True,
                                info_text="Du musst Administrator und eingeloggt sein, um diese Aktion durchführen zu dürfen")
 
+    if not session[SESSIONV_ADMIN]:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst Administrator sein, um diese Aktion durchführen zu dürfen")
+
     uid = request.args.get("uid")
+    password = request.form["password"]
 
     try:
         int(uid)
@@ -523,7 +529,23 @@ def delete_user():
         return render_template("quick_info.html", info_danger=True,
                                info_text="User ID muss ein INT sein.")
 
+    if not password:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Bitte gebe ein Passwort ein.")
+
     db_handler = DB_Handler()
+
+    # Überprüfe, ob Passwork korrekt
+    (code, data) = db_handler.get_password_for_user(mysql, session[SESSIONV_USER])
+
+    if code == -1:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Konnte Benutzerdaten nicht abrufen. Bitte versuche es erneut.")
+
+    if not check_password_hash(data, password):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Das eingegebene Passwort war ungültig.")
+
     (code, e) = db_handler.delete_user(mysql, int(uid))
 
     if code == -1:
@@ -537,6 +559,111 @@ def delete_user():
         app.logger.debug("Fehler beim Löschen eines Benutzers:\n" + str(e))
         return render_template("quick_info.html", info_danger=True,
                                info_text="Ein unerwarteter Fehler ist aufgetreten.")
+
+
+@app.route("/auth/admin/confirm")
+def admin_confirm():
+    try:
+        session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst Administrator und eingeloggt sein, um diese Aktion durchführen zu dürfen")
+
+    if not session[SESSIONV_ADMIN]:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst Administrator sein, um diese Aktion durchführen zu dürfen")
+
+    method = request.args.get("method")
+    obj = request.args.get("obj")
+
+    try:
+        int(obj)
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Objekt muss ein INT sein.")
+
+    if not method in ["delete"]:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Ungültige Aktion. Bitte versuche es erneut.")
+
+    return render_template("confirm_admin.html", obj=obj, method=method)
+
+
+@app.route("/reset/password")
+def reset_password():
+    return render_template("reset_password.html")
+
+
+@app.route("/reset/password/handle", methods=["POST"])
+def handle_password_reset():
+    try:
+        if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+            return render_template("quick_info.html", info_danger=True,
+                                   info_text="Du bist bereits eingeloggt. Du musst dich zuerst ausloggen, bevor du dein Passwort zurücksetzen kannst.")
+    except:
+        pass
+
+    email = request.form["reset_email"]
+
+    if not email or not security_helper.check_mail(email):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Die E-Mail besitzt ein ungültiges Format. Bitte versuche es erneut.")
+
+    db_handler = DB_Handler()
+
+    # Überprüfe, ob Account mit angegebener E-Mail existiert
+    (code, data) = db_handler.check_for_existence(mysql, email)
+    if code != 1:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Wir konnten leider keinen Account mit der angegebenen E-Mail finden. Bitte Überprüfe die E-Mail und versuche es erneut.")
+
+    uid = data["uid"]
+
+    # Überprüfe auf Spam Attacke bzw. zu viele Passwort Resets
+    if not db_handler.count_password_requests(mysql, int(uid), app):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du hast zu oft versucht dein Passwort zurückzusetzen, weshalb wir dieses Feature für dich vorübergehend deaktiviert haben, um mögliche Spam-Attacken zu verhindern. Vielen Dank für dein Verständnis.")
+
+    # Persistiere Reset Token
+    token = function_helper.generate_verification_token(32)
+    db_handler.set_reset_token(mysql, token, uid, app)
+
+    # Sende Reset Email
+    function_helper.send_reset_mail(email, uid, token, url_for("confirm_password_reset"), app)
+
+    return render_template("quick_info.html", info_success=True,
+                           info_text="Falls deine E-Mail Adresse bei uns registriert ist, haben wir dir eine E-Mail mit weiteren Anweisungen zum Vorgehen geschickt.")
+
+
+@app.route("/reset/password/confirm_reset")
+def confirm_password_reset():
+    try:
+        if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+            return render_template("quick_info.html", info_danger=True,
+                                   info_text="Du bist bereits eingeloggt. Du musst dich zuerst ausloggen, bevor du den Password Reset vervollständigen kannst.")
+    except:
+        pass
+
+    token = request.args.get("token")
+    uid = request.args.get("uid")
+
+    if not function_helper.check_params("text", token) or not function_helper.check_params("id", uid):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Leider konnten wir deine Anfrage nicht verstehen. Bitte ändere nichts an dem Link, den wir dir per Mail zugeschickt haben.")
+
+    db_handler = DB_Handler()
+    ref_token = db_handler.get_reset_token(mysql, uid)
+    if ref_token == None:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Es wurde kein zugehöriger Passwort Request in unserem System gefunden. Bitte versuche es erneut.")
+    app.logger.debug("ref_token=" + ref_token)
+
+    if token == ref_token:
+        return render_template("quick_info.html", info_success=True,
+                               info_text="Token stimmen überein. Passwort darf geändert werden.")
+    else:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Token stimmen nicht überein.")
 
 
 '''

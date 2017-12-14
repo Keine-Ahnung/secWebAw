@@ -4,6 +4,7 @@ import time
 import datetime
 import security_helper
 import traceback
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class DB_Handler:
@@ -13,6 +14,7 @@ class DB_Handler:
     DB_TABLE_TRALALA_POST_VOTES = "tralala_post_votes"
     DB_TABLE_TRALALA_ACTIVE_SESSIONS = "tralala_active_sessions"
     DB_TABLE_TRALALA_ROLES = "tralala_roles"
+    DB_TABLE_TRALALA_RESET_PASSWORD = "tralala_reset_password"
 
     MAX_SESSION_TIME = 60  # Minuten
 
@@ -410,13 +412,45 @@ class DB_Handler:
             conn.close()
             return -1, e
 
-    '''
-    Method to set the reset token into the database
-    '''
+    def get_password_for_user(self, mysql, email):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
 
-    @staticmethod
-    def set_reset_token(mysql, token, uid):
+        cursor.execute(
+            "select password from " + self.DB_TABLE_TRALALA_USERS + " where email=%s",
+            (email,))
+        data = cursor.fetchone()
 
+        if cursor.rowcount == 0:
+            conn.close()
+            return -1, False
+        else:
+            conn.close()
+            return 1, data[0]
+
+    def count_password_requests(self, mysql, uid, app):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "select * from " + self.DB_TABLE_TRALALA_RESET_PASSWORD + " where userid=%s",
+            (uid,))
+        data = cursor.fetchall()
+        app.logger.debug("Total resets for " + str(uid) + ": " + str(cursor.rowcount))
+        if cursor.rowcount >= 5:
+            conn.close()
+            return False
+        else:
+            conn.close()
+            return True
+
+    def set_reset_token(self, mysql, token, uid, app):
         ts = time.time()
         timestamp = datetime.datetime.fromtimestamp(ts).strftime(
             '%Y-%m-%d %H:%M:%S')
@@ -424,27 +458,28 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("INSERT INTO tralala_reset_password VALUES (%s,%s,%s)", (uid, token, timestamp,))
+            cursor.execute("INSERT INTO " + self.DB_TABLE_TRALALA_RESET_PASSWORD + " VALUES (%s,%s,%s)",
+                           (uid, token, timestamp,))
             conn.commit()
             conn.close()
         except Exception as e:
+            app.logger.debug("Exception bei set_reset_token:\n" + str(e))
             conn.close()
 
-    '''
-    Method to get the token from the database.
-    '''
-
-    @staticmethod
-    def get_reset_token(mysql, userid):
+    def get_reset_token(self, mysql, userid):
         conn = mysql.connect()
         cursor = conn.cursor()
         try:
-            cursor.execute("""SELECT token FROM tralala_reset_password 
-                               WHERE uid=(%s)""", userid)
+            cursor.execute("SELECT token FROM tralala_reset_password WHERE uid=%s ORDER BY requesttime DESC", (userid,))
             data = cursor.fetchall()
-            cursor.close()
-            conn.close()
+
+            if cursor.rowcount == 0:
+                cursor.close()
+                conn.close()
+                return None
+
             return data[0]
+
         except Exception:
             conn.close()
-            return ''
+            return None
