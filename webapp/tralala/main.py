@@ -637,6 +637,11 @@ def handle_password_reset():
 
 @app.route("/reset/password/confirm_reset")
 def confirm_password_reset():
+    """
+    Handler, um den Passwort Reset Link auszuwerten und anschließend auf die Seite weiterzuleiten, auf der das neue Passwort gesetzt
+    werden kann
+    :return:
+    """
     try:
         if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
             return render_template("quick_info.html", info_danger=True,
@@ -658,15 +663,59 @@ def confirm_password_reset():
         return render_template("quick_info.html", info_danger=True,
                                info_text="Es wurde kein zugehöriger Passwort Request in unserem System gefunden. Bitte versuche es erneut.")
 
-    if token == ref_token:
-        return render_template("password_reset_change.html", hidden_field="")
-    else:
+    if not token == ref_token:
         return render_template("quick_info.html", info_danger=True,
                                info_text="Token stimmen nicht überein.")
+    return render_template("password_reset_change.html", token=ref_token, uid=uid)
 
-@app.route("/reset/password/set_new")
+
+@app.route("/reset/password/set_new", methods=["POST"])
 def set_new_password():
-    pass
+    try:
+        if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+            return render_template("quick_info.html", info_danger=True,
+                                   info_text="Du bist bereits eingeloggt. Du musst dich zuerst ausloggen, bevor du den Password Reset vervollständigen kannst.")
+    except:
+        pass
+
+    new_pass = request.form["new_password"]
+    new_pass_confirm = request.form["new_password_confirm"]
+    hidden_token = request.form["h_token"]
+    hidden_uid = request.form["h_uid"]
+
+    # Überprüfe auf korrekte Form der Parameterinhalte
+    if not function_helper.check_params("password", new_pass) or not function_helper.check_params("password",
+                                                                                                  new_pass_confirm) or not function_helper.check_params(
+        "text", hidden_token) or not function_helper.check_params("id", hidden_uid):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Wir konnten deine Anfrage leider nicht verarbeiten, da einige Felder entweder leer waren oder das falsche Format aufwiesen")
+
+    # Überprüfe auf Gleichheit der Passwörter
+    if not new_pass == new_pass_confirm:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Die beiden Passwörter stimmen leider nicht überein. Bitte versuche es erneut.")
+
+    # Überprüfe, ob Token und ID korrekt sind und setze anschließend das Passwort
+    db_handler = DB_Handler()
+
+    ref_token = db_handler.get_reset_token(mysql, int(hidden_uid))
+
+    if not ref_token == hidden_token:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Das übermittelte Reset Token stimmt leider nicht mit dem uns bekannten Token überein. Es ist möglich, dass dieses während der Übertragung verändert wurde. Bitte versuche es erneut.")
+
+    # Hole mit dem Token korrespondierendes Token aus der Datenbank
+    (uid, token) = db_handler.get_reset_token(mysql, hidden_uid, "get_token_uid")
+
+    # Schreibe neues Passwort in die Datenbank
+    hashed_pass = generate_password_hash(new_pass)
+    db_handler.set_pass_for_user(mysql, uid, hashed_pass, app)
+
+    # Lösche Tokeneintrag aus der Datenbank
+    db_handler.delete_pass_reset_token(mysql, uid, app)
+
+    return render_template("quick_info.html", info_success=True,
+                           info_text="Dein Passwort wurde geändert. Du kannst dich nun einloggen.")
 
 
 '''
@@ -676,6 +725,12 @@ Method receiving the token to perform the recheck and the password reset
 
 @app.route("/reset_password/action", methods=["GET", "POST"])
 def reset_password_action():
+    """
+    Erhält Daten des neuen Passworts. Ändert Passwort des Benutzers in der Datenbank.
+    Wichtig: Setze das Passwort nur für die User ID die für das Token aus der Datenbank ausgelesen wurde und nicht das Passwort der UID,
+    die über die URL mitgegeben wurde!
+    :return:
+    """
     token = request.form["token"]
     uid = request.form["uid"]
     token_check = function_helper.compare_reset_token(mysql, uid, token)

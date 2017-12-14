@@ -466,7 +466,7 @@ class DB_Handler:
             app.logger.debug("Exception bei set_reset_token:\n" + str(e))
             conn.close()
 
-    def get_reset_token(self, mysql, userid):
+    def get_reset_token(self, mysql, userid, mode=None):
         conn = mysql.connect()
         cursor = conn.cursor()
         try:
@@ -480,8 +480,46 @@ class DB_Handler:
                 conn.close()
                 return None
 
+            if mode == "get_token_uid":
+                return data[0][0], data[0][1]
+
             return data[0][1]
 
         except Exception:
             conn.close()
             return None
+
+    def set_pass_for_user(self, mysql, uid, new_pass, app):
+        """
+         tbd
+         """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET password=%s WHERE uid=%s", (new_pass, uid))
+            conn.commit()
+            conn.close()
+            return 1
+        except Exception as e:
+            app.logger.debug("Fehler bei set_pass_for_user:\n" + str(e))
+            conn.close()
+            return -1
+
+    def delete_pass_reset_token(self, mysql, uid, app):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("DELETE FROM " + self.DB_TABLE_TRALALA_RESET_PASSWORD + " WHERE userid=%s", (uid,))
+            conn.commit()
+            conn.close()
+            return 1, None
+        except Exception as e:
+            app.logger.debug("Fehler bei delete_pass_reset_token:\n" + str(e))
+            conn.close()
+            return -1, e

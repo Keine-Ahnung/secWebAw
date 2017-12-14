@@ -149,3 +149,17 @@ def check_params(type, param):
             return False
 
         return True
+
+    elif type == "password":
+        if not param:
+            return False
+
+        if param == "":
+            return False
+
+        if not security_helper.check_password_strength(param)[0]:
+            return False
+
+        return True
+
+        return True
