@@ -85,3 +85,6 @@ Lösungen:
 ## Attacke auf den Passwort Reset
 
 Reset Token und UID werden über den Reset Link mitgegeben. Suche mithilfe der über die URL spezifizierten UID in der Datenbank nach einem Reset Token. Wurde eins gefunden, vergleiches diese Token mit dem über die URL mitgelieferten Token. Sind diese Token identisch, erlaube dem Benutzer sein Passwort zu ändern. Ändere nur das Passworts des Benutzers mit der UID, welche in der Datenbank mit dem Token gespeichert wurde und nicht die UID, die der Benutzer über die URL mitgegeben hat.
+
+
+Spam durch Passwort Reset Funktion: Erlaube maximal 5 gleichzeitige Password Change Requests (um Spam durch diese Funktion zu verhindern), resette Sperre nach erfolgreicher Änderung 

@@ -74,9 +74,17 @@ Posts besser zu designen
 - [x] Set HttpOnly und Secure Flags
 
 ## Password reset
-- [ ] Build method to reset the password (Check mail + security question + answer, send mail if ok, no mail if not)
-- [ ] Add security- question to sign up
-- [ ] Build html page to insert the mail, captcha, security-question
+- [X] Build method to reset the password (Check mail + security question + answer, send mail if ok, no mail if not)
+- [X] Add security- question to sign up
+- [X] Build html page to insert the mail, captcha, security-question
+- [X] Überprüfe, ob UID oder Token des Reset Links verändert wurden
+- [X] Behandle verschiedene Fälle (z.B. Manipualtion) entsprechend und verweigere den Zugriff
+- [X] Nach erfolgreicher Änderung, lösche alle Password Change Requests aus der Datenbank
+- [X] Erlaube maximal 5 gleichzeitige Password Change Requests (um Spam durch diese Funktion zu verhindern), resette Sperre nach erfolgreicher Änderung
+
+## Passwortänderung
+- [X] Implementiere Passwortänderung
+- [x] Überprüfe Passwörter auf Gleichheit, Stärke etc.
 
 
 ## Skripte

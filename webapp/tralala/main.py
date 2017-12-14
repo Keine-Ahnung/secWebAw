@@ -483,12 +483,57 @@ def change_email():
     return render_template("quick_info.html", info_success=True, info_text="Email ändern")
 
 
-@app.route("/auth/controlpanel/change-password")
+@app.route("/auth/controlpanel/change_password")
 def change_password():
     """
     tbd
     """
-    return render_template("quick_info.html", info_success=True, info_text="Passwort ändern")
+    try:
+        session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst eingeloggt sein, um diese Aktion durchführen zu dürfen")
+
+    return render_template("password_change.html")
+
+
+@app.route("/auth/controlpanel/change_password_handler", methods=["POST"])
+def change_password_handler():
+    try:
+        session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst eingeloggt sein, um diese Aktion durchführen zu dürfen")
+
+    old_pass = request.form["old_password"]
+    new_pass = request.form["new_password"]
+    new_pass_confirm = request.form["new_password_confirm"]
+
+    if not function_helper.check_params("password", old_pass) or not function_helper.check_params("password",
+                                                                                                  new_pass) or not function_helper.check_params(
+        "password", new_pass_confirm):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Bitte fülle alle Felder aus und beachte die Passwortrichtlinien.")
+
+    if not new_pass == new_pass_confirm:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Die Bestätigung des neuen Passworts stimmt nicht mit dem neuen Passwort überein. Bitte versuche es erneut.")
+
+    db_handler = DB_Handler()
+
+    user_email = session[SESSIONV_USER]
+    curr_pass = db_handler.get_password_for_user(mysql, user_email)[
+        1]  # Greife auf Index 1 zu, da Tupel zurückgegeben wird mit (1, "pbkdf2:sha256:xxx")
+    app.logger.debug("Passwörter: user_email=" + user_email + " old_pass=" + old_pass + " curr_pass=" + str(curr_pass))
+    uid = int(session[SESSIONV_UID])
+
+    if not check_password_hash(curr_pass, old_pass):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Das eingegebene Passwort war falsch. Bitte versuche es erneut.")
+
+    db_handler.set_pass_for_user(mysql, uid, generate_password_hash(new_pass), app)
+
+    return render_template("quick_info.html", info_success=True, info_text="Dein Passwort wurde geändert.")
 
 
 @app.route("/reset_password1", methods=["GET", "POST"])
