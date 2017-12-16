@@ -73,13 +73,17 @@ Method to send the reset mail to an user.
 
 def send_reset_mail(to, uid, token, url, app):
     mail_body_plain = "Wir haben dein Passwortanfrage erhalten.\n" \
-                      "Bitte besuche den untenstehenden Link, um dein Passwort zurückzusetzen\n\n" + "http://localhost:5000" + str(
-        url) + "?token=" + str(token) + "&uid=" + str(uid)
+                      "Bitte besuche den untenstehenden Link, um dein " \
+                      "Passwort zurückzusetzen\n\n" +\
+                      "http://localhost:5000" + str(url) + \
+                      "?token=" + str(token) + "&uid=" + str(uid)
 
     try:
-        send_mail_basic(to, "Tralala - Passwort zurücksetzen", text_mail_body=mail_body_plain,
+        send_mail_basic(to, "Tralala - Passwort zurücksetzen",
+                        text_mail_body=mail_body_plain,
                         html_mail_body=None)
-        app.logger.debug("Passwort Reset Mail gesendet an " + to + " mit Token " + token)
+        app.logger.debug("Passwort Reset Mail gesendet an "
+                         + to + " mit Token " + token)
         return True
     except Exception as e:
         return False
