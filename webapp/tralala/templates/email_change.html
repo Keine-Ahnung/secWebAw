@@ -1,0 +1,22 @@
+{% extends "base_2.html" %}
+
+{% block title %} E-Mail ändern {% endblock %}
+
+{% block body %}
+
+<div class="modal-dialog">
+    <div class="loginmodal-container">
+        <h1>E-Mail ändern</h1><br>
+        <form method="POST" action="{{ url_for('change_email_handler') }}">
+            <input type="email" name="new_email" id="new_email" placeholder="Neue E-Mail..." required>
+            <input type="email" name="new_email_confirm" id="new_email_confirm"
+                   placeholder="Neue E-Mail wiederholen..." required>
+            <input type="password" name="confirm_pass" id="confirm_pass" placeholder="Passwort..." required>
+            <input type="hidden" name="h_token" value="{{ token }}">
+            <input type="hidden" name="h_uid" value="{{ uid }}">
+            <input type="submit" name="login" class="login loginmodal-submit" value="Abschicken">
+        </form>
+    </div>
+</div>
+
+{% endblock %}

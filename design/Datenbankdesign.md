@@ -35,6 +35,20 @@
 * session_start:`datetime`
 * session_max_alive:`datetime`
 
+## tralala_reset_password
+* userid:`int` (FK -> tralala_users.uid)
+* token:`varchar(100)`
+* requesttime:`datetime`
+
+## tralala_cp_change
+* uid:`int`(FK -> tralala_users.uid)
+* token:`varchar(100)`
+* requesttime:`datetime`
+* action:`varchar(50)`
+* data:`varchar(250)`
+
+
+
 # Constraints
 ## tralala_users -> tralala_profiles
 

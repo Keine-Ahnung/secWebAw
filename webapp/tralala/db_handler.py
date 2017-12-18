@@ -15,6 +15,7 @@ class DB_Handler:
     DB_TABLE_TRALALA_ACTIVE_SESSIONS = "tralala_active_sessions"
     DB_TABLE_TRALALA_ROLES = "tralala_roles"
     DB_TABLE_TRALALA_RESET_PASSWORD = "tralala_reset_password"
+    DB_TABLE_TRALALA_CP_CHANGE = "tralala_cp_change"
 
     MAX_SESSION_TIME = 60  # Minuten
 
@@ -491,8 +492,8 @@ class DB_Handler:
 
     def set_pass_for_user(self, mysql, uid, new_pass, app):
         """
-         tbd
-         """
+        tbd
+        """
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -504,6 +505,24 @@ class DB_Handler:
             return 1
         except Exception as e:
             app.logger.debug("Fehler bei set_pass_for_user:\n" + str(e))
+            conn.close()
+            return -1
+
+    def set_email_for_user(self, mysql, uid, new_email, app):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET email=%s WHERE uid=%s", (new_email, uid))
+            conn.commit()
+            conn.close()
+            return 1
+        except Exception as e:
+            app.logger.debug("Fehler bei set_email_for_user:\n" + str(e))
             conn.close()
             return -1
 
@@ -523,3 +542,94 @@ class DB_Handler:
             app.logger.debug("Fehler bei delete_pass_reset_token:\n" + str(e))
             conn.close()
             return -1, e
+
+    def set_token_password_change(self, mysql, uid, token, new_pass):
+        ts = time.time()
+        timestamp = datetime.datetime.fromtimestamp(ts).strftime(
+            '%Y-%m-%d %H:%M:%S')
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("INSERT INTO " + self.DB_TABLE_TRALALA_CP_CHANGE + " VALUES (%s,%s,%s,%s,%s)",
+                           (uid, token, timestamp, "change_password", new_pass))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            conn.close()
+
+    def set_token_email_change(self, mysql, uid, token, new_email):
+        ts = time.time()
+        timestamp = datetime.datetime.fromtimestamp(ts).strftime(
+            '%Y-%m-%d %H:%M:%S')
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("INSERT INTO " + self.DB_TABLE_TRALALA_CP_CHANGE + " VALUES (%s,%s,%s,%s,%s)",
+                           (uid, token, timestamp, "change_email", new_email))
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            conn.close()
+
+    def get_reset_token_cp(self, mysql, uid, action, mode=None, app=None):
+        conn = mysql.connect()
+        cursor = conn.cursor()
+        try:
+            cursor.execute(
+                "SELECT uid, token, data FROM " + self.DB_TABLE_TRALALA_CP_CHANGE + " WHERE uid=%s AND action=%s ORDER BY requesttime DESC",
+                (uid, action))
+            data = cursor.fetchall()
+
+            if cursor.rowcount == 0:
+                cursor.close()
+                conn.close()
+                return None
+
+            # Gebe das neue Passwort zurück, das nun in die Users-Tabelle geschrieben wird (spezieller Modus, um nicht zu viele einzelne Funktionen zu haben)
+            if mode == "get_data":
+                return data[0][2]
+            # Gebe das Token zur Überprüfung zurück (eigentlicher Standardmodus)
+            return data[0][1]
+
+        except Exception as e:
+            conn.close()
+            if not app is None:
+                app.logger.debug("Fehler bei get_reset_token_cp:\n" + str(e))
+            return None
+
+    def delete_cp_token(self, mysql, uid, action):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("DELETE FROM " + self.DB_TABLE_TRALALA_CP_CHANGE + " WHERE uid=%s AND action=%s",
+                           (uid, action))
+            conn.commit()
+            conn.close()
+            return 1, None
+        except Exception as e:
+            conn.close()
+            return -1, e
+
+    def set_email_for_user(self, mysql, uid, new_email, app):
+        """
+        tbd
+        """
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET email=%s WHERE uid=%s", (new_email, uid))
+            conn.commit()
+            conn.close()
+            return 1
+        except Exception as e:
+            app.logger.debug("Fehler bei set_email_for_user:\n" + str(e))
+            conn.close()
+            return -1

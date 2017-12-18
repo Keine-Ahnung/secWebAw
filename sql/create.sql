@@ -56,6 +56,15 @@ CREATE TABLE tralala.tralala_reset_password(
 	requesttime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
 ) ENGINE=INNODB;
 
+CREATE TABLE tralala.tralala_cp_change(
+	uid INT NOT NULL,
+	token varchar(100) NOT NULL UNIQUE,
+	requesttime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	action varchar(50) NOT NULL,
+	data varchar(250) NOT NULL
+) ENGINE=INNODB;
+
+
 DROP USER IF EXISTS 'db_admin_tralala'@'localhost', 'db_admin_tralala'@'%';
 FLUSH PRIVILEGES;
 CREATE USER 'db_admin_tralala'@'localhost' IDENTIFIED BY 'tr4l4l4_mysql_db.';

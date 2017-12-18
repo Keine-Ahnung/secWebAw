@@ -10,6 +10,8 @@ Posts besser zu designen
 - [ ] Dokumentation der Funktionen im Code
 - [X] Stelle Funktionalität auf neues Design um
 - [ ] Überprüfe alle Texeingaben (z.B.) E-Mail mit den implementierten Funktionen aus dem Backend
+- [ ] Loggingtabelle erstellen
+- [ ] Accountübersicht mit E-Mail und evtl. Anzahl Posts
 
 ## Zugriff auf die Datenbank
 - [ ] Benutzen von Stored Procedures

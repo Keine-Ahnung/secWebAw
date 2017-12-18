@@ -10,6 +10,7 @@ import function_helper
 import security_helper
 from db_handler import DB_Handler
 from function_helper import generate_verification_token
+import datetime
 
 app = Flask(__name__)
 
@@ -34,6 +35,12 @@ SESSIONV_ADMIN = "is_admin"
 SESSIONV_ITER = [SESSIONV_LOGGED_IN, SESSIONV_USER, SESSIONV_UID, SESSIONV_ROLE_ID, SESSIONV_VERIFIED]
 
 SESSIONID_ROLE_ADMIN = 5
+
+"""
+    Andere Konstanten
+"""
+
+DBC_CP_GETDATA = "get_data"
 
 
 @app.route("/")
@@ -465,23 +472,107 @@ def change_email():
     tbd
     """
     try:
-        session["logged_in"]  # Nur eingeloggte Benutzer dUerfen Nachrichten posten
+        session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except:
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du musst eingeloggt sein, um deine Email zu ändern.")
+                               info_text="Du musst eingeloggt sein, um diese Aktion durchführen zu dürfen")
+
+    return render_template("email_change.html")
+
+
+@app.route("/auth/controlpanel/change_email_handler", methods=["POST"])
+def change_email_handler():
+    try:
+        session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du musst eingeloggt sein, um diese Aktion durchführen zu dürfen")
+
+    new_email = request.form["new_email"]
+    new_email_confirm = request.form["new_email_confirm"]
+    confirm_pass = request.form["confirm_pass"]
+
+    if not function_helper.check_params("password", confirm_pass) or not function_helper.check_params("email",
+                                                                                                      new_email) or not function_helper.check_params(
+        "email", new_email_confirm):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Bitte fülle alle Felder aus und beachte die Passwortrichtlinien.")
+
+    if not new_email == new_email_confirm:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Die Bestätigung der neuen E-Mail stimmt nicht mit der neuen Mail überein. Bitte versuche es erneut.")
 
     db_handler = DB_Handler()
 
-    # Session Timeout Handling
-    if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
-            db_handler.invalidate_session(mysql, session["uid"])
-            delete_user_session()
-            return render_template("session_timeout.html",
-                                   timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+    user_email = session[SESSIONV_USER]
+    curr_pass = db_handler.get_password_for_user(mysql, user_email)[
+        1]  # Greife auf Index 1 zu, da Tupel zurückgegeben wird mit (1, "pbkdf2:sha256:xxx")
+    uid = int(session[SESSIONV_UID])
 
-    return render_template("quick_info.html", info_success=True, info_text="Email ändern")
+    # Überprüfe, ob das eingegebene Passwort richtig war
 
+    if not check_password_hash(curr_pass, confirm_pass):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Das eingegebene Passwort war falsch. Bitte versuche es erneut.")
+
+    # Confirm Token in Datenbank festschreiben
+    token = generate_verification_token(32)
+    db_handler.set_token_email_change(mysql, uid, token, new_email)
+
+    # Bestätigungsmail senden
+    ts = time.time()
+    timestamp = datetime.datetime.fromtimestamp(ts).strftime(
+        '%Y-%m-%d %H:%M:%S')
+
+    function_helper.send_mail_basic(user_email,
+                                    "Änderung der E-Mail",
+                                    "Hallo " + user_email + ",\n bitte klicke auf den folgenden Link, um die Änderung deiner E-Mail um " + str(
+                                        timestamp) + " zu bestätigen.\n\nlocalhost:5000" + url_for(
+                                        "confirm_email_change") + "?uid=" + str(uid) + "&token=" + str(token))
+
+    return render_template("quick_info.html", info_success=True,
+                           info_text="Wir haben eine Bestätigungsmail an die angegebene E-Mail Adresse geschickt. Der darin enthaltene Link bestätigt deine Änderung.")
+
+
+@app.route("/auth/controlpanel/confirm_email_change")
+def confirm_email_change():
+    uid = request.args.get("uid")
+    token = request.args.get("token")
+
+    if not function_helper.check_params("id", uid) or not function_helper.check_params("text", token):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Leider konnten wir deine übermittelte Anfrage nicht verstehen. Bitte verändere nichts an dem Link, den wir dir geschickt haben.")
+
+    try:
+        int(uid)
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Leider konnten wir deine übermittelte Anfrage nicht verstehen. Bitte verändere nichts an dem Link, den wir dir geschickt haben.")
+
+    db_handler = DB_Handler()
+
+    sys_token = db_handler.get_reset_token_cp(mysql, int(uid), "change_email", app=app)
+
+    app.logger.debug("sys_token=" + str(sys_token) + " token=" + token)
+
+    if sys_token == None:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Wir konnten leider keine zugehörige Anfrage zur Passwortänderung im System finden. Bitte achte darauf, nichts an dem Link zu verändern und versuche es erneut.")
+
+    if not sys_token == token:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Das übermittelte Token war ungültig.")
+
+    new_email = db_handler.get_reset_token_cp(mysql, int(uid), "change_email", mode=DBC_CP_GETDATA)
+
+    db_handler.set_email_for_user(mysql, int(uid), new_email, app)
+
+    # Tabelle aufräumen
+    db_handler.delete_cp_token(mysql, int(uid), "change_email")
+
+    delete_user_session()
+
+    return render_template("quick_info.html", info_success=True, info_text="Die E-Mail wurde geändert.")
 
 @app.route("/auth/controlpanel/change_password")
 def change_password():
@@ -524,16 +615,70 @@ def change_password_handler():
     user_email = session[SESSIONV_USER]
     curr_pass = db_handler.get_password_for_user(mysql, user_email)[
         1]  # Greife auf Index 1 zu, da Tupel zurückgegeben wird mit (1, "pbkdf2:sha256:xxx")
-    app.logger.debug("Passwörter: user_email=" + user_email + " old_pass=" + old_pass + " curr_pass=" + str(curr_pass))
     uid = int(session[SESSIONV_UID])
 
     if not check_password_hash(curr_pass, old_pass):
         return render_template("quick_info.html", info_danger=True,
                                info_text="Das eingegebene Passwort war falsch. Bitte versuche es erneut.")
 
-    db_handler.set_pass_for_user(mysql, uid, generate_password_hash(new_pass), app)
+    # Confirm Token in Datenbank festschreiben
+    token = generate_verification_token(32)
+    db_handler.set_token_password_change(mysql, uid, token, generate_password_hash(new_pass))
 
-    return render_template("quick_info.html", info_success=True, info_text="Dein Passwort wurde geändert.")
+    # Bestätigungsmail senden
+    ts = time.time()
+    timestamp = datetime.datetime.fromtimestamp(ts).strftime(
+        '%Y-%m-%d %H:%M:%S')
+
+    function_helper.send_mail_basic(user_email,
+                                    "Änderung des Passworts",
+                                    "Hallo " + user_email + ",\n bitte klicke auf den folgenden Link, um die Änderung deines Passworts um " + str(
+                                        timestamp) + " zu bestätigen.\n\nlocalhost:5000" + url_for(
+                                        "confirm_password_change") + "?uid=" + str(uid) + "&token=" + str(token))
+
+    return render_template("quick_info.html", info_success=True,
+                           info_text="Wir haben eine Bestätigungsmail an die angegebene E-Mail Adresse geschickt. Der darin enthaltene Link bestätigt deine Änderung.")
+
+
+@app.route("/auth/controlpanel/confirm_password_change")
+def confirm_password_change():
+    uid = request.args.get("uid")
+    token = request.args.get("token")
+
+    if not function_helper.check_params("id", uid) or not function_helper.check_params("text", token):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Leider konnten wir deine übermittelte Anfrage nicht verstehen. Bitte verändere nichts an dem Link, den wir dir geschickt haben.")
+
+    try:
+        int(uid)
+    except:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Leider konnten wir deine übermittelte Anfrage nicht verstehen. Bitte verändere nichts an dem Link, den wir dir geschickt haben.")
+
+    db_handler = DB_Handler()
+
+    sys_token = db_handler.get_reset_token_cp(mysql, int(uid), "change_password", app=app)
+
+    if sys_token == None:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Wir konnten leider keine zugehörige Anfrage zur Passwortänderung im System finden. Bitte achte darauf, nichts an dem Link zu verändern und versuche es erneut.")
+
+    app.logger.debug("sys_token=" + str(sys_token) + " token=" + token)
+
+    if not sys_token == token:
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Das übermittelte Token war ungültig.")
+
+    new_pass = db_handler.get_reset_token_cp(mysql, int(uid), "change_password", mode=DBC_CP_GETDATA)
+
+    db_handler.set_pass_for_user(mysql, int(uid), new_pass, app)
+
+    # Tabelle aufräumen
+    db_handler.delete_cp_token(mysql, int(uid), "change_password")
+
+    delete_user_session()
+
+    return render_template("quick_info.html", info_success=True, info_text="Das Passwort wurde geändert.")
 
 
 @app.route("/reset_password1", methods=["GET", "POST"])
