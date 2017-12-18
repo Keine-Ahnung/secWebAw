@@ -66,6 +66,10 @@ Posts besser zu designen
 - [X] Darstellung der Rollen
 - [X] Löschen von Benutzer (erfordert erneute Anmeldung für Wirksamkeit)
 
+## Controlpanel
+- [X] Passwortänderung mit E-Mail Bestätigung
+- [X] Änderung der E-mail mit E-Mail Bestätigung
+
 ## Security
 - [x] Implemented a method to strip down html from messagebox
 - [x] Implemented method to strip down html and # from hashtags. Method is based on the change request.
