@@ -136,3 +136,52 @@
 [18:24:08 18-12-2017] (Debug) main.py::<module>.1157: Server Reload...
 [18:25:01 18-12-2017] (Debug) main.py::<module>.1159: Server Reload...
 [18:25:40 18-12-2017] (Debug) main.py::<module>.1160: Server Reload...
+[18:26:25 18-12-2017] (Debug) main.py::<module>.1163: Server Reload...
+[18:26:47 18-12-2017] (Debug) main.py::<module>.1158: Server Reload...
+[18:26:54 18-12-2017] (Debug) main.py::<module>.1156: Server Reload...
+[18:27:30 18-12-2017] (Debug) main.py::<module>.1154: Server Reload...
+[18:27:40 18-12-2017] (Debug) main.py::<module>.1150: Server Reload...
+[18:28:22 18-12-2017] (Success) main.py::logout.183: Benutzer wurde ausgeloggt: marc-friedrich94@web.de
+[18:29:36 18-12-2017] (Success) main.py::handle_password_reset.942: Anfrage für Passwort Reset wurde registriert. Sende Reset E-Mail an marc-friedrich94@web.de
+[18:30:18 18-12-2017] (Error) main.py::confirm_password_reset.980: Übermitteltes Token stimmt nicht mit registriertem Token überein. Mögliche Attacke (SQLi) erkannt.
+[18:30:34 18-12-2017] (Success) main.py::set_new_password.1029: Passwort für Benutzer 9 wurde geändert.
+[18:30:35 18-12-2017] (Debug) main.py::set_new_password.1033: Logge Benutzer 9 aus, um sich mit den geänderten Credentials erneut auszuloggen.
+[18:30:53 18-12-2017] (Success) main.py::handle_password_reset.942: Anfrage für Passwort Reset wurde registriert. Sende Reset E-Mail an marc-friedrich94@web.de
+[18:31:19 18-12-2017] (Success) main.py::set_new_password.1029: Passwort für Benutzer 9 wurde geändert.
+[18:31:20 18-12-2017] (Debug) main.py::set_new_password.1033: Logge Benutzer 9 aus, um sich mit den geänderten Credentials erneut auszuloggen.
+[18:31:29 18-12-2017] (Error) main.py::login.139: Gescheiterter Login (Übereinstimmung): marc-friedrich94@web.de
+[18:31:39 18-12-2017] (Success) main.py::login.160: Erfolgreicher Login: marc-friedrich94@web.de (ADMINISTRATOR)
+[18:32:35 18-12-2017] (Success) main.py::change_password_handler.714: Bestätigungsmail für Passwortänderung wurde an marc-friedrich94@web.de gesendet.
+[18:33:03 18-12-2017] (Success) main.py::confirm_password_change.767: Benutzer 9 hat Passwort geändert. Räume Tabelle mit alten Einträgen dieses Users auf...
+[18:33:03 18-12-2017] (Debug) main.py::confirm_password_change.770: Logge User aus, um sich mit den neuen Credentials anzumelden.
+[18:33:24 18-12-2017] (Success) main.py::login.160: Erfolgreicher Login: marc-friedrich94@web.de (ADMINISTRATOR)
+[18:33:54 18-12-2017] (Success) main.py::change_email_handler.580: Bestätigungsmail für E-Mail Änderung wurde an marc-friedrich94@web.de gesendet.
+[18:36:13 18-12-2017] (Success) main.py::change_email_handler.580: Bestätigungsmail für E-Mail Änderung wurde an marc-friedrich94@web.de gesendet.
+[18:36:53 18-12-2017] (Success) main.py::confirm_email_change.632: Benutzer 9 hat seine E-Mail geändert. Räume Tabelle mit alten Einträgen dieses Users auf...
+[18:36:53 18-12-2017] (Debug) main.py::confirm_email_change.635: Logge User aus, um sich mit den neuen Credentials anzumelden.
+[18:37:04 18-12-2017] (Error) main.py::login.129: Gescheiterter Login (Datenbankfehler): marc-friedrich94@web.de
+[18:37:13 18-12-2017] (Success) main.py::login.160: Erfolgreicher Login: marc.friedrich94@web.de (ADMINISTRATOR)
+[18:37:20 18-12-2017] (Success) main.py::admin_dashboard.280: Administrator 'marc.friedrich94@web.de hat Admin Dashboard geladen
+[18:37:28 18-12-2017] (Success) main.py::admin_dashboard.280: Administrator 'marc.friedrich94@web.de hat Admin Dashboard geladen
+[18:37:31 18-12-2017] (Success) main.py::admin_confirm.891: Adminstratorfunktion wurde erfolgreich bestätigt. (Methode:delete, Objekt: 4
+[18:37:35 18-12-2017] (Success) main.py::logout.183: Benutzer wurde ausgeloggt: marc.friedrich94@web.de
+[18:38:03 18-12-2017] (Success) main.py::login.160: 
+[18:38:14 18-12-2017] (Error) main.py::admin_dashboard.265: Unbefugter Benutzer 'Ingo.piller@hans-maier.de versucht auf das Admin Dashboard zuzugreifen. Verweigere Zugriff.
+[18:38:38 18-12-2017] (Error) main.py::delete_user.802: Unbefugter Benutzer Ingo.piller@hans-maier.de wollte User löschen. Mögliche Attacke erkannt.
+[18:39:00 18-12-2017] (Success) main.py::post_message.366: Neue Nachricht von Benuzter Ingo.piller@hans-maier.de geposted
+[18:39:11 18-12-2017] (Success) main.py::vote.424: Gebe Seite mit CSRF Token zurück. Warte auf Eingabe von Benutzer...
+[18:39:18 18-12-2017] (Success) main.py::finish_vote.488: Upvote für 3 von Ingo.piller@hans-maier.de wurde registriert.
+[18:39:30 18-12-2017] (Success) main.py::vote.407: Benutzer Ingo.piller@hans-maier.de hat bereits für Post 3 abgestimmt
+[18:39:41 18-12-2017] (Success) main.py::vote.424: Gebe Seite mit CSRF Token zurück. Warte auf Eingabe von Benutzer...
+[18:39:44 18-12-2017] (Error) main.py::finish_vote.455: Vote konnte nicht abgeschlossen werden (keine Übereinstimmung der Token)
+[18:39:55 18-12-2017] (Success) main.py::vote.424: Gebe Seite mit CSRF Token zurück. Warte auf Eingabe von Benutzer...
+[18:40:02 18-12-2017] (Success) main.py::finish_vote.488: Upvote für 4 von Ingo.piller@hans-maier.de wurde registriert.
+[18:40:15 18-12-2017] (Success) main.py::vote.424: Gebe Seite mit CSRF Token zurück. Warte auf Eingabe von Benutzer...
+[18:40:26 18-12-2017] (Success) main.py::finish_vote.488: Upvote für 6 von Ingo.piller@hans-maier.de wurde registriert.
+[18:40:31 18-12-2017] (Success) main.py::logout.183: Benutzer wurde ausgeloggt: Ingo.piller@hans-maier.de
+[18:40:41 18-12-2017] (Success) main.py::login.160: Erfolgreicher Login: marc.friedrich94@web.de (ADMINISTRATOR)
+[18:40:48 18-12-2017] (Success) main.py::vote.424: Gebe Seite mit CSRF Token zurück. Warte auf Eingabe von Benutzer...
+[18:40:55 18-12-2017] (Success) main.py::finish_vote.488: Upvote für 6 von marc.friedrich94@web.de wurde registriert.
+[18:41:07 18-12-2017] (Success) main.py::logout.183: Benutzer wurde ausgeloggt: marc.friedrich94@web.de
+[18:41:14 18-12-2017] (Success) main.py::login.160: 
+[18:41:22 18-12-2017] (Success) main.py::vote.407: Benutzer Ingo.piller@hans-maier.de hat bereits für Post 6 abgestimmt

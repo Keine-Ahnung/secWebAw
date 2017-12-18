@@ -1065,13 +1065,9 @@ Hilfsfunktionen, die keine HTTP Requests bearbeiten
 
 
 def delete_user_session():
-    session.pop("logged_in", None)
-    session.pop("user", None)
-    session.pop("uid", None)
-    session.pop("role_id", None)
-    session.pop("verified", None)
+    for sessionv in SESSIONV_ITER:
+        session.pop(sessionv, None)
 
-    
 
 def check_for_session_state(uid):
     db_handler = DB_Handler()
@@ -1079,11 +1075,9 @@ def check_for_session_state(uid):
     (code, data) = db_handler.check_session_state(mysql, uid)
 
     if code == 1:
-        app.logger.debug(data)
         return True
 
     if code == -1:
-        app.logger.debug(data)
         return False
 
 
@@ -1137,10 +1131,6 @@ def prepare_info_json(affected_url, info_text, additions):
         return json.dumps(copy, indent=4)
 
     return json.dumps(return_info, indent=4)
-
-
-def log_e(m):
-    pass
 
 
 """
