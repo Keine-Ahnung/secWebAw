@@ -56,7 +56,7 @@ Posts besser zu designen
 - [X] Es dürfen nur Benutzer posten, deren Account verifiziert ist
 - [ ] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden?
 - [X] Pro Post darf nur ein User voten
-- [ ] Wenn Benutzer gelöscht wurde, zeige OP als unbekannt an
+- [X] Wenn Benutzer gelöscht wurde, lösche auch Posts
 
 ## Voting
 - [X] Ungültige Formen von Parametern: IDs als Text, IDs negativ oder zu groß, ...
