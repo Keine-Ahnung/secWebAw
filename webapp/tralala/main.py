@@ -363,7 +363,7 @@ def post_message():
         return render_template("quick_info.html", info_danger=True,
                                info_text="Deine Nachricht konnte nicht geposted werden. Versuche es erneut!")
     elif success == 1:
-        logger.success("Neue Nachricht von Benuzter " + session[SESSIONV_USER] + " geposted")
+        logger.success("Neue Nachricht von Benutzer " + session[SESSIONV_USER] + " geposted")
         return render_template("quick_info.html", info_success=True,
                                info_text="Deine Nachricht wurde geposted. Du kannst sie auf der Postseite nun sehen!")
 
