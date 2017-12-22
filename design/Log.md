@@ -1,4 +1,4 @@
-# Zu klären
+﻿# Zu klären
 
 - Sollen wir in User Messages nur br, b, i und strong zulassen? bleach.ALLOWED_TAGS ist etwas liberaler und lässt den Benutzern auch mehr Freiheit, ihre eigenen
 Posts besser zu designen
@@ -12,6 +12,7 @@ Posts besser zu designen
 - [ ] Überprüfe alle Texeingaben (z.B.) E-Mail mit den implementierten Funktionen aus dem Backend
 - [ ] Loggingtabelle erstellen
 - [ ] Accountübersicht mit E-Mail und evtl. Anzahl Posts
+- [ ] Konformität mit Skript (sind alle dort aufgezählten Schwachstellen mitigiert?)
 
 ## Zugriff auf die Datenbank
 - [ ] Benutzen von Stored Procedures
