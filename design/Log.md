@@ -7,11 +7,10 @@ Posts besser zu designen
 # Implementierte Features
 
 ## Allgemein
-- [ ] Dokumentation der Funktionen im Code
+- [X] Dokumentation der Funktionen im Code
 - [X] Stelle Funktionalität auf neues Design um
 - [ ] Überprüfe alle Texeingaben (z.B.) E-Mail mit den implementierten Funktionen aus dem Backend
-- [ ] Loggingtabelle erstellen
-- [ ] Accountübersicht mit E-Mail und evtl. Anzahl Posts
+- [X] Loggingtabelle erstellen
 - [ ] Konformität mit Skript (sind alle dort aufgezählten Schwachstellen mitigiert?)
 
 ## Zugriff auf die Datenbank

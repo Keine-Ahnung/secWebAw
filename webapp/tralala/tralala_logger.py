@@ -6,6 +6,12 @@ import pytz
 
 
 class Logger():
+    """
+    Loggerklasse um wichtige Events und Meldungen in der Webapp innerhalb eines Logfiles festzuhalten.
+
+    Jedes Event wird mithilfe eines eigenen Filehandlers eingetragen, der nach dem Schreiben automatisch geschlossen wird, was
+    die Liveüberwachung mit Tools wie "tail" ermöglicht.
+    """
 
     def __init__(self, dir):
         self.dir = dir
@@ -17,6 +23,10 @@ class Logger():
         self.log_file.close()
 
     def error(self, s):
+        """
+        Schreibe eine Fehlermeldung in events.log
+        """
+
         self.log_file = open(self.dir + os.sep + "events.log", "a+")
 
         self.log_file.write(
@@ -26,6 +36,10 @@ class Logger():
         self.log_file.close()
 
     def debug(self, s):
+        """
+        Schreibe eine Fehlermeldung in events.log
+        """
+
         self.log_file = open(self.dir + os.sep + "events.log", "a+")
 
         self.log_file.write(
@@ -35,6 +49,10 @@ class Logger():
         self.log_file.close()
 
     def success(self, s):
+        """
+        Schreibe eine Fehlermeldung in events.log
+        """
+
         self.log_file = open(self.dir + os.sep + "events.log", "a+")
 
         self.log_file.write(
@@ -44,5 +62,9 @@ class Logger():
         self.log_file.close()
 
     def timestamp(self):
+        """
+        Timestamp für den Logging-Eintrag
+        """
+
         ts = time.time()
         return str(datetime.datetime.fromtimestamp(ts).strftime('%H:%M:%S %d-%m-%Y'))

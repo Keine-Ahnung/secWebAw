@@ -7,13 +7,12 @@ import security_helper
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
-'''
-Method to send Mails using a gmx account
-
-'''
-
 
 def send_mail_basic(to, subject, text_mail_body, html_mail_body=None):
+    """
+    Method to send Mails using a gmx account
+    """
+
     sender = "verification_tralala@gmx.de"
     password = "sichwebapp_2017"
 
@@ -41,6 +40,10 @@ def send_mail_basic(to, subject, text_mail_body, html_mail_body=None):
 
 
 def send_verification_mail(to, confirm_url):
+    """
+    Wrapper um eine Bestätigungsmail (Registrierung) zu senden.
+    """
+
     subject = 'Bestaetige deinen Account bei Tralala!'
 
     html = """\
@@ -66,15 +69,14 @@ def send_verification_mail(to, confirm_url):
     return success
 
 
-'''
-Method to send the reset mail to an user.
-'''
-
-
 def send_reset_mail(to, uid, token, url, app):
+    """
+    Wrapper method to send the reset mail to an user.
+    """
+
     mail_body_plain = "Wir haben dein Passwortanfrage erhalten.\n" \
                       "Bitte besuche den untenstehenden Link, um dein " \
-                      "Passwort zurückzusetzen\n\n" +\
+                      "Passwort zurückzusetzen\n\n" + \
                       "http://localhost:5000" + str(url) + \
                       "?token=" + str(token) + "&uid=" + str(uid)
 
@@ -89,13 +91,12 @@ def send_reset_mail(to, uid, token, url, app):
         return False
 
 
-'''
-Method to reset the password of an existing user, by sending a mail to the 
-mailaddress stored in the database
-'''
-
-
 def reset_password(mysql: db_handler.DB_Handler, mail: str, url: str):
+    """
+    Method to reset the password of an existing user, by sending a mail to the
+    mailaddress stored in the database
+    """
+
     success, data = mysql.check_for_existence(mysql=mysql, email=mail)
     if success != 1:
         return False
@@ -108,11 +109,19 @@ def reset_password(mysql: db_handler.DB_Handler, mail: str, url: str):
 
 
 def generate_verification_token(length):
+    """
+    Generiere ein Verification Token der Länge length (String zufälliger Buchstaben und Zahlen)
+    """
+
     return ''.join(random.choice(string.ascii_lowercase + string.digits)
                    for _ in range(length))
 
 
 def compare_reset_token(mysql: db_handler.DB_Handler, userid: int, token: str):
+    """
+    Vergleiche das übergebene Reset Token mit dem in der Datenbank gespeicherten Reset Token.
+    """
+
     token_database = mysql.get_reset_token(mysql=mysql, userid=userid)
 
     if token == token_database:
@@ -122,6 +131,10 @@ def compare_reset_token(mysql: db_handler.DB_Handler, userid: int, token: str):
 
 
 def check_params(type, param):
+    """
+    Hilfsfunktion die das Format von Parametern überprüft, wie bspw. die Passwortstärke. Gibt True zurück, wenn die Evaluation erfolgreich war
+    und False, wenn Abweichungen oder nicht-zugelassene Formate entdeckt wurden.
+    """
     if type == "email":
         if not param:
             return False

@@ -34,12 +34,13 @@ class DB_Handler:
 
     def add_new_user(self, mysql, email, pw_hash, verification_token):
         """
-            DB-Verbindung nach jedem Call wieder schließen
+        DB-Verbindung nach jedem Call wieder schließen
 
-            1: User wurde angelegt
-            0: User existiert bereits
-            -1: User konnte nicht angelegt werden
+        1: User wurde angelegt
+        0: User existiert bereits
+        -1: User konnte nicht angelegt werden
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -71,8 +72,9 @@ class DB_Handler:
 
     def get_token_for_user(self, mysql, email):
         """
-        tbd
+        Gebe das Bestätigungstoken für eine E-Mail zurück.
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -90,8 +92,9 @@ class DB_Handler:
 
     def get_user_for_token(self, mysql, token):
         """
-        tbd
+        Gebe den Benutzer basierend auf einem Bestätigungstoken zurück.
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -111,8 +114,9 @@ class DB_Handler:
 
     def user_successful_verify(self, mysql, email):
         """
-        tbd
+        Setze verified auf 1 und role_id auf 4 (verified) nach erfolgreicher Bestätigung des Accounts
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -129,8 +133,9 @@ class DB_Handler:
 
     def check_for_existence(self, mysql, email):
         """
-        tbd
+        Überprüfe anhand der E-Mail auf die Existenz eines Benutzers. Überprüfe ebenfalls, ob der Benutzer bestätigt ist.
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -150,8 +155,10 @@ class DB_Handler:
 
     def post_message_to_db(self, mysql, uid, email, text, hashtags):
         """
-        tbd
+        Schreibe die neue Nachricht in die Datenbank. Die Nachricht als auch die Hashtags werden sanitized, um bösartigen
+        Input zu unterbinden.
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -176,8 +183,17 @@ class DB_Handler:
 
     def get_all_posts(self, mysql):
         """
-        tbd
+        Gebe alls Posts als Liste zurück zurück.
+
+        Indizes:
+        - 0: post_id
+        - 1: post_date
+        - 2: post_text
+        - 3: post_hashtags
+        - 4: post_upvotes
+        - 5: post_downvotes
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -193,6 +209,10 @@ class DB_Handler:
             return 1, data
 
     def get_post_by_pid(self, mysql, post_id):
+        """
+        Hole Post basierend auf einer spezifizierten Post-ID.
+        """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -211,8 +231,9 @@ class DB_Handler:
 
     def do_upvote(self, mysql, post_id):
         """
-        tbd
+        Registriere Upvote (inkrementiere Upvote-Wert eines Posts in der Tabelle um 1).
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -228,9 +249,11 @@ class DB_Handler:
 
     def do_downvote(self, mysql, post_id):
         """
-        tbd
-        votes = upvotes + (neg(downvotes))
+        Registriere Downvote (inkrementiere Downvote-Wert eines Posts in der Tabelle um 1).
+
+        Achtung: Der Downvotewert setzt sich folgendermaßen zusammen: downvote_real = upvote - downvote
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -328,7 +351,7 @@ class DB_Handler:
 
     def start_session(self, mysql, uid):
         """
-        tbd
+        Trägt eine neue Session mit Startzeit und Endzeit in die Sessions-Tabelle ein (benötigt für automatischen Timeout)
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -383,7 +406,7 @@ class DB_Handler:
 
     def invalidate_session(self, mysql, uid):
         """
-        tbd
+        Lösche des Session-Eintrag des Benutzers aus der Sessions-Tabelle
         """
         conn = mysql.connect()
         cursor = conn.cursor()

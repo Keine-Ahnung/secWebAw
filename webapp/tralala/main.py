@@ -13,43 +13,51 @@ from db_handler import DB_Handler
 from function_helper import generate_verification_token
 import datetime
 
+
+# Erstellung der App
 app = Flask(__name__)
 
+# MySQL Credentials
 app.config["MYSQL_DATABASE_USER"] = "db_admin_tralala"
 app.config["MYSQL_DATABASE_PASSWORD"] = "tr4l4l4_mysql_db."
 app.config["MYSQL_DATABASE_DB"] = "tralala"
 app.config["MYSQL_DATABASE_HOST"] = "localhost"
 
+# Setup MySQL
 mysql = MySQL()
-mysql.init_app(app)  # Setup MySQL
+mysql.init_app(app)
+
+# Setup Logger
 logger = Logger("log")  # Setup eigener Logger
 
-"""
-    Sessionvariablen hier übersichtlich ordnen
-"""
+# Sessionvariablen
 SESSIONV_LOGGED_IN = "logged_in"
 SESSIONV_USER = "user"
 SESSIONV_UID = "uid"
 SESSIONV_ROLE_ID = "role_id"
 SESSIONV_VERIFIED = "verified"
 SESSIONV_ADMIN = "is_admin"
+SESSIONV_ITER = [SESSIONV_LOGGED_IN, SESSIONV_USER, SESSIONV_UID, SESSIONV_ROLE_ID, SESSIONV_VERIFIED] # Iterable, für Session Termination
 
-SESSIONV_ITER = [SESSIONV_LOGGED_IN, SESSIONV_USER, SESSIONV_UID, SESSIONV_ROLE_ID, SESSIONV_VERIFIED]
-
+# Muss von Hand geänder werden, sollte sich die Rollen-ID des Administrators ändern!
 SESSIONID_ROLE_ADMIN = 5
 
-"""
-    Andere Konstanten
-"""
+# Funktionmodi
+DBC_CP_GETDATA = "get_data"  # Modus für db_handler.get_reset_token_cp. Wird im DB_Handler verwendet um nur die Daten zurückzugeben, die zu einem Change Request gespeichert wurden (bspw. neue E-Mail oder neues Passwort)
 
-DBC_CP_GETDATA = "get_data"
 
+"""
+Flask Handler
+####################################################
+"""
 
 @app.route("/")
+@app.route("/index")
 def index():
     """
-    Startseite
-    Hier muss ebenfalls die Darstellung aller Posts aus der DB behandelt werden
+    Landing Page der Webapplikation. Kann durch "/" oder "/index" aufgerufen werden.
+
+    Die Indexseite der Webapplikation stellt zugleich die Übersicht der Posts dar.
     """
 
     db_handler = DB_Handler()
@@ -97,7 +105,17 @@ def index():
 @app.route("/login", methods=["POST", "GET"])
 def login():
     """
-    tbd
+    Ziel des Loginformulars. Überprüft in der Datenbank auf Existenz des angegebenen Benutzers als auch der Übereinstimmung
+    des Passworts. Nur bestätigte Benutzer können sich einloggen.
+
+    Bei erfolgreichem Login wird eine Session erstellt, die wichtige Werte speichert, die zur Identifikation auf weiteren Seiten
+    benötigt wird:
+
+    - logged_in: True, wenn eingeloggt.
+    - user: Login-Email des angemeldeten Benutzeraccounts
+    - uid: User-ID des Benutzers
+    - role_id: Rollen-ID des Benutzers (3 unverified, 4 verified, 5 administrator)
+    - is_admin: True, wenn die Rollen-ID des Benutzers 5 ist
     """
     # Falls bereits eingeloggt
     try:
@@ -156,7 +174,8 @@ def login():
         else:
             session[SESSIONV_ADMIN] = False
         # Starte Timeout Timer
-        db_handler.start_session(mysql, data["uid"])
+        db_handler.start_session(mysql, data[
+            "uid"])  # Trage neue Session in Session-Tabelle ein, um den automatischen Logout zu tracken
         logger.success("Erfolgreicher Login: " + login_email + " (ADMINISTRATOR)" if session[SESSIONV_ADMIN] else "")
         return render_template("quick_info.html", info_success=True,
                                info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
@@ -166,7 +185,10 @@ def login():
 @app.route("/logout", methods=["POST", "GET"])
 def logout():
     """
-    tbd
+    Logge den aktuell angemeldeten Benutzer aus => Terminiere die Session, indem die Session-Variablen aus der Session
+    gepopped werden.
+
+    Zusätzlich wird die aktuelle Session aus der Sessions-Tabelle gelöscht.
     """
     try:
         # Zugriff auf die Session Variable wirft einen KeyError. Durch den Catch wird das Template gerendert
@@ -175,7 +197,7 @@ def logout():
         return render_template("quick_info.html", info_warning=True, info_text="Du bist nicht eingeloggt!")
 
     db_handler = DB_Handler()
-    db_handler.invalidate_session(mysql, session["uid"])
+    db_handler.invalidate_session(mysql, session["uid"])  # Lösche Session aus der Trackingtabelle
     email = session[SESSIONV_USER]
 
     for sessionv in SESSIONV_ITER:
@@ -187,11 +209,14 @@ def logout():
 @app.route("/signup/post_user", methods=["POST", "GET"])
 def post_user():
     """
-    Ueberprüfe die Eingaben des Benutzers unabhaengig von der clientseitigen UeberprUefung.
-    Sollten alle Eingaben korrekt sein, persistiere das neue Benutzerkonto in der Datenbank und schicke
+    Überprüfe die Eingaben des Benutzers unabhängig von der clientseitigen Überprüfung.
+    Sollten alle Eingaben korrekt bzw. valide sein, persistiere das neue Benutzerkonto in der Datenbank und schicke
     eine Bestaetigungsemail an die angegebene Email.
-    :return:
+
+    - Nach Registrierung und vor Bestätigung: Benutzer ist unverified => role_id = 3
+    - Nach Registrierung und nach Bestätigung: Benutzer ist verified => role_id = 4
     """
+
     try:
         session["logged_in"]  # Falls der User bereits eingeloggt ist, soll er auf die Startseite weitergeleitet werden
         return redirect(url_for("index"))
@@ -210,15 +235,14 @@ def post_user():
         reg_password = request.form["reg_password"]
         reg_password_repeat = request.form["reg_password_repeat"]
 
-        if reg_email == "" or reg_password == "" or reg_password_repeat == "":  # Reicht es, das allein durch JavaScript zu UeberprUefen?
-            return prepare_info_json(url_for("post_user"), "Es wurden Felder bei der Registrierung leer gelassen")
-
-        # Hier UeberprUefen und ggf. sanitizen
+        if reg_email == "" or reg_password == "" or reg_password_repeat == "":
+            return prepare_info_json(url_for("post_user"),
+                                     "Es wurden Felder bei der Registrierung leer gelassen")  # Gebe als JSON zurück, da per einfacher Registrierung durch Formular nicht erreichbar
 
         if not security_helper.check_mail(reg_email):
             return render_template("registration_no_success.html", info_danger=True, code=5)
 
-        # UeberprUefe, ob Password und Passwordwiederholung übereinstimmen
+        # Überprüfe, ob Passwort und Passwortwiederholung übereinstimmen
         if not reg_password == reg_password_repeat:
             return render_template("registration_no_success.html", info_danger=True, code=2)
 
@@ -226,9 +250,9 @@ def post_user():
         if not passed:
             return render_template("registration_no_success.html", info_danger=True, code=4, comment=comment)
 
-        # Ueberprüfe, ob User schon existiert
+        # Überprüfe, ob User schon existiert
         success = register_new_account(mysql, reg_email, generate_password_hash(reg_password),
-                                       generate_verification_token(50))
+                                       generate_verification_token(50))  # Persistiere neuen Benutzer in der Datenbank
         if success == -1:
             logger.error("Benuzter konnte nicht in Datenbank geschrieben werden.")
             return render_template("registration_no_success.html", info_danger=True, code=-1)
@@ -236,7 +260,8 @@ def post_user():
             logger.error("Fehler bei Registrierung. Benutzer existiert bereits.")
             return render_template("registration_no_success.html", info_danger=True, code=0, reg_email=reg_email)
 
-        success = send_verification_email(reg_email)
+        success = send_verification_email(
+            reg_email)  # Sende Mail mit Bestätigungslink an die angegebene E-Mail, mit dem die Registrierung abgeschlossen werden kann
 
         if success == -1:
             logger.error("Fehler beim Senden der Bestätigungsmail an: " + reg_email)
@@ -250,7 +275,10 @@ def post_user():
 @app.route("/auth/dashboard")
 def admin_dashboard():
     """
-    tbd
+    Administrator-Dashboard. Erlaubt, Benutzer zu löschen.
+
+    Nur zugänglich wenn man Administrator ist, also wenn die Sessionvariable is_admin = True. Zugriffe auf das
+    Dashboard durch einen Benutzer der nicht als Administrator registriert ist, werden geloggt.
     """
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
@@ -266,7 +294,7 @@ def admin_dashboard():
         return render_template("quick_info.html", info_danger=True,
                                info_text="Du musst Administrator sein, um diese Aktion durchführen zu dürfen")
 
-    # Benutzerdaten holen
+    # Benutzerdaten holen (Benutzer und Rollen)
     db_handler = DB_Handler()
     (code_users, users) = db_handler.get_all_users(mysql)
     (code_roles, roles) = db_handler.get_all_roles(mysql)
@@ -284,23 +312,33 @@ def admin_dashboard():
 @app.route("/confirm")
 def confirm():
     """
-    tbd
+    Ziel des Bestätigungslinks nach der Registrierung. Informationen zur Bestätigung wie token werden direkt per GET
+    übergeben.
+
+    Der Bestätigungsprozess läuft wie folgt ab:
+    - Lade Confirm Token aus dem aufrufenden Link
+    - Überprüfe in der zugehörigen Tabelle, ob das Token bekannt ist
+        - Nicht bekannt (kein Eintrag): Fehler
+        - Bekannt, aber bereits bestätigt: Meldung
+        - Bekannt und nicht bestätigt: Erfolg
+    - Setze verified in der Benutzertabelle von 3 (unverified) auf 4 (verified)
     """
-    # Suche nach Email basierend auf Token
+
     token = request.args.get("token")
 
     db_handler = DB_Handler()
-    (success, email) = db_handler.get_user_for_token(mysql, token)
+    (success, email) = db_handler.get_user_for_token(mysql,
+                                                     token)  # Suche nach Benutzer basierend auf dem angegebenen Token
     if success == -1:
         logger.error("Unbekanntes Token wurde übergeben")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Der Benutzer konnte nicht bestaetigt werden!")
+                               info_text="Der Benutzer konnte nicht bestätigt werden!")
 
     if success == 2:
         logger.success("Benutzer '" + email + "' wurde bereits bestätigt")
         return render_template("quick_info.html", info_warning=True, info_text="Der Benutzer wurde bereits bestaetigt!")
 
-    # Setze Token auf Defaultwert und setze verified auf 1
+    # Markiere Benutzer als bestätigt
     success = db_handler.user_successful_verify(mysql, email)
 
     if success == -1:
@@ -316,11 +354,20 @@ def confirm():
 
 @app.route("/auth/write_post")
 def write_post():
+    """
+    Präsentiere Seite, um einen neuen Post zu schreiben.
+    """
     return render_template("new_post.html", new_post_active="active")
 
 
 @app.route("/auth/post_message", methods=["POST", "GET"])
 def post_message():
+    """
+    Ziel nachdem ein neuer Post zur abgeschickt wurde. Aktion ist nur zugänglich für eingeloggte Mitglieder.
+    Die Nachrichtenlänge ist auf 280 Zeichen beschränkt (angelehnt an Twitter).
+
+    """
+
     try:
         session["logged_in"]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except:
@@ -354,7 +401,7 @@ def post_message():
         return render_template("quick_info.html", info_danger=True,
                                info_text="Du musst deinen Account zuerst bestätigen, bevor du etwas posten kannst.")
 
-    # Post in DB schreiben
+    # Post in DB schreiben (post_message_to_db übernimmt Sanitizing der Nachricht)
     success = db_handler.post_message_to_db(mysql, session["uid"], None, message[:279], hashtags)
 
     if success == -1:
@@ -367,14 +414,14 @@ def post_message():
         return render_template("quick_info.html", info_success=True,
                                info_text="Deine Nachricht wurde geposted. Du kannst sie auf der Postseite nun sehen!")
 
-    return "post message uid=" + str(session["uid"]) + " message=" + message + " hashtags=" + hashtags
+    return "post message uid=" + str(
+        session["uid"]) + " message=" + message + " hashtags=" + hashtags  # Programmfluss sollte hier nie ankommen
 
 
 @app.route("/auth/vote")
 def vote():
     """
-
-    /vote_up?method=...&post_id=123
+    Ziel des Votes (Klick auf + oder - neben den Posts). Pro Benutzer ist maximal ein Vote erlaubt.
     """
     db_handler = DB_Handler()
 
@@ -401,7 +448,8 @@ def vote():
         logger.error("Ungültiger Zugriff (Post ID oder Methode)")
         return render_template("quick_info.html", info_danger=True, info_text="Ungültige Post ID oder Zugriffsmethode!")
 
-    (code, data) = db_handler.check_if_already_voted(mysql, post_id, uid)
+    (code, data) = db_handler.check_if_already_voted(mysql, post_id,
+                                                     uid)  # Überprüfe ob der Benutzer bereits für diesen Post abgestimmt hat
 
     if code == -1:
         logger.success("Benutzer " + session[SESSIONV_USER] + " hat bereits für Post " + str(post_id) + " abgestimmt")
@@ -429,7 +477,7 @@ def vote():
 @app.route("/auth/finish_vote", methods=["GET", "POST"])
 def finish_vote():
     """
-    tbd
+    Ziel nachdem das Bestätigungstoken für den Vote eingegeben wurde.
     """
     # Hole GET-Parameter
     csrf_token = request.args.get("csrf_token")
@@ -439,18 +487,25 @@ def finish_vote():
     uid = session["uid"]
 
     try:
-        post_id_int = int(post_id)
+        post_id_int = int(
+            post_id)  # Überprüft, ob die über den Link übergebene Post-ID ein INT ist. Sollte nicht auf INT gecasted werden können, wird eine Exception geworfen was bedeutet, dass die Post-ID ungültig ist
     except:
         logger.error("Post ID konnte nicht zu INT umgewandelt werden. Möglicher Versuch einer SQL Injection erkannt.")
         return render_template("quick_info.html", info_danger=True,
                                info_text="Deine Anfrage war ungültig. Bitte versuche es erneut!")
 
-    if input_csrf == "" or csrf_token == "" or post_id == "" or post_id_int < 0 or not method in ["upvote", "downvote"]:
+    # Gültigkeitsprüfung der Parameter
+    if not function_helper.check_params("text", input_csrf) or not function_helper.check_params("text",
+                                                                                                csrf_token) or not function_helper.check_params(
+        "id",
+        post_id) or not method in [
+        "upvote", "downvote"]:
         logger.error(
             "Request um den Vote abzuschließen wies ungültige Parameter(formen) auf. Vote kann nicht abgeschlossen werden.")
         return render_template("quick_info.html", info_danger=True,
                                info_text="Deine Anfrage war ungültig. Bitte versuche es erneut!")
-    # Ueberprüfe csrf_seq
+
+    # Überprüfe csrf_seq
     if not csrf_token == input_csrf:
         logger.error("Vote konnte nicht abgeschlossen werden (keine Übereinstimmung der Token)")
         return render_template("quick_info.html", info_danger=True,
@@ -505,7 +560,7 @@ def finish_vote():
 @app.route("/auth/controlpanel/change-email")
 def change_email():
     """
-    tbd
+    Präsentiere Seite um die E-Mail zu ändern. (nicht Reset)
     """
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
@@ -518,6 +573,20 @@ def change_email():
 
 @app.route("/auth/controlpanel/change_email_handler", methods=["POST"])
 def change_email_handler():
+    """
+    Ziel nachdem das Formular der E-Mailänderung abgeschickt wurde. Überprüft die E-Mail u.A. auf korrektes Format.
+    Nach erfolgreichen Checks wird der Change Request in die tralala_cp_change-Tabelle geschrieben und ist nun
+    registriert. Durch die Bestätigung der Änderung mithilfe des Links aus der Bestätigungsmail wird die Änderung durchgeführt.
+
+    Die Tabelle speichert folgende Informationen der Change Request:
+    - Token (wird zur Bestätigung benötigt)
+    - Requesttime (wann die Änderung angefragt wurde)
+    - Action (Emailänderung oder Passwortänderung)
+    - Data (Dafür benötigte Daten wie z.B. die neue E-Mail oder das neue Passwort)
+
+    Diese Funktion kann nur von angemeldeten Benutzern ausgeführt werden.
+    """
+
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except:
@@ -584,6 +653,12 @@ def change_email_handler():
 
 @app.route("/auth/controlpanel/confirm_email_change")
 def confirm_email_change():
+    """
+    Ziel des Bestätigungslink nach einer angeforderten Emailänderung.
+    Überprüft die Gültigkeit des Tokens (also, ob ein solches in der Änderungstabelle bekannt ist) und lädt anschließend
+    die Daten, die zu diesem Token gespeichert wurden (neue E-Mail).
+    """
+
     uid = request.args.get("uid")
     token = request.args.get("token")
 
@@ -624,14 +699,15 @@ def confirm_email_change():
 
     new_email = db_handler.get_reset_token_cp(mysql, int(uid), "change_email", mode=DBC_CP_GETDATA)
 
-    db_handler.set_email_for_user(mysql, int(uid), new_email, app)
+    db_handler.set_email_for_user(mysql, int(uid), new_email,
+                                  app)  # Ändere E-Mail des Benutzers anhand der Daten aus der Änderungstabelle
 
     # Tabelle aufräumen
     db_handler.delete_cp_token(mysql, int(uid), "change_email")
     logger.success(
         "Benutzer " + str(uid) + " hat seine E-Mail geändert. Räume Tabelle mit alten Einträgen dieses Users auf...")
 
-    delete_user_session()
+    delete_user_session()  # Automatischer Logout
     logger.debug("Logge User aus, um sich mit den neuen Credentials anzumelden.")
 
     return render_template("quick_info.html", info_success=True, info_text="Die E-Mail wurde geändert.")
@@ -640,7 +716,7 @@ def confirm_email_change():
 @app.route("/auth/controlpanel/change_password")
 def change_password():
     """
-    tbd
+    Präsentiere Seite zum Ändern des Passworts.
     """
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
@@ -653,6 +729,21 @@ def change_password():
 
 @app.route("/auth/controlpanel/change_password_handler", methods=["POST"])
 def change_password_handler():
+    """
+    Ziel nachdem das Formular der Passwortänderung abgeschickt wurde. Überprüft das Passwort u.A. auf die vorgegebenen
+    Passwortrichtlinien.
+    Nach erfolgreichen Checks wird der Change Request in die tralala_cp_change-Tabelle geschrieben und ist nun
+    registriert. Durch die Bestätigung der Änderung mithilfe des Links aus der Bestätigungsmail wird die Änderung durchgeführt.
+
+    Die Tabelle speichert folgende Informationen der Change Request:
+    - Token (wird zur Bestätigung benötigt)
+    - Requesttime (wann die Änderung angefragt wurde)
+    - Action (Emailänderung oder Passwortänderung)
+    - Data (Dafür benötigte Daten wie z.B. die neue E-Mail oder das neue Passwort)
+
+    Diese Funktion kann nur von angemeldeten Benutzern ausgeführt werden.
+    """
+
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except:
@@ -719,6 +810,12 @@ def change_password_handler():
 
 @app.route("/auth/controlpanel/confirm_password_change")
 def confirm_password_change():
+    """
+    Ziel des Bestätigungslink nach einer angeforderten Passwortänderung.
+    Überprüft die Gültigkeit des Tokens (also, ob ein solches in der Änderungstabelle bekannt ist) und lädt anschließend
+    die Daten, die zu diesem Token gespeichert wurden (neues Passwort).
+    """
+
     uid = request.args.get("uid")
     token = request.args.get("token")
 
@@ -774,6 +871,10 @@ def confirm_password_change():
 
 @app.route("/reset_password1", methods=["GET", "POST"])
 def reset_password1():
+    """
+    @deprecated
+    """
+
     if request.method == "GET":
         return_info = {}
         return_info["invalid_method"] = "GET"
@@ -791,6 +892,11 @@ def reset_password1():
 
 @app.route("/auth/admin/delete_user", methods=["POST", "GET"])
 def delete_user():
+    """
+     Administratorfunktion, um einen Benutzer zu löschen.
+     Benötigt die Passwortbestätigung durch den Administrator, um CSRF-Attacken zu vermeiden.
+    """
+
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except:
@@ -860,6 +966,10 @@ def delete_user():
 
 @app.route("/auth/admin/confirm")
 def admin_confirm():
+    """
+    Präsentiert die Bestätigungsseite für die Durchführung einer Administratorfunktion.
+    """
+
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except:
@@ -875,12 +985,10 @@ def admin_confirm():
     method = request.args.get("method")
     obj = request.args.get("obj")
 
-    try:
-        int(obj)
-    except:
+    if not function_helper.check_params("text", method) or not function_helper.check_params("id", obj):
         logger.error("obj konnte nicht zu INT umgewandelt werden.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Objekt muss ein INT sein.")
+                               info_text="Auswertung der Parameter war fehlerhaft.")
 
     if not method in ["delete"]:
         logger.error("Unbekannte Methode. Erlaubt sind: delete")
@@ -894,11 +1002,25 @@ def admin_confirm():
 
 @app.route("/reset/password")
 def reset_password():
+    """
+    Präsentiert die Passwort-Reset Seite
+    """
     return render_template("reset_password.html")
 
 
 @app.route("/reset/password/handle", methods=["POST"])
 def handle_password_reset():
+    """
+    Ziel nach Absenden des Passwort-Request Formulars. Überprüft die eingegebene E-Mail-Adresse auf Format.
+    Ebenfalls wird überprüft, ob die eingegebene E-Mail im System registriert ist. Anschließend wird eine Reset-Mail an die
+    angegebene E-Mail-Adresse geschickt.
+
+    Um Spam-Attacken zu vermeiden, wurde die Anzahl der möglichen Resets innerhalb von 30 Minuten auf 5 Versuche beschränkt. Das
+    Tracking erfolgt mittels der tralala_reset_password-Tabelle.
+
+    Funktioniert nur bei nicht-eingeloggten Benutzern unter der Annahme, dass eingeloggte Benutzer ihr Passwort noch kennen.
+    """
+
     try:
         if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
             return render_template("quick_info.html", info_danger=True,
@@ -948,9 +1070,12 @@ def handle_password_reset():
 @app.route("/reset/password/confirm_reset")
 def confirm_password_reset():
     """
-    Handler, um den Passwort Reset Link auszuwerten und anschließend auf die Seite weiterzuleiten, auf der das neue Passwort gesetzt
-    werden kann
-    :return:
+    Ziel des Links des Password-Resets. Überprüft das über die URL angegebene Token mit Einträgen in der Datenbank.
+    Ist das Token richtig (= wurde in der Datenbank gefunden) wird ein Formular präsentiert, auf der das Passwort geändert werden kann.
+
+    Das Token als auch die User-ID werden als Hidden Fields auf der Seite zur Änderung des Passworts eingetragen. Diese Felder
+    werden unbedingt benötigt, um die Änderung festzuschreiben. Werden diese Werte verändert, wird der Reset nicht durchgeführt,
+    da erneut überprüft wird, ob die Eingaben beim Absenden des Formulars verändert wurden oder nicht.
     """
     try:
         if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
@@ -968,7 +1093,7 @@ def confirm_password_reset():
                                info_text="Leider konnten wir deine Anfrage nicht verstehen. Bitte ändere nichts an dem Link, den wir dir per Mail zugeschickt haben.")
 
     db_handler = DB_Handler()
-    ref_token = db_handler.get_reset_token(mysql, uid)
+    ref_token = db_handler.get_reset_token(mysql, uid)  # Suche nach zugehörigem Reset Token in der Datenbank
 
     if ref_token is None:
         logger.error("Kein zugehöriger Passwort Reset Request für Token " + str(ref_token) + " gefunden.")
@@ -985,6 +1110,13 @@ def confirm_password_reset():
 
 @app.route("/reset/password/set_new", methods=["POST"])
 def set_new_password():
+    """
+    Handler der letztendlich das neue Passwort setzt.
+    Hier wird erneut überprüft, ob das Token aus dem Hidden Field mit dem in der DB bekannten Token übereinstimmt. Ebenfalls
+    wird ein Check auf die ID aus dem Hidden Field gemacht, ob auch diese verändert wurde. Nur wenn diese beiden Werte unverändert
+    geblieben sind und einen zugehörigen Eintrag in der Datenbank haben, wird die Änderung des Passworts durchgeführt.
+    """
+
     try:
         if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
             return render_template("quick_info.html", info_danger=True,
@@ -1023,7 +1155,7 @@ def set_new_password():
     # Hole mit dem Token korrespondierendes Token aus der Datenbank
     (uid, token) = db_handler.get_reset_token(mysql, hidden_uid, "get_token_uid")
 
-    # Schreibe neues Passwort in die Datenbank
+    # Schreibe neues Passwort (bzw. Hash des Passworts) in die Datenbank
     hashed_pass = generate_password_hash(new_pass)
     db_handler.set_pass_for_user(mysql, uid, hashed_pass, app)
     logger.success("Passwort für Benutzer " + str(uid) + " wurde geändert.")
@@ -1034,11 +1166,6 @@ def set_new_password():
 
     return render_template("quick_info.html", info_success=True,
                            info_text="Dein Passwort wurde geändert. Du kannst dich nun einloggen.")
-
-
-'''
-Method receiving the token to perform the recheck and the password reset
-'''
 
 
 @app.route("/reset_password/action", methods=["GET", "POST"])
@@ -1061,15 +1188,27 @@ def reset_password_action():
 
 """
 Hilfsfunktionen, die keine HTTP Requests bearbeiten
+####################################################
 """
 
-
 def delete_user_session():
+    """
+     Terminiere Benutzersession indem alle Sessionvariablen aus der Session gelöscht werden.
+    """
+
     for sessionv in SESSIONV_ITER:
         session.pop(sessionv, None)
 
 
 def check_for_session_state(uid):
+    """
+    Überprüfe den Status der aktuellen Benutzersitzung.
+
+    - True: Der Benutzer ist noch eingeloggt und kann Aktionen durchführen
+    - False: Die Sitzung des Benutzers ist außerhalb der Alive-Zeit (automatischer Timeout). Er wird bei der nächsten privilegierten
+    Aktion automatisch ausgeloggt (=> wird durch Timeout-Handling Code innerhalb der Funktionen durchgeführt).
+    """
+
     db_handler = DB_Handler()
 
     (code, data) = db_handler.check_session_state(mysql, uid)
@@ -1083,7 +1222,7 @@ def check_for_session_state(uid):
 
 def send_verification_email(reg_email):
     """
-        Sende Bestaetigungsmail mit Verification Token.
+    Wrapper. Verwendet Implementierung aus function_helper. Sende Bestätigungsmail mit Verification Token.
     """
 
     app.logger.debug("Sende Bestaetigungsmail.")
@@ -1099,23 +1238,23 @@ def send_verification_email(reg_email):
         url = 'localhost:5000' + url_for('confirm') + '?token=' + token
         function_helper.send_verification_mail(reg_email, url)
     except Exception as e:
-        app.logger.error("Fehler beim Senden der Bestaetigungsmail."
-                         "..\n" + str(e))
+        logger.error("Fehler beim Senden der Bestätigungsmail."
+                     "..\n" + str(e))
         return -1
 
-    app.logger.debug("Bestaetigungsemail gesendet an '" + reg_email + "' ...")
+    logger.success("Bestätigungsemail gesendet an '" + reg_email + "' ...")
     return 1
 
 
 def prepare_info_json(affected_url, info_text, additions):
     """
-        Gebe eine Info- bzw. Fehlermeldung im JSON-Format zurUeck.
-        Dictionary akzeptiert keine additions, falls folgende Keys in den
-        additions existieren:
-            1. called_url
-            2. timestamp
-            3. info_text
-        Durch eine Exception wird der dict merge abgebrochen
+    Gebe eine Info- bzw. Fehlermeldung im JSON-Format zurUeck.
+    Dictionary akzeptiert keine additions, falls folgende Keys in den
+    additions existieren:
+        - called_url
+        - timestamp
+        - info_text
+    Durch eine Exception wird der dict merge abgebrochen.
     """
 
     return_info = {}
@@ -1133,17 +1272,16 @@ def prepare_info_json(affected_url, info_text, additions):
     return json.dumps(return_info, indent=4)
 
 
-"""
-    Zugriff auf die DB mit der DB_Handler Klasse
-"""
-
-
 def register_new_account(mysql, email, pw_hash, verification_token):
     db_handler = DB_Handler()
     success = db_handler.add_new_user(mysql, email, pw_hash, verification_token)
 
     return success
 
+"""
+Einstiegspunkt
+####################################################
+"""
 
 if __name__ == '__main__':
     app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
