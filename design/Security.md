@@ -33,7 +33,7 @@
 
 ### Registrierung
 
-_E-Mail_
+**E-Mail**
 
 Test
 
