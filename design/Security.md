@@ -31,9 +31,9 @@
 	* Neues Passwort
 	* Neues Passwort wiederholen
 
-## Registrierung
+### Registrierung
 
-*E-Mail*
+_E-Mail_
 
 Test
 
