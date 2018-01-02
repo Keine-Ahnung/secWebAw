@@ -176,7 +176,7 @@ def login():
         # Starte Timeout Timer
         db_handler.start_session(mysql, data[
             "uid"])  # Trage neue Session in Session-Tabelle ein, um den automatischen Logout zu tracken
-        logger.success("Erfolgreicher Login: " + login_email + " (ADMINISTRATOR)" if session[SESSIONV_ADMIN] else "")
+        logger.success("Erfolgreicher Login: " + login_email + (" (ADMINISTRATOR)" if session[SESSIONV_ADMIN] else ""))
         return render_template("quick_info.html", info_success=True,
                                info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
 
@@ -329,6 +329,11 @@ def confirm():
     """
 
     token = request.args.get("token")
+
+    if not function_helper.check_params("token", str(token)):
+        logger.error("Token konnte nicht ausgewertet werden (" + str(token) + ")")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Token konnte nicht ausgewertet werden. Bitte verändere nichts an dem Bestätigungslink.")
 
     db_handler = DB_Handler()
     (success, email) = db_handler.get_user_for_token(mysql,

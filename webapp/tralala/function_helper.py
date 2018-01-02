@@ -187,5 +187,17 @@ def check_params(t, param):
 
         return True
 
+    elif t == "token":
+        if not param:
+            return False
+
+        if param == "":
+            return False
+
+        if not param.isalnum():
+            return False
+
+        return True
+
 def sanitize_generic_input(s):
     pass

@@ -33,17 +33,27 @@
 
 ### Registrierung
 
-**E-Mail** (post_user())
+**E-Mail** ('''post_user()''')
 
 Check auf Länge (> 0) und korrektes Format mit '''security_helper.check_mail()'''
 
-**Password** (post_user())
+**Password** ('''post_user()''')
 
 Check auf Länge (> 0) und Passwortstärke/-richtlinien mit '''security_helper.check_password_strength()'''
 
-**Passwortbestätigung** (post_user())
+**Passwortbestätigung** ('''post_user()''')
 
 Check auf Länge (> 0) und Passwortstärke/-richtlinien mit '''security_helper.check_password_strength()'''
+
+**Confirmtoken** ('''confirm()''')
+
+Check auf Länge (> 0) und korrektes Format mit '''function_helper.check_params()''' . Dies prüft, ob '''str.isalphanum()'''. Sind Sonderzeichen im Token enthalten, wird ein Fehler ausgegeben. SQLi oder ähnliches wird vom DB-Handler in '''get_user_for_token()''' durch Escaped Statements überprüft.
+
+### Login
+
+**E-Mail** ('''login()''')
+
+**Passwort** ('''login()''')
 
 # Schwachstellen
 
