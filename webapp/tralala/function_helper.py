@@ -134,6 +134,12 @@ def check_params(type, param):
     """
     Hilfsfunktion die das Format von Parametern überprüft, wie bspw. die Passwortstärke. Gibt True zurück, wenn die Evaluation erfolgreich war
     und False, wenn Abweichungen oder nicht-zugelassene Formate entdeckt wurden.
+
+    Typen:
+    - email
+    - id
+    - text
+    - password
     """
     if type == "email":
         if not param:
@@ -180,3 +186,6 @@ def check_params(type, param):
         return True
 
         return True
+
+def sanitize_generic_input(s):
+    pass

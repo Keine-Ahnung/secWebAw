@@ -269,7 +269,7 @@ class DB_Handler:
 
     def get_all_users(self, mysql):
         """
-        tbd
+        Liefere alle Benutzer zurück.
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -287,7 +287,7 @@ class DB_Handler:
 
     def get_all_roles(self, mysql):
         """
-        tbd
+        Liefere alle Rollen zurück.
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -308,7 +308,7 @@ class DB_Handler:
 
     def check_if_already_voted(self, mysql, post_id, uid):
         """
-        tbd
+        Überprüfe, ob ein Benutzer bereits für einen Post abgestimmt hat.
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -327,7 +327,7 @@ class DB_Handler:
 
     def register_vote(self, mysql, post_id, uid, method):
         """
-        tbd
+        Persistiere Vote des Benutzers.
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -351,7 +351,7 @@ class DB_Handler:
 
     def start_session(self, mysql, uid):
         """
-        Trägt eine neue Session mit Startzeit und Endzeit in die Sessions-Tabelle ein (benötigt für automatischen Timeout)
+        Trägt eine neue Session mit Startzeit und Endzeit in die Sessions-Tabelle ein (benötigt für automatischen Timeout).
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -375,7 +375,7 @@ class DB_Handler:
 
     def check_session_state(self, mysql, uid):
         """
-        tbd
+        Überprüfe ob Session für Benutzer noch gültig ist.
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -406,7 +406,7 @@ class DB_Handler:
 
     def invalidate_session(self, mysql, uid):
         """
-        Lösche des Session-Eintrag des Benutzers aus der Sessions-Tabelle
+        Lösche den Session-Eintrag des Benutzers aus der Sessions-Tabelle
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -422,7 +422,7 @@ class DB_Handler:
 
     def delete_user(self, mysql, uid):
         """
-        tbd
+        Lösche Benutzer.
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -438,7 +438,7 @@ class DB_Handler:
 
     def get_password_for_user(self, mysql, email):
         """
-        tbd
+        Liefere Passwordhash für einen Benutzer zurück.
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -457,7 +457,7 @@ class DB_Handler:
 
     def count_password_requests(self, mysql, uid, app):
         """
-        tbd
+        Liefere die Anzahl bereits abgeschickter Passwort Resets zurück.
         """
         conn = mysql.connect()
         cursor = conn.cursor()
@@ -475,6 +475,10 @@ class DB_Handler:
             return True
 
     def set_reset_token(self, mysql, token, uid, app):
+        """
+        Registriere ein neues Reset Token für einen Passwortreset.
+        """
+
         ts = time.time()
         timestamp = datetime.datetime.fromtimestamp(ts).strftime(
             '%Y-%m-%d %H:%M:%S')
@@ -491,6 +495,10 @@ class DB_Handler:
             conn.close()
 
     def get_reset_token(self, mysql, userid, mode=None):
+        """
+        Liefere das Token des aktuellsten Passwortrequest zurück.
+        """
+
         conn = mysql.connect()
         cursor = conn.cursor()
         try:
@@ -515,8 +523,9 @@ class DB_Handler:
 
     def set_pass_for_user(self, mysql, uid, new_pass, app):
         """
-        tbd
+        Setze neues Passwort für einen Benutzer.
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -533,8 +542,9 @@ class DB_Handler:
 
     def set_email_for_user(self, mysql, uid, new_email, app):
         """
-        tbd
+        Setze neue E-Mail für einen Benutzer.
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -551,8 +561,9 @@ class DB_Handler:
 
     def delete_pass_reset_token(self, mysql, uid, app):
         """
-        tbd
+        Lösche alle Token vergangener Passwortrequests.
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -567,6 +578,10 @@ class DB_Handler:
             return -1, e
 
     def set_token_password_change(self, mysql, uid, token, new_pass):
+        """
+        Registriere Token für Controlpanel Aktion (Passwort- oder E-Mailänderung).
+        """
+
         ts = time.time()
         timestamp = datetime.datetime.fromtimestamp(ts).strftime(
             '%Y-%m-%d %H:%M:%S')
@@ -582,6 +597,10 @@ class DB_Handler:
             conn.close()
 
     def set_token_email_change(self, mysql, uid, token, new_email):
+        """
+        Setze Token für E-Mailänderung.
+        """
+
         ts = time.time()
         timestamp = datetime.datetime.fromtimestamp(ts).strftime(
             '%Y-%m-%d %H:%M:%S')
@@ -597,6 +616,10 @@ class DB_Handler:
             conn.close()
 
     def get_reset_token_cp(self, mysql, uid, action, mode=None, app=None):
+        """
+        Setze Token für Passwortänderung.
+        """
+
         conn = mysql.connect()
         cursor = conn.cursor()
         try:
@@ -624,8 +647,9 @@ class DB_Handler:
 
     def delete_cp_token(self, mysql, uid, action):
         """
-        tbd
+        Lösche Token für Controlpanel Aktionen.
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 
@@ -641,8 +665,9 @@ class DB_Handler:
 
     def set_email_for_user(self, mysql, uid, new_email, app):
         """
-        tbd
+        Setze neue E-Mail für Benutzer.
         """
+
         conn = mysql.connect()
         cursor = conn.cursor()
 

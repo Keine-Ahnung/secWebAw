@@ -13,7 +13,6 @@ from db_handler import DB_Handler
 from function_helper import generate_verification_token
 import datetime
 
-
 # Erstellung der App
 app = Flask(__name__)
 
@@ -37,7 +36,8 @@ SESSIONV_UID = "uid"
 SESSIONV_ROLE_ID = "role_id"
 SESSIONV_VERIFIED = "verified"
 SESSIONV_ADMIN = "is_admin"
-SESSIONV_ITER = [SESSIONV_LOGGED_IN, SESSIONV_USER, SESSIONV_UID, SESSIONV_ROLE_ID, SESSIONV_VERIFIED] # Iterable, für Session Termination
+SESSIONV_ITER = [SESSIONV_LOGGED_IN, SESSIONV_USER, SESSIONV_UID, SESSIONV_ROLE_ID,
+                 SESSIONV_VERIFIED]  # Iterable, für Session Termination
 
 # Muss von Hand geänder werden, sollte sich die Rollen-ID des Administrators ändern!
 SESSIONID_ROLE_ADMIN = 5
@@ -45,11 +45,11 @@ SESSIONID_ROLE_ADMIN = 5
 # Funktionmodi
 DBC_CP_GETDATA = "get_data"  # Modus für db_handler.get_reset_token_cp. Wird im DB_Handler verwendet um nur die Daten zurückzugeben, die zu einem Change Request gespeichert wurden (bspw. neue E-Mail oder neues Passwort)
 
-
 """
 Flask Handler
 ####################################################
 """
+
 
 @app.route("/")
 @app.route("/index")
@@ -129,10 +129,12 @@ def login():
         return_info = {}
         return_info["invalid_method"] = "GET"
         logger.error("Unzulässiger Zugriff mit HTTP-GET. Präsentiere JSON")
-        return prepare_info_json(url_for("post_user"), "GET ist unzulaessig fUer den Login", return_info)
+        return prepare_info_json(url_for("post_user"), "GET ist unzulässig für den Login", return_info)
 
     login_email = request.form["login_email"]
     login_password = request.form["login_password"]
+
+
 
     if login_email == "" or login_password == "":
         return prepare_info_json(url_for("post_user"), "Es wurden Felder beim Login leergelassen")
@@ -279,6 +281,8 @@ def admin_dashboard():
 
     Nur zugänglich wenn man Administrator ist, also wenn die Sessionvariable is_admin = True. Zugriffe auf das
     Dashboard durch einen Benutzer der nicht als Administrator registriert ist, werden geloggt.
+
+    Da es sich hier um sensitive Operationen mit der Datenbank handelt, wird aus Konsistenzgründen keine Validitätsprüfung auf die Session durchgeführt
     """
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
@@ -377,13 +381,9 @@ def post_message():
     db_handler = DB_Handler()
 
     # Session Timeout Handling
-    if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
-            db_handler.invalidate_session(mysql, session["uid"])
-            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
-            delete_user_session()
-            return render_template("quick_info.html", info_warning=True,
-                                   info_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+    if not check_if_valid_session(db_handler, session):
+        return render_template("session_timeout.html",
+                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
     # Post sanitizen
     message = request.form["post_message"]
@@ -431,13 +431,9 @@ def vote():
         return render_template("quick_info.html", info_danger=True, info_text="Du musst eingeloggt sein, um zu voten!")
 
     # Session Timeout Handling
-    if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
-            db_handler.invalidate_session(mysql, session["uid"])
-            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
-            delete_user_session()
-            return render_template("session_timeout.html",
-                                   timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+    if not check_if_valid_session(db_handler, session):
+        return render_template("session_timeout.html",
+                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
     # Lese GET-Parameter
     method = request.args.get("method")
@@ -515,13 +511,9 @@ def finish_vote():
     db_handler = DB_Handler()
 
     # Session Timeout Handling
-    if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
-            db_handler.invalidate_session(mysql, session["uid"])
-            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
-            delete_user_session()
-            return render_template("quick_info.html", info_warning=True,
-                                   info_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+    if not check_if_valid_session(db_handler, session):
+        return render_template("session_timeout.html",
+                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
     (code, data) = db_handler.check_if_already_voted(mysql, post_id, uid)
 
@@ -544,6 +536,7 @@ def finish_vote():
         return render_template("quick_info.html", info_success=True, info_text="Upvote erfolgreich!")
 
     elif method == "downvote":
+
         # Registriere Downvote
         success_register = db_handler.register_vote(mysql, post_id, uid, "downvote")
 
@@ -612,13 +605,9 @@ def change_email_handler():
     db_handler = DB_Handler()
 
     # Session Timeout Handling
-    if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
-            db_handler.invalidate_session(mysql, session["uid"])
-            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
-            delete_user_session()
-            return render_template("quick_info.html", info_warning=True,
-                                   info_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+    if not check_if_valid_session(db_handler, session):
+        return render_template("session_timeout.html",
+                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
     user_email = session[SESSIONV_USER]
     curr_pass = db_handler.get_password_for_user(mysql, user_email)[
@@ -677,13 +666,9 @@ def confirm_email_change():
     db_handler = DB_Handler()
 
     # Session Timeout Handling
-    if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
-            db_handler.invalidate_session(mysql, session["uid"])
-            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
-            delete_user_session()
-            return render_template("quick_info.html", info_warning=True,
-                                   info_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+    if not check_if_valid_session(db_handler, session):
+        return render_template("session_timeout.html",
+                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
     sys_token = db_handler.get_reset_token_cp(mysql, int(uid), "change_email", app=app)
 
@@ -769,13 +754,9 @@ def change_password_handler():
     db_handler = DB_Handler()
 
     # Session Timeout Handling
-    if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
-            db_handler.invalidate_session(mysql, session["uid"])
-            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
-            delete_user_session()
-            return render_template("quick_info.html", info_warning=True,
-                                   info_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+    if not check_if_valid_session(db_handler, session):
+        return render_template("session_timeout.html",
+                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
     user_email = session[SESSIONV_USER]
     curr_pass = db_handler.get_password_for_user(mysql, user_email)[
@@ -834,13 +815,9 @@ def confirm_password_change():
     db_handler = DB_Handler()
 
     # Session Timeout Handling
-    if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
-            db_handler.invalidate_session(mysql, session["uid"])
-            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
-            delete_user_session()
-            return render_template("quick_info.html", info_warning=True,
-                                   info_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+    if not check_if_valid_session(db_handler, session):
+        return render_template("session_timeout.html",
+                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
     sys_token = db_handler.get_reset_token_cp(mysql, int(uid), "change_password", app=app)
 
@@ -927,13 +904,9 @@ def delete_user():
     db_handler = DB_Handler()
 
     # Session Timeout Handling
-    if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
-            db_handler.invalidate_session(mysql, session["uid"])
-            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
-            delete_user_session()
-            return render_template("quick_info.html", info_warning=True,
-                                   info_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+    if not check_if_valid_session(db_handler, session):
+        return render_template("session_timeout.html",
+                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
 
     # Überprüfe, ob Passwork korrekt
     (code, data) = db_handler.get_password_for_user(mysql, session[SESSIONV_USER])
@@ -1191,6 +1164,7 @@ Hilfsfunktionen, die keine HTTP Requests bearbeiten
 ####################################################
 """
 
+
 def delete_user_session():
     """
      Terminiere Benutzersession indem alle Sessionvariablen aus der Session gelöscht werden.
@@ -1277,6 +1251,21 @@ def register_new_account(mysql, email, pw_hash, verification_token):
     success = db_handler.add_new_user(mysql, email, pw_hash, verification_token)
 
     return success
+
+
+def check_if_valid_session(db_handler, session):
+    # Session Timeout Handling
+    if session["logged_in"]:
+        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
+            db_handler.invalidate_session(mysql, session["uid"])
+            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
+            delete_user_session()
+            return False
+        else:
+            return True
+
+def sanitize_input(s):
+    pass
 
 """
 Einstiegspunkt

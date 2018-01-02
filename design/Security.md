@@ -1,6 +1,14 @@
 # Securitychecks
 - [ ] Wo sollen Eingaben geprüft und sanitized werden? Direkt im Backend oder im DB Handler?
 
+# Inputchecks
+- Registrierung
+	* E-Mail
+	* Passwort
+	* Passwortbestätigung
+- Login
+	* E-Mail
+	* Passwort
 
 # Schwachstellen
 

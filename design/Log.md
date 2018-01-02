@@ -47,6 +47,7 @@ Posts besser zu designen
 ## Session
 - [X] Timestamp bei Erstellung der User Session anlegen, nach jedem weiterem Request der selben Session überprüfen, ob inaktiv
 - [X] User wird nach einer bestimmten Zeit automatisch ausgeloggt und die Session wird aus der zugehörigen Tabelle entfernt
+- [ ] Session pro Aktion refreshen und automatischer Timeout nur nach Untätigkeitszeit?
 
 ## Postliste
 - [X] Zufällige Auswahl von Farben für den Hintergrund von Posts
