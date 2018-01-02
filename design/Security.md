@@ -4,9 +4,9 @@
 # Inputchecks
 
 - Registrierung
-	* E-Mail -> Check in post_user()
-	* Passwort -> Check in post_user()
-	* Passwortbestätigung -> Check in post_user()
+	* E-Mail
+	* Passwort
+	* Passwortbestätigung
 	* Confirmtoken
 - Login
 	* E-Mail
@@ -33,9 +33,17 @@
 
 ### Registrierung
 
-**E-Mail**
+**E-Mail** (post_user())
 
-Test
+Check auf Länge (> 0) und korrektes Format mit '''security_helper.check_mail()'''
+
+**Password** (post_user())
+
+Check auf Länge (> 0) und Passwortstärke/-richtlinien mit '''security_helper.check_password_strength()'''
+
+**Passwortbestätigung** (post_user())
+
+Check auf Länge (> 0) und Passwortstärke/-richtlinien mit '''security_helper.check_password_strength()'''
 
 # Schwachstellen
 
