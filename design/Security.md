@@ -53,7 +53,11 @@ Check auf Länge (> 0) und korrektes Format mit `function_helper.check_params()`
 
 **E-Mail** (`login()`)
 
+Check auf Länge (> 0). SQLi-Handling durch Escaped Statement in `check_for_existence()`.
+
 **Passwort** (`login()`)
+
+Check auf Länge (> 0). Überprüfung auf SQLi nicht nötig, da dieser Input nie in Kontakt mit der Datenbank gerät.
 
 # Schwachstellen
 

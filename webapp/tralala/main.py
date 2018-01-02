@@ -134,7 +134,9 @@ def login():
     login_email = request.form["login_email"]
     login_password = request.form["login_password"]
 
-    if login_email == "" or login_password == "":
+    # Hier soll lediglich auf die Länge der Credentials getestet werden. Ein Test auf Passwortstärke wäre unnötig, da dieser bereits bei der Registrierung durchgeführt wurde
+    if not function_helper.check_params("text", login_email) or not function_helper.check_params("text",
+                                                                                                 login_password):
         return prepare_info_json(url_for("post_user"), "Es wurden Felder beim Login leergelassen")
 
     # Hashe Passwort
@@ -237,7 +239,7 @@ def post_user():
 
         if not function_helper.check_params("text", reg_email) or not function_helper.check_params("text",
                                                                                                    reg_password) or not function_helper.check_params(
-                "text", reg_password_repeat):
+            "text", reg_password_repeat):
             return prepare_info_json(url_for("post_user"),
                                      "Es wurden Felder bei der Registrierung leer gelassen")  # Gebe als JSON zurück, da per einfacher Registrierung durch Formular nicht erreichbar
 
