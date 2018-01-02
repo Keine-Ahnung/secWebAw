@@ -130,7 +130,7 @@ def compare_reset_token(mysql: db_handler.DB_Handler, userid: int, token: str):
         return False
 
 
-def check_params(type, param):
+def check_params(t, param):
     """
     Hilfsfunktion die das Format von Parametern überprüft, wie bspw. die Passwortstärke. Gibt True zurück, wenn die Evaluation erfolgreich war
     und False, wenn Abweichungen oder nicht-zugelassene Formate entdeckt wurden.
@@ -141,7 +141,7 @@ def check_params(type, param):
     - text
     - password
     """
-    if type == "email":
+    if t == "email":
         if not param:
             return False
 
@@ -150,7 +150,7 @@ def check_params(type, param):
 
         return True
 
-    elif type == "id":
+    elif t == "id":
         if not param:
             return False
 
@@ -164,7 +164,7 @@ def check_params(type, param):
 
         return True
 
-    elif type == "text":
+    elif t == "text":
         if not param:
             return False
 
@@ -173,7 +173,7 @@ def check_params(type, param):
 
         return True
 
-    elif type == "password":
+    elif t == "password":
         if not param:
             return False
 

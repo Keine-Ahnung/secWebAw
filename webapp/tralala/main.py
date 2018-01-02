@@ -134,8 +134,6 @@ def login():
     login_email = request.form["login_email"]
     login_password = request.form["login_password"]
 
-
-
     if login_email == "" or login_password == "":
         return prepare_info_json(url_for("post_user"), "Es wurden Felder beim Login leergelassen")
 
@@ -237,7 +235,9 @@ def post_user():
         reg_password = request.form["reg_password"]
         reg_password_repeat = request.form["reg_password_repeat"]
 
-        if reg_email == "" or reg_password == "" or reg_password_repeat == "":
+        if not function_helper.check_params("text", reg_email) or not function_helper.check_params("text",
+                                                                                                   reg_password) or not function_helper.check_params(
+                "text", reg_password_repeat):
             return prepare_info_json(url_for("post_user"),
                                      "Es wurden Felder bei der Registrierung leer gelassen")  # Gebe als JSON zurück, da per einfacher Registrierung durch Formular nicht erreichbar
 
@@ -1077,7 +1077,7 @@ def confirm_password_reset():
         logger.error(
             "Übermitteltes Token stimmt nicht mit registriertem Token überein. Mögliche Attacke (SQLi) erkannt.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Token stimmen nicht überein.")
+                               info_text="Wir konnten dein Token leider nicht bei uns im System finden. Bitte verändere nichts an dem Link, den wir die per Mail zugeschickt haben.")
     return render_template("password_reset_change.html", token=ref_token, uid=uid)
 
 
@@ -1120,6 +1120,7 @@ def set_new_password():
 
     ref_token = db_handler.get_reset_token(mysql, int(hidden_uid))
 
+    # Gibt Fehler zurück, sollte z.B. das Feld h_uid innerhalb des Formulars verändert worden sein
     if not ref_token == hidden_token:
         logger.error("Das übermittelte Reset Token stimmt leider nicht mit dem registrierten Token überein.")
         return render_template("quick_info.html", info_danger=True,
@@ -1135,7 +1136,7 @@ def set_new_password():
 
     # Lösche Tokeneintrag aus der Datenbank
     db_handler.delete_pass_reset_token(mysql, uid, app)
-    logger.debug("Logge Benutzer " + str(uid) + " aus, um sich mit den geänderten Credentials erneut auszuloggen.")
+    logger.debug("Logge Benutzer " + str(uid) + " aus, um sich mit den geänderten Credentials erneut einzuloggen.")
 
     return render_template("quick_info.html", info_success=True,
                            info_text="Dein Passwort wurde geändert. Du kannst dich nun einloggen.")
@@ -1264,8 +1265,10 @@ def check_if_valid_session(db_handler, session):
         else:
             return True
 
+
 def sanitize_input(s):
     pass
+
 
 """
 Einstiegspunkt

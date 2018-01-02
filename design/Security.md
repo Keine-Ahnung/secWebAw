@@ -2,13 +2,40 @@
 - [ ] Wo sollen Eingaben geprüft und sanitized werden? Direkt im Backend oder im DB Handler?
 
 # Inputchecks
+
 - Registrierung
-	* E-Mail
-	* Passwort
-	* Passwortbestätigung
+	* E-Mail -> Check in post_user()
+	* Passwort -> Check in post_user()
+	* Passwortbestätigung -> Check in post_user()
+	* Confirmtoken
 - Login
 	* E-Mail
 	* Passwort
+- Passwort vergessen
+	* E-Mail
+	* Resettoken
+- Neuer Post
+	* Nachricht
+	* Hashtags
+- Vote
+	* URL
+	* Verifikationstoken
+- Dashboard
+	* Passwortbestätigung
+- E-Mail ändern
+	* Neue E-Mail
+	* Neue E-Mail wiederholen
+	* Passwort
+- Passwort ändern
+	* Altes Passwort
+	* Neues Passwort
+	* Neues Passwort wiederholen
+
+## Registrierung
+
+*E-Mail*
+
+Test
 
 # Schwachstellen
 
