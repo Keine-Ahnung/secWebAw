@@ -258,7 +258,7 @@ class DB_Handler:
 
         try:
             cursor.callproc("do_downvote", (post_id,))
-            
+
             conn.commit()
             conn.close()
             return 1
@@ -273,8 +273,7 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            "select email, uid, role_id from " + self.DB_TABLE_TRALALA_USERS)
+        cursor.callproc("get_all_users")
         data = cursor.fetchall()
 
         if cursor.rowcount == 0:
@@ -292,8 +291,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute(
-                "select role_id, role_name, del_user, set_role from " + self.DB_TABLE_TRALALA_ROLES)
+            cursor.callproc("get_all_roles")
             data = cursor.fetchall()
         except Exception as e:
             print(str(e))
@@ -312,9 +310,7 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            "select * from " + self.DB_TABLE_TRALALA_POST_VOTES + " where post_id=%s and uid=%s",
-            (post_id, uid,))
+        cursor.callproc("check_if_already_voted", (post_id, uid,))
         data = cursor.fetchone()
 
         if not cursor.rowcount == 0:

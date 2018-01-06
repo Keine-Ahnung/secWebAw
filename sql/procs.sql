@@ -126,10 +126,38 @@ END$$
 
 DELIMITER ;
 
+-- Stored Proc: db_handler.get_all_users()
+DELIMITER $$
 
+CREATE PROCEDURE tralala.get_all_users()
+BEGIN
+  SELECT email, uid, role_id FROM tralala.tralala_users;
+END$$
 
+DELIMITER ;
 
+-- Stored Proc: db_handler.get_all_roles()
+DELIMITER $$
 
+CREATE PROCEDURE tralala.get_all_roles()
+BEGIN
+  SELECT role_id, role_name, del_user, set_role FROM tralala.tralala_roles;
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.check_if_already_voted()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.check_if_already_voted(
+  IN p_pid int(11),
+  IN p_uid int(11)
+)
+BEGIN
+  SELECT * FROM tralala.tralala_post_votes WHERE post_id = p_pid and uid = p_uid;
+END$$
+
+DELIMITER ;
 
 
 
