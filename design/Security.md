@@ -89,6 +89,14 @@ Die eingegebene Nachricht wird auf Länge (> 0) getestet. Bei dem Persistieren d
 
 Die eingegebenen Hashtags werden auf Länge (> 0) getestet. Bei dem Persistieren der Hashtags in die Datenbank werden diese mithilfe des `bleach`-Packages gesäubert: das bedeutet, dass für die Hashtags keinerlei HTML-Tags zulässig sind. Alle Tags werden in HTML-Entities umgewandelt. Diese werden vom Browser nicht interpretiert, was XSS-Attacken verhindert. Beim Schreiben in die Datenbank werden wieder Escaped Statements verwendet, was SQLi unterbindet.
 
+### Vote
+
+**URL**
+
+
+
+**Verifikationstoken**
+
 # Schwachstellen
 
 Welche Schwachstellen sollen überprüft und sanitized werden?
@@ -103,6 +111,7 @@ Welche Schwachstellen sollen überprüft und sanitized werden?
 1. Serverzeit
 1. Cross Site Request Forgery (CSRF)
 1. Attacke auf den Passwort Reset
+1. Fehlermeldungen
 
 
 # Mitigation
@@ -175,3 +184,7 @@ Reset Token und UID werden über den Reset Link mitgegeben. Suche mithilfe der �
 
 
 Spam durch Passwort Reset Funktion: Erlaube maximal 5 gleichzeitige Password Change Requests (um Spam durch diese Funktion zu verhindern), resette Sperre nach erfolgreicher Änderung
+
+## Fehlermeldungen
+
+Möchte ein Benutzer ungültige Seiten wie z.B. `<seite>/ungueltigerPfad` aufrufen (was einen HTTP 400 Error generieren würde) wird der Benutzer stattdessen auf die Indexseite weitergeleitet, was es verhindert, möglicherweise Fehlermeldungen auszugeben (bspw. im Fall, dass der Debug-Modus in `app.run(debug=True)` versehentlich aktiviert gelassen wurde)

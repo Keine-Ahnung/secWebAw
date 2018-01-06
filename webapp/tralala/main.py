@@ -1279,6 +1279,14 @@ def check_if_valid_session(db_handler, session):
 def sanitize_input(s):
     pass
 
+"""
+Errorhandler für HTTP-Errorcodes
+####################################################
+"""
+
+@app.errorhandler(404)
+def not_found_error(error):
+    return redirect(url_for("index"))
 
 """
 Einstiegspunkt
@@ -1288,4 +1296,4 @@ Einstiegspunkt
 if __name__ == '__main__':
     app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
     logger.debug("Server Reload...")
-    app.run(debug=True)
+    app.run(debug=False)

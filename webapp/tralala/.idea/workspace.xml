@@ -10,7 +10,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/tralala$main.coverage" NAME="main Coverage Results" MODIFIED="1515234782211" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/tralala$main.coverage" NAME="main Coverage Results" MODIFIED="1515239144092" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/tralala$db_handler.coverage" NAME="db_handler Coverage Results" MODIFIED="1511964921218" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/tralala$security_helper.coverage" NAME="security_helper Coverage Results" MODIFIED="1512552891522" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/tralala$tralala_logger.coverage" NAME="tralala_logger Coverage Results" MODIFIED="1513610146433" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
@@ -27,8 +27,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="400" column="97" lean-forward="false" selection-start-line="400" selection-start-column="97" selection-end-line="400" selection-end-column="97" />
+            <state relative-caret-position="313">
+              <caret line="1280" column="0" lean-forward="true" selection-start-line="1280" selection-start-column="0" selection-end-line="1280" selection-end-column="0" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
                 <element signature="e#1632#3422#0" expanded="false" />
@@ -39,6 +39,7 @@
                 <element signature="e#11975#13922#0" expanded="false" />
                 <element signature="e#13967#16200#0" expanded="false" />
                 <element signature="e#16256#16394#0" expanded="false" />
+                <element signature="e#16479#19252#0" expanded="false" />
                 <element signature="e#19296#21641#0" expanded="false" />
                 <element signature="e#21724#25726#0" expanded="false" />
                 <element signature="e#25799#26207#0" expanded="false" />
@@ -540,6 +541,7 @@
             <element signature="e#11975#13922#0" expanded="false" />
             <element signature="e#13967#16200#0" expanded="false" />
             <element signature="e#16256#16394#0" expanded="false" />
+            <element signature="e#16479#19252#0" expanded="false" />
             <element signature="e#19296#21641#0" expanded="false" />
             <element signature="e#21724#25726#0" expanded="false" />
             <element signature="e#25799#26207#0" expanded="false" />
@@ -654,6 +656,7 @@
             <element signature="e#11975#13922#0" expanded="false" />
             <element signature="e#13967#16200#0" expanded="false" />
             <element signature="e#16256#16394#0" expanded="false" />
+            <element signature="e#16479#19252#0" expanded="false" />
             <element signature="e#19296#21641#0" expanded="false" />
             <element signature="e#21724#25726#0" expanded="false" />
             <element signature="e#25799#26207#0" expanded="false" />
@@ -994,8 +997,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="400" column="97" lean-forward="false" selection-start-line="400" selection-start-column="97" selection-end-line="400" selection-end-column="97" />
+        <state relative-caret-position="313">
+          <caret line="1280" column="0" lean-forward="true" selection-start-line="1280" selection-start-column="0" selection-end-line="1280" selection-end-column="0" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
             <element signature="e#1632#3422#0" expanded="false" />
@@ -1006,6 +1009,7 @@
             <element signature="e#11975#13922#0" expanded="false" />
             <element signature="e#13967#16200#0" expanded="false" />
             <element signature="e#16256#16394#0" expanded="false" />
+            <element signature="e#16479#19252#0" expanded="false" />
             <element signature="e#19296#21641#0" expanded="false" />
             <element signature="e#21724#25726#0" expanded="false" />
             <element signature="e#25799#26207#0" expanded="false" />
