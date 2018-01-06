@@ -53,7 +53,7 @@ Posts besser zu designen
 - [X] Email über dem Post anzeigen
 - [X] Up- und Downvotebuttons durch Links (mit Icons) ersetzen
 - [X] Es dürfen nur Benutzer posten, deren Account verifiziert ist
-- [ ] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden?
+- [X] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden? (=> Es wird nur ein Hashtag angezeigt mit der falschen Formatierung, da nach "," gesplitted wird)
 - [X] Pro Post darf nur ein User voten
 - [X] Wenn Benutzer gelöscht wurde, lösche auch Posts
 

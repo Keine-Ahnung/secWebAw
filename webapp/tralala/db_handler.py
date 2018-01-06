@@ -51,7 +51,7 @@ class DB_Handler:
         record = [email.lower(), pw_hash, role_id, verified, verification_token]
 
         # Überprüfe ob User schon existiert
-        cursor.execute("select email from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email.lower(),))
+        cursor.callproc("tralala.check_for_existence", (email.lower(),))
         data = cursor.fetchone()
 
         if cursor.rowcount != 0:  # User existiert bereits
@@ -59,9 +59,12 @@ class DB_Handler:
 
         # Füge neuen User zur DB
         try:
-            cursor.execute(
-                "insert into " + self.DB_TABLE_TRALALA_USERS + " (email, password, role_id, verified, verification_token) values (%s,%s,%s,%s,%s)",
-                record)
+            # cursor.execute(
+            #     "insert into " + self.DB_TABLE_TRALALA_USERS + " (email, password, role_id, verified, verification_token) values (%s,%s,%s,%s,%s)",
+            #     record)
+
+            cursor.callproc("tralala.add_new_user", (email.lower(), pw_hash, role_id, verified, verification_token))
+
             conn.commit()
             conn.close()
             return 1
@@ -78,8 +81,7 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            "select verification_token from " + self.DB_TABLE_TRALALA_USERS + " where email=%s", (email.lower(),))
+        cursor.callproc("tralala.get_token_for_user", (email.lower(),))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -98,8 +100,7 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            "select email, verified from " + self.DB_TABLE_TRALALA_USERS + " where verification_token=%s", (token,))
+        cursor.callproc("tralala.get_user_for_token", (token,))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -121,8 +122,8 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET verified=1, role_id=4 WHERE email=%s", (email.lower(),))
+            cursor.callproc("user_successful_verify", (email.lower(),))
+
             conn.commit()
             conn.close()
             return 1
@@ -139,9 +140,12 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            "select email, password, uid, role_id, verified from " + self.DB_TABLE_TRALALA_USERS + " where email=%s",
-            (email.lower(),))
+        # cursor.execute(
+        #     "select email, password, uid, role_id, verified from " + self.DB_TABLE_TRALALA_USERS + " where email=%s",
+        #     (email.lower(),))
+
+        cursor.callproc("tralala.check_for_existence", (email.lower(),))
+
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -170,9 +174,7 @@ class DB_Handler:
         record = [uid, post_date, cleaned_text, cleaned_hashtags, 0, 0]
 
         try:
-            cursor.execute(
-                "INSERT INTO " + self.DB_TABLE_TRALALA_POSTS + " (uid, post_date, post_text, hashtags, upvotes, downvotes) VALUES (%s,%s,%s,%s,%s,%s)",
-                record)
+            cursor.callproc("post_message_to_db", (uid, post_date, cleaned_text, cleaned_hashtags, 0, 0))
 
             conn.commit()
             conn.close()
@@ -197,8 +199,7 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            "SELECT tralala_posts.post_id, tralala_users.email, tralala_posts.post_date, tralala_posts.post_text, tralala_posts.hashtags, tralala_posts.upvotes, tralala_posts.downvotes FROM tralala_posts INNER JOIN tralala_users ON tralala_posts.uid = tralala_users.uid ORDER BY post_id DESC")
+        cursor.callproc("tralala.get_all_posts")
         data = cursor.fetchall()
 
         if cursor.rowcount == 0:
@@ -216,10 +217,8 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        # cursor.execute("SELECT * FROM " + self.DB_TABLE_TRALALA_POSTS + " WHERE post_id=%s", (post_id,))
-        cursor.execute(
-            "SELECT tralala_posts.post_id, tralala_users.email, tralala_posts.post_date, tralala_posts.post_text, tralala_posts.hashtags, tralala_posts.upvotes, tralala_posts.downvotes FROM tralala_posts INNER JOIN tralala_users ON tralala_posts.uid = tralala_users.uid WHERE post_id=%s",
-            (post_id,))
+        cursor.callproc("get_post_by_pid", (post_id,))
+
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -238,8 +237,8 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_POSTS + " SET upvotes = upvotes + 1 WHERE post_id=%s", (post_id,))
+            cursor.callproc("do_upvote", (post_id,))
+
             conn.commit()
             conn.close()
             return 1
@@ -258,8 +257,8 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_POSTS + " SET downvotes = downvotes + 1 WHERE post_id=%s", (post_id,))
+            cursor.callproc("do_downvote", (post_id,))
+            
             conn.commit()
             conn.close()
             return 1
