@@ -52,7 +52,6 @@ Posts besser zu designen
 - [X] Zufällige Auswahl von Farben für den Hintergrund von Posts
 - [X] Email über dem Post anzeigen
 - [X] Up- und Downvotebuttons durch Links (mit Icons) ersetzen
-- [ ] Zeilenumbruch für lange Nachrichten einfügen
 - [X] Es dürfen nur Benutzer posten, deren Account verifiziert ist
 - [ ] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden?
 - [X] Pro Post darf nur ein User voten
