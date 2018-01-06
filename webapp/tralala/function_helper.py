@@ -198,6 +198,3 @@ def check_params(t, param):
             return False
 
         return True
-
-def sanitize_generic_input(s):
-    pass

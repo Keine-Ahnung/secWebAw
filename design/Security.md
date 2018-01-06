@@ -198,13 +198,13 @@ Mit W3-Code das Passwort auf dessen Stärke während der Eingabe überprüfen. I
 - HTML Entity Injection (HTML darf nicht gerendert werden)
 
 Lösungen:
-- HTTP-Only und Secury Flag
+- HTTP-Only und Secure Flag
 - Nachrichtenlänge im Frontend auf 280 Zeichen beschränken in HTML Tag
 - Prüfung der Hashtagliste im Frontend (durch Kommatrennung)
 
 ## Serverzeit
 
-**TODO** Serverzeit nicht synchron (-1 h).
+Zeitstempel in den Logs stimmt nun.
 
 ## Cross Site Request Forgery (CSRF)
 

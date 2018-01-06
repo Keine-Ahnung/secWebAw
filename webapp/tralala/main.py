@@ -397,9 +397,6 @@ def post_message():
     message = request.form["post_message"]
     hashtags = request.form["post_hashtags"]
 
-    # temp
-    logger.debug("Bleached message: " + str(bleach.clean(message, tags=['br', 'b', 'i', 'strong'])))
-
     if not function_helper.check_params("text", message) or not function_helper.check_params("text", hashtags):
         return render_template("quick_info.html", info_danger=True,
                                info_text="Leider konnte deine Nachricht nicht gepostet werden. Bitte fülle alle Felder aus und versuche es erneut.")
@@ -1270,6 +1267,13 @@ def register_new_account(mysql, email, pw_hash, verification_token):
 
 
 def check_if_valid_session(db_handler, session):
+    """
+    Der Session State wird pro autorisierbarer Aktion aktualisiert, sofern die aktuelle Session noch gültig ist, ansonsten wird die Session terminiert.
+    Die Aktualisierung der Session bedeutet, dass session_start auf die aktuelle Zeit aktualisiert wird. session_max_alive wird auf session_start + MAX_SESSION_TIME gesetzt
+
+    Der Session Timeout erfolgt nur, wenn MAX_SESSION_TIME lang keine Aktion ausgeführt wurde (wie z.B. eine Nachricht posten), die die Session refreshed hätte.
+    """
+
     # Session Timeout Handling
     if session["logged_in"]:
         if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
@@ -1278,6 +1282,9 @@ def check_if_valid_session(db_handler, session):
             delete_user_session()
             return False
         else:
+            # Refreshe den Session State
+            db_handler.refresh_session_state(mysql, int(session[SESSIONV_UID]))
+
             return True
 
 

@@ -681,3 +681,28 @@ class DB_Handler:
             app.logger.debug("Fehler bei set_email_for_user:\n" + str(e))
             conn.close()
             return -1
+
+    def refresh_session_state(self, mysql, uid):
+        """
+        Refreshe die Session für den Benutzer.
+        """
+
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        session_start = datetime.datetime.now()
+        session_max_alive = session_start + datetime.timedelta(minutes=self.MAX_SESSION_TIME)
+
+        try:
+            cursor.execute(
+                "UPDATE " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + " SET session_start = %s, session_max_alive = %s WHERE uid = %s",
+                (session_start, session_max_alive, uid))
+
+            conn.commit()
+            conn.close()
+            return 1
+            # return "refreshed session for " + str(uid) + " with session_start=" + str(session_start) + " session_max_alive=" + str(session_max_alive)
+        except Exception as e:
+            conn.close()
+            return -1
+            # return str(e)

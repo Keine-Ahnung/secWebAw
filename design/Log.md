@@ -9,7 +9,7 @@ Posts besser zu designen
 ## Allgemein
 - [X] Dokumentation der Funktionen im Code
 - [X] Stelle Funktionalität auf neues Design um
-- [ ] Überprüfe alle Texeingaben (z.B.) E-Mail mit den implementierten Funktionen aus dem Backend
+- [X] Überprüfe alle Texeingaben (z.B.) E-Mail mit den implementierten Funktionen aus dem Backend
 - [X] Loggingtabelle erstellen
 - [ ] Konformität mit Skript (sind alle dort aufgezählten Schwachstellen mitigiert?)
 
@@ -30,24 +30,23 @@ Posts besser zu designen
 - [X] System sendet zufällige Buchstabenfolge als Mail, muss bei Bestätigung unverändert zurückgeliefert werden
 - [X] Bestätigungsstatus in DB ändern nach erfolgreicher Bestätigung
 - [X] Rückmeldung an User wenn gleicher Bestätigungslink erneut angeklickt wird
-- [ ] Token sanitizen bevor es zur DB geschickt wird
+- [X] Token sanitizen bevor es zur DB geschickt wird (=> wird überprüft, ob alphanumerisch. Wenn nicht, wird der Bestätigungsprozess abgebrochen)
 
 ## Login
 - [X] Auf SQLi prüfen
 - [x] Nur verifizierte Benutzer können sich einloggen
-- [ ] Rollen für User abrufen und in die Session eintragen (für Admin Dashboard)
+- [X] Rollen für User abrufen und in die Session eintragen (für Admin Dashboard) (=> role_id und is_admin=True (oder False, wenn role_id nicht der Adminrolle entspricht) wird in Session eingetragen)
 
 
 ## Nachricht posten
 - [X] Auf XSS prüfen (sollte durch Verwendung von `, (val)` escaped werden)
 - [X] Nachricht in DB posten mit Postdaten
 - [X] Es können keine leeren Posts abgesendet werden (wird client- und serverseitig überprüft)
-- [ ] Nachrichten die reinkopiert werden bekommen keinen Linebreak, Nachrichten, die man schreibt jedoch schon
 
 ## Session
 - [X] Timestamp bei Erstellung der User Session anlegen, nach jedem weiterem Request der selben Session überprüfen, ob inaktiv
 - [X] User wird nach einer bestimmten Zeit automatisch ausgeloggt und die Session wird aus der zugehörigen Tabelle entfernt
-- [ ] Session pro Aktion refreshen und automatischer Timeout nur nach Untätigkeitszeit?
+- [X] Session pro Aktion refreshen und automatischer Timeout nur nach Untätigkeitszeit? (=> Feature implementiert)
 
 ## Postliste
 - [X] Zufällige Auswahl von Farben für den Hintergrund von Posts
@@ -102,4 +101,3 @@ Posts besser zu designen
 ## Changerequests
 - [x] Change method to store the hashtags from the actual to something like: Storing data in database splitted by,
       Read list from db and add # before rendering
-
