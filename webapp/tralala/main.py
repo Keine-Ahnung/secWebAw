@@ -1284,7 +1284,6 @@ def check_if_valid_session(db_handler, session):
         else:
             # Refreshe den Session State
             db_handler.refresh_session_state(mysql, int(session[SESSIONV_UID]))
-
             return True
 
 

@@ -27,8 +27,8 @@
       <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="290">
-              <caret line="397" column="44" lean-forward="false" selection-start-line="397" selection-start-column="44" selection-end-line="397" selection-end-column="44" />
+            <state relative-caret-position="467">
+              <caret line="1285" column="79" lean-forward="false" selection-start-line="1285" selection-start-column="79" selection-end-line="1285" selection-end-column="79" />
               <folding>
                 <element signature="e#0#11#0" expanded="true" />
                 <element signature="e#1619#3409#0" expanded="false" />
@@ -59,7 +59,6 @@
                 <element signature="e#58024#58758#0" expanded="false" />
                 <element signature="e#58824#59454#0" expanded="false" />
                 <element signature="e#59530#59656#0" expanded="false" />
-                <element signature="e#59712#60790#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -582,7 +581,6 @@
             <element signature="e#58024#58758#0" expanded="false" />
             <element signature="e#58824#59454#0" expanded="false" />
             <element signature="e#59530#59656#0" expanded="false" />
-            <element signature="e#59712#60790#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -695,7 +693,6 @@
             <element signature="e#58024#58758#0" expanded="false" />
             <element signature="e#58824#59454#0" expanded="false" />
             <element signature="e#59530#59656#0" expanded="false" />
-            <element signature="e#59712#60790#0" expanded="false" />
           </folding>
         </state>
       </provider>
@@ -1013,8 +1010,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="290">
-          <caret line="397" column="44" lean-forward="false" selection-start-line="397" selection-start-column="44" selection-end-line="397" selection-end-column="44" />
+        <state relative-caret-position="467">
+          <caret line="1285" column="79" lean-forward="false" selection-start-line="1285" selection-start-column="79" selection-end-line="1285" selection-end-column="79" />
           <folding>
             <element signature="e#0#11#0" expanded="true" />
             <element signature="e#1619#3409#0" expanded="false" />
@@ -1045,7 +1042,6 @@
             <element signature="e#58024#58758#0" expanded="false" />
             <element signature="e#58824#59454#0" expanded="false" />
             <element signature="e#59530#59656#0" expanded="false" />
-            <element signature="e#59712#60790#0" expanded="false" />
           </folding>
         </state>
       </provider>
