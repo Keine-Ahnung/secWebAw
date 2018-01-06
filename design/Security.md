@@ -1,6 +1,3 @@
-# Securitychecks
-- [ ] Wo sollen Eingaben geprüft und sanitized werden? Direkt im Backend oder im DB Handler?
-
 # Inputchecks
 
 - Registrierung
@@ -91,11 +88,47 @@ Die eingegebenen Hashtags werden auf Länge (> 0) getestet. Bei dem Persistieren
 
 ### Vote
 
-**URL**
+**URL** (`vote()`)
 
+Sollte in der URL die Art des Votes verändert werden, also ob Up- oder Downvote, wird dies erkannt und mit einer entsprechenden Fehlerseite behandelt. Der `post_id`-Parameter nimmt ebenfalls nur Zahlen entgegen. Wird diesem Parameter eine unbekannte Post-ID übergeben, wird dies mit einer entsprechenden Fehlerseite behandelt. Die Angabe anderer gültiger Post-IDs ist möglich, da darin keine Angriffsmöglichkeit erkannt wird.
 
+**Verifikationstoken** (`vote()`)
 
-**Verifikationstoken**
+Eine Angriffsmöglichkeit auf das Verifikationstoken selbst ist uns nicht bekannt, da lediglich das gespeicherte als auch das zurückgelieferte Token auf Gleichheit überprüft werden.
+
+### Dashboard
+
+**Passwortbestätigung** (`delete_user()`)
+
+Das eingegebene Passwort kommt nicht in Berührung mit der Datenbank. Um das eingegebene Passwort zu verifizieren, wird der in der Session eingetragene Benutzer verwendet. Das eingegebene Passwort dient lediglich als Vergleichswert.
+
+### E-Mail ändern
+
+**Neue E-Mail** (`change_email_handler()`)
+
+Die neue E-Mail wird auf Länge (> 0) und auf korrektes E-Mail Format überprüft. Die neue E-Mail-Addresse wird anschließend temporär in einer Datenbanktabelle zwischengespeichert. Die Persistierung erfolgt über ein Escaped Statement und verhindert somit SQLi.
+
+**Neue E-Mail wiederholen** (`change_email_handler()`)
+
+Die Bestätigung der E-Mail wird auf Länge (> 0) und korrektes E-Mail Format überprüft. Jedoch kommt diese Eingabe nie in Berührung mit der Datenbank und dient lediglich als Referenzwert, weshalb dieser kein Sicherheitsrisiko zugeschrieben wird.
+
+**Passwort** (`change_email_handler()`)
+
+Das Passwort wird lediglich als Referenzwert verwendet. Mithilfe der in der Session gespeicherten E-Mail des angemeldeten Benutzers wird der Hash des Passworts aus der Datenbank ermittelt und im Anschluss gegen das eingegebene Passwort überprüft. Dieser Eingabe wird kein Sicherheitsrisiko zugeschrieben, da dieses nicht in Berührung mit der Datenbank kommt.
+
+### Passwort ändern
+
+**Altes Passwort** (`change_password_handler()`)
+
+Das alte Passwort (also das aktuelle Passwort) wird auf dessen Länge und dessen Übereinstimmung mit den Passwortrichtlinien überprüft. Überprüfung auf Stärke eigentlich unnötig, da das schon bei der Registrierung geprüft wurde, wird jedoch aus "Bequemlichkeit" verwendet, da die überprüfende Funktion ebenfalls auf korrektes Format überprüft (was die eigentliche Intention der Überprüng ist).
+
+**Neues Passwort** (`change_password_handler()`)
+
+Das neue Passwort wird auf Länge und Format überprüft. Anschließend wird es temporär in eine Datenbanktabelle geschrieben, während die Bestätigung der Änderung, die per Mail durchgeführt werden muss, aussteht. Die Persistierung in die Datenbank geschieht über ein Escaped Statement, was SQLi unterbindet.
+
+**Neues Passwort wiederholen** (`change_password_handler()`)
+
+Dient lediglich als Referenzwert, um die Änderung registrieren zu können. Kommt nicht mit der Datenbank in Verbindung und stellt deshalb kein Sicherheitsrisiko dar.
 
 # Schwachstellen
 
@@ -112,7 +145,7 @@ Welche Schwachstellen sollen überprüft und sanitized werden?
 1. Cross Site Request Forgery (CSRF)
 1. Attacke auf den Passwort Reset
 1. Fehlermeldungen
-
+1. Deaktivieren des Debug-Modus
 
 # Mitigation
 ## SQL Injection
@@ -169,7 +202,6 @@ Lösungen:
 - Nachrichtenlänge im Frontend auf 280 Zeichen beschränken in HTML Tag
 - Prüfung der Hashtagliste im Frontend (durch Kommatrennung)
 
-
 ## Serverzeit
 
 **TODO** Serverzeit nicht synchron (-1 h).
@@ -187,3 +219,16 @@ Spam durch Passwort Reset Funktion: Erlaube maximal 5 gleichzeitige Password Cha
 ## Fehlermeldungen
 
 Möchte ein Benutzer ungültige Seiten wie z.B. `<seite>/ungueltigerPfad` aufrufen (was einen HTTP 400 Error generieren würde) wird der Benutzer stattdessen auf die Indexseite weitergeleitet, was es verhindert, möglicherweise Fehlermeldungen auszugeben (bspw. im Fall, dass der Debug-Modus in `app.run(debug=True)` versehentlich aktiviert gelassen wurde)
+
+## Deaktivieren des Debug-Modus
+
+Bei auftretenden Fehlermeldungen z.B. beim Anfordern einer unbekannten Ressource werden Fehlermeldungen direkt im Browser auf einer Flask-spezifischen Debugseite angezeigt. Ein gravierendes Sicherheitsrisiko besteht darin, dass diese Fehlerseiten absolute Dateipfade preisgeben, wie z.B. im folgenden Beispiel.
+
+Aufgerufen wurde die URL `http://localhost:5000/auth/vote?method=upvawote&post_id=6`. In dem Pfad wurde anstatt "upvote" "upvawote" eingegeben, was zu einem Fehler führt. Ist der Debug-Modus durch `app.run(debug=True)` aktiviert, wird folgender Output generiert (verkürzte Darstellung):
+
+```
+File "E:\IT Security\ITSBSc7\Sichere Webanwendungen\Praktikum\repo\secWebAw\webapp\tralala\main.py", line 483, in vote
+method_label=method_labels[method])
+KeyError: 'upvawote'
+```
+Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur noch eine generische Fehlerseite für den HTTP-Errorcode 500 angezeigt.

@@ -10,7 +10,7 @@ from tralala_logger import Logger
 import function_helper
 import security_helper
 from db_handler import DB_Handler
-from function_helper import generate_verification_token
+from function_helper import generate_token
 import datetime
 import bleach
 
@@ -257,7 +257,7 @@ def post_user():
 
         # Überprüfe, ob User schon existiert
         success = register_new_account(mysql, reg_email, generate_password_hash(reg_password),
-                                       generate_verification_token(50))  # Persistiere neuen Benutzer in der Datenbank
+                                       generate_token(50))  # Persistiere neuen Benutzer in der Datenbank
         if success == -1:
             logger.error("Benuzter konnte nicht in Datenbank geschrieben werden.")
             return render_template("registration_no_success.html", info_danger=True, code=-1)
@@ -450,9 +450,14 @@ def vote():
     post_id = request.args.get("post_id")
     uid = session["uid"]
 
-    if post_id == "" or method == "":
+    if not function_helper.check_params("text", method) or not function_helper.check_params("id", post_id):
         logger.error("Ungültiger Zugriff (Post ID oder Methode)")
         return render_template("quick_info.html", info_danger=True, info_text="Ungültige Post ID oder Zugriffsmethode!")
+
+    if not method in ["upvote", "downvote"]:
+        logger.error("Ungültiger Zugriff (Post ID oder Methode)")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Art des Votes konnte nicht verstanden werden. Bitte verändere nichts am Link und versuche es erneut.")
 
     (code, data) = db_handler.check_if_already_voted(mysql, post_id,
                                                      uid)  # Überprüfe ob der Benutzer bereits für diesen Post abgestimmt hat
@@ -471,7 +476,7 @@ def vote():
                                info_text="Wir konnten leider keinen Post mit der ID " + str(post_id) + " finden!")
 
     method_labels = {"upvote": "Upvote", "downvote": "Downvote"}
-    csrf_seq = generate_verification_token(8)
+    csrf_seq = generate_token(8)
 
     # Gebe Seite mit vollstaendigem Post zurück
     # Praesentiere zufaellige Zeichenfolge, die eingegeben werden muss, um CSRF-Attacken zu unterbinden
@@ -632,7 +637,7 @@ def change_email_handler():
                                info_text="Das eingegebene Passwort war falsch. Bitte versuche es erneut.")
 
     # Confirm Token in Datenbank festschreiben
-    token = generate_verification_token(32)
+    token = generate_token(32)
     db_handler.set_token_email_change(mysql, uid, token, new_email)
 
     # Bestätigungsmail senden
@@ -779,7 +784,7 @@ def change_password_handler():
                                info_text="Das eingegebene Passwort war falsch. Bitte versuche es erneut.")
 
     # Confirm Token in Datenbank festschreiben
-    token = generate_verification_token(32)
+    token = generate_token(32)
     db_handler.set_token_password_change(mysql, uid, token, generate_password_hash(new_pass))
 
     # Bestätigungsmail senden
@@ -1038,7 +1043,7 @@ def handle_password_reset():
                                info_text="Du hast zu oft versucht dein Passwort zurückzusetzen, weshalb wir dieses Feature für dich vorübergehend deaktiviert haben, um mögliche Spam-Attacken zu verhindern. Vielen Dank für dein Verständnis.")
 
     # Persistiere Reset Token
-    token = function_helper.generate_verification_token(32)
+    token = function_helper.generate_token(32)
     db_handler.set_reset_token(mysql, token, uid, app)
 
     # Sende Reset Email
@@ -1279,14 +1284,17 @@ def check_if_valid_session(db_handler, session):
 def sanitize_input(s):
     pass
 
+
 """
 Errorhandler für HTTP-Errorcodes
 ####################################################
 """
 
+
 @app.errorhandler(404)
 def not_found_error(error):
     return redirect(url_for("index"))
+
 
 """
 Einstiegspunkt
@@ -1296,4 +1304,4 @@ Einstiegspunkt
 if __name__ == '__main__':
     app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
     logger.debug("Server Reload...")
-    app.run(debug=False)
+    app.run(debug=True)

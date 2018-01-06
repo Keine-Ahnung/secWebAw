@@ -101,14 +101,14 @@ def reset_password(mysql: db_handler.DB_Handler, mail: str, url: str):
     if success != 1:
         return False
     else:
-        token = generate_verification_token(99)
+        token = generate_token(99)
         mysql.set_reset_token(mysql, token, data["uid"])
         mail_sended = send_reset_mail(data["email"], data["uid"], token, url)
 
     return mail_sended
 
 
-def generate_verification_token(length):
+def generate_token(length):
     """
     Generiere ein Verification Token der Länge length (String zufälliger Buchstaben und Zahlen)
     """
