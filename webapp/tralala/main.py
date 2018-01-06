@@ -12,6 +12,7 @@ import security_helper
 from db_handler import DB_Handler
 from function_helper import generate_verification_token
 import datetime
+import bleach
 
 # Erstellung der App
 app = Flask(__name__)
@@ -396,10 +397,12 @@ def post_message():
     message = request.form["post_message"]
     hashtags = request.form["post_hashtags"]
 
-    if message == "":
+    # temp
+    logger.debug("Bleached message: " + str(bleach.clean(message, tags=['br', 'b', 'i', 'strong'])))
+
+    if not function_helper.check_params("text", message) or not function_helper.check_params("text", hashtags):
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Leider konnte deine Nachricht nicht gepostet werden, da du keine Nachricht"
-                                         " angegeben hast. Versuche es bitte erneut!")
+                               info_text="Leider konnte deine Nachricht nicht gepostet werden. Bitte fülle alle Felder aus und versuche es erneut.")
 
     # Nur bestätigte Benutzer dürfen voten
     if not session["verified"]:
@@ -1067,7 +1070,7 @@ def confirm_password_reset():
     token = request.args.get("token")
     uid = request.args.get("uid")
 
-    if not function_helper.check_params("text", token) or not function_helper.check_params("id", uid):
+    if not function_helper.check_params("token", token) or not function_helper.check_params("id", uid):
         logger.error("Konnte die übergebenen URL-Parameter nicht auswerten.")
         return render_template("quick_info.html", info_danger=True,
                                info_text="Leider konnten wir deine Anfrage nicht verstehen. Bitte ändere nichts an dem Link, den wir dir per Mail zugeschickt haben.")

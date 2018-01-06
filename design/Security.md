@@ -14,6 +14,8 @@
 - Passwort vergessen
 	* E-Mail
 	* Resettoken
+	* Neues Passwort
+	* Neues Passwort bestätigen
 - Neuer Post
 	* Nachricht
 	* Hashtags
@@ -58,6 +60,34 @@ Check auf Länge (> 0). SQLi-Handling durch Escaped Statement in `check_for_exis
 **Passwort** (`login()`)
 
 Check auf Länge (> 0). Überprüfung auf SQLi nicht nötig, da dieser Input nie in Kontakt mit der Datenbank gerät.
+
+### Passwort vergessen
+
+**E-Mail** (`handle_password_request()`)
+
+E-Mail wird Länge (> 0) und richtiges E-Mail-Format geprüft. Anschließend wird in `check_for_existence()` die Möglichkeit auf eine SQLi durch ein Escaped Statement verhindert.
+
+**Resettoken** (`handle_password_request()`)
+
+Übergebenes Resettoken wird zu erst mithilfe von `check_params()` überprüft, ob es exklusiv alphanumerisch ist, gängige Sonderzeichen bei einer SQLi wie `'` oder `);` werden dadurch nicht erlaubt. Weiterhin wird das nach dem Token in der Datenbank gesucht mit `get_reset_token()`. Dafür wird ein Escaped Statement verwendet, welches alle Sonderzeichen escaped.
+
+**Neues Passwort** (`set_new_password()`)
+
+Passwort wird auf Länge (> 0) geprüft als auch auf dessen Übereinstimmung mit unseren Passwortrichtlinien. Mögliche SQLi werden durch Escaped Statements verhindert.
+
+**Neues Passwort bestätigen*** (`set_new_password()`)
+
+Passwortbestätigung wird auf Länge (> 0) geprüft als auch auf dessen Übereinstimmung mit unseren Passwortrichtlinien. Mögliche SQLi werden durch Escaped Statements verhindert.
+
+### Neuer Post
+
+**Nachricht** (`post_message()`)
+
+Die eingegebene Nachricht wird auf Länge (> 0) getestet. Bei dem Persistieren der Nachricht in die Datenbank wird diese mithilfe des `bleach`-Packages gesäubert: das bedeutet, dass nur HTML-Tags wie `<br>`, `<b>`, `<i>` und `<strong>` zulässig sind. Dies soll eine bis zu einem gewissen Grad individualisierbare Nachricht ermöglichen. Alle anderen nicht zulässigen Zeichen werden in HTML-Entities umgewandelt. Diese werden vom Browser nicht interpretiert, was XSS-Attacken verhindert. Beim Schreiben in die Datenbank werden wieder Escaped Statements verwendet, was SQLi unterbindet.
+
+**Hashtags** (`post_message()`)
+
+Die eingegebenen Hashtags werden auf Länge (> 0) getestet. Bei dem Persistieren der Hashtags in die Datenbank werden diese mithilfe des `bleach`-Packages gesäubert: das bedeutet, dass für die Hashtags keinerlei HTML-Tags zulässig sind. Alle Tags werden in HTML-Entities umgewandelt. Diese werden vom Browser nicht interpretiert, was XSS-Attacken verhindert. Beim Schreiben in die Datenbank werden wieder Escaped Statements verwendet, was SQLi unterbindet.
 
 # Schwachstellen
 
@@ -144,4 +174,4 @@ Lösungen:
 Reset Token und UID werden über den Reset Link mitgegeben. Suche mithilfe der über die URL spezifizierten UID in der Datenbank nach einem Reset Token. Wurde eins gefunden, vergleiches diese Token mit dem über die URL mitgelieferten Token. Sind diese Token identisch, erlaube dem Benutzer sein Passwort zu ändern. Ändere nur das Passworts des Benutzers mit der UID, welche in der Datenbank mit dem Token gespeichert wurde und nicht die UID, die der Benutzer über die URL mitgegeben hat.
 
 
-Spam durch Passwort Reset Funktion: Erlaube maximal 5 gleichzeitige Password Change Requests (um Spam durch diese Funktion zu verhindern), resette Sperre nach erfolgreicher Änderung 
+Spam durch Passwort Reset Funktion: Erlaube maximal 5 gleichzeitige Password Change Requests (um Spam durch diese Funktion zu verhindern), resette Sperre nach erfolgreicher Änderung
