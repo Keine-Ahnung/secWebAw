@@ -15,7 +15,7 @@ Posts besser zu designen
 
 ## Zugriff auf die Datenbank
 - [X] Benutzen von Stored Procedures
-- [ ] Lese- und Schreibrechte für Stored Procedures individuell verteilen um Sicherheit zu erhöhen
+- [X] Lese- und Schreibrechte für Stored Procedures individuell verteilen um Sicherheit zu erhöhen
 
 ## Registrierung
 - [X] User kann ein Account registrieren
@@ -79,7 +79,7 @@ Posts besser zu designen
 - [x] Corrected logic flaws in the validation of the password strength
 - [x] Set HttpOnly und Secure Flags
 
-## Password reset
+## Password Reset
 - [X] Build method to reset the password (Check mail + security question + answer, send mail if ok, no mail if not)
 - [X] Add security- question to sign up
 - [X] Build html page to insert the mail, captcha, security-question
