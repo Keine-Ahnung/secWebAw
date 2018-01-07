@@ -14,7 +14,8 @@ Posts besser zu designen
 - [ ] Konformität mit Skript (sind alle dort aufgezählten Schwachstellen mitigiert?)
 
 ## Zugriff auf die Datenbank
-- [ ] Benutzen von Stored Procedures
+- [X] Benutzen von Stored Procedures
+- [ ] Lese- und Schreibrechte für Stored Procedures individuell verteilen um Sicherheit zu erhöhen
 
 ## Registrierung
 - [X] User kann ein Account registrieren

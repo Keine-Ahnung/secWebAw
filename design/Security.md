@@ -158,9 +158,7 @@ cursor.execute("select email, verified from " + self.DB_TABLE_TRALALA_USERS + " 
 
 Mithilfe von `%s` und der Übergabe eines Tupels mit `, (var)` (mit einem Komma) wird der String escaped an den Cursor übergeben. Die Verwendung von `%s` mittels `% (var)` würde einer direkt Stringsubstitution gleichkommen.
 
-Zusötzlich wurden nachträglich Stored Procedures verwendet. Dies sind festgelegte Abfragepläne innerhalb der Datenbank. Mehr Informationen dazu unter [MSDN](https://blogs.msdn.microsoft.com/brian_swan/2011/02/16/do-stored-procedures-protect-against-sql-injection/)
-
-**Test durchführen, ob das auch wirklich so ist** [StackOverflow](https://stackoverflow.com/questions/7929364/python-best-practice-and-securest-to-connect-to-mysql-and-execute-queries)
+Zusätzlich wurden nachträglich Stored Procedures verwendet. Dies sind festgelegte Abfragepläne innerhalb der Datenbank. Mehr Informationen dazu unter [MSDN](https://blogs.msdn.microsoft.com/brian_swan/2011/02/16/do-stored-procedures-protect-against-sql-injection/).
 
 ## User Enumeration über das Verification Token
 

@@ -512,8 +512,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET password=%s WHERE uid=%s", (new_pass, uid))
+            cursor.callproc("set_pass_for_user", (new_pass, uid,))
             conn.commit()
             conn.close()
             return 1
@@ -531,8 +530,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET email=%s WHERE uid=%s", (new_email, uid))
+            cursor.callproc("set_email_for_user", (new_email, uid,))
             conn.commit()
             conn.close()
             return 1
@@ -550,7 +548,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("DELETE FROM " + self.DB_TABLE_TRALALA_RESET_PASSWORD + " WHERE userid=%s", (uid,))
+            cursor.callproc("delete_pass_reset_token", (uid,))
             conn.commit()
             conn.close()
             return 1, None
@@ -571,8 +569,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("INSERT INTO " + self.DB_TABLE_TRALALA_CP_CHANGE + " VALUES (%s,%s,%s,%s,%s)",
-                           (uid, token, timestamp, "change_password", new_pass))
+            cursor.callproc("set_token_password_change", (uid, token, timestamp, "change_password", new_pass,))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -590,8 +587,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("INSERT INTO " + self.DB_TABLE_TRALALA_CP_CHANGE + " VALUES (%s,%s,%s,%s,%s)",
-                           (uid, token, timestamp, "change_email", new_email))
+            cursor.callproc("set_token_email_change", (uid, token, timestamp, "change_email", new_email,))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -605,9 +601,7 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
         try:
-            cursor.execute(
-                "SELECT uid, token, data FROM " + self.DB_TABLE_TRALALA_CP_CHANGE + " WHERE uid=%s AND action=%s ORDER BY requesttime DESC",
-                (uid, action))
+            cursor.callproc("get_reset_token_cp", (uid, action,))
             data = cursor.fetchall()
 
             if cursor.rowcount == 0:
@@ -636,8 +630,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("DELETE FROM " + self.DB_TABLE_TRALALA_CP_CHANGE + " WHERE uid=%s AND action=%s",
-                           (uid, action))
+            cursor.callproc("delete_cp_token", (uid, action,))
             conn.commit()
             conn.close()
             return 1, None
@@ -654,8 +647,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_USERS + " SET email=%s WHERE uid=%s", (new_email, uid))
+            cursor.callproc("set_email_for_user", (new_email, uid,))
             conn.commit()
             conn.close()
             return 1
@@ -676,10 +668,7 @@ class DB_Handler:
         session_max_alive = session_start + datetime.timedelta(minutes=self.MAX_SESSION_TIME)
 
         try:
-            cursor.execute(
-                "UPDATE " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + " SET session_start = %s, session_max_alive = %s WHERE uid = %s",
-                (session_start, session_max_alive, uid))
-
+            cursor.callproc("refresh_session_state", (session_start, session_max_alive, uid,))
             conn.commit()
             conn.close()
             return 1
