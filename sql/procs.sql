@@ -159,6 +159,140 @@ END$$
 
 DELIMITER ;
 
+-- Stored Proc: db_handler.register_vote()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.register_vote(
+  IN p_uid int(11),
+  IN p_vote_date datetime,
+  IN p_post_id int(11),
+  IN p_was_upvote tinyint(1),
+  IN p_was_downvote tinyint(1)
+)
+BEGIN
+  INSERT INTO tralala.tralala_post_votes (uid, vote_date, post_id, was_upvote, was_downvote) VALUES (p_uid, p_vote_date, p_post_id, p_was_upvote, p_was_downvote);
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.start_session()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.start_session(
+  IN p_uid int(11),
+  IN p_session_start datetime,
+  IN p_session_max_alive datetime
+)
+BEGIN
+  INSERT INTO tralala.tralala_active_sessions (uid, session_start, session_max_alive) VALUES (p_uid, p_session_start, p_session_max_alive);
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.check_session_state()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.check_session_state(
+  IN p_uid int(11)
+)
+BEGIN
+  SELECT uid, session_max_alive FROM tralala.tralala_active_sessions WHERE uid = p_uid;
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.invalidate_session()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.invalidate_session(
+  IN p_uid int(11)
+)
+BEGIN
+  DELETE FROM tralala.tralala_active_sessions WHERE uid = p_uid;
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.delete_user()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.delete_user(
+  IN p_uid int(11)
+)
+BEGIN
+  DELETE FROM tralala.tralala_users WHERE uid = p_uid;
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.get_password_for_user()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.get_password_for_user(
+  IN p_email varchar(100)
+)
+BEGIN
+  SELECT password FROM tralala.tralala_users WHERE email = p_email;
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.count_password_requests()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.count_password_requests(
+  IN p_uid int(11)
+)
+BEGIN
+  SELECT * FROM tralala.tralala_reset_password WHERE userid = p_uid;
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.set_reset_token()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.set_reset_token(
+  IN p_uid int(11),
+  IN p_token varchar(100),
+  IN p_timestamp timestamp
+)
+BEGIN
+  INSERT INTO tralala.tralala_reset_password VALUES (p_uid, p_token, p_timestamp);
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.get_reset_token()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.get_reset_token(
+  IN p_uid int(11)
+)
+BEGIN
+  SELECT userid, token FROM tralala.tralala_reset_password WHERE userid = p_uid ORDER BY requesttime DESC;
+END$$
+
+DELIMITER ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

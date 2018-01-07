@@ -334,9 +334,7 @@ class DB_Handler:
         record = [uid, vote_date, post_id, was_upvote, was_downvote]
 
         try:
-            cursor.execute(
-                "INSERT INTO " + self.DB_TABLE_TRALALA_POST_VOTES + " (uid, vote_date, post_id, was_upvote, was_downvote) VALUES (%s,%s,%s,%s,%s)",
-                record)
+            cursor.callproc("register_vote", (uid, vote_date, post_id, was_upvote, was_downvote))
             conn.commit()
             conn.close()
             return 1
@@ -357,10 +355,7 @@ class DB_Handler:
         record = [uid, session_start, session_max_alive]
 
         try:
-            cursor.execute(
-                "INSERT INTO " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + " (uid, session_start, session_max_alive) VALUES (%s, %s, %s)",
-                record)
-
+            cursor.callproc("start_session", (uid, session_start, session_max_alive,))
             conn.commit()
             conn.close()
             return 1
@@ -378,8 +373,7 @@ class DB_Handler:
         current_time = datetime.datetime.now()
 
         try:
-            cursor.execute(
-                "select uid, session_max_alive FROM " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + " where uid=%s", (uid,))
+            cursor.callproc("check_session_state", (uid,))
             data = cursor.fetchone()
 
             if cursor.rowcount == 0:
@@ -407,7 +401,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("DELETE FROM " + self.DB_TABLE_TRALALA_ACTIVE_SESSIONS + " WHERE uid=%s", (uid,))
+            cursor.callproc("invalidate_session", (uid,))
             conn.commit()
             conn.close()
             return 1, None
@@ -423,7 +417,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("DELETE FROM " + self.DB_TABLE_TRALALA_USERS + " WHERE uid=%s", (uid,))
+            cursor.callproc("delete_user", (uid,))
             conn.commit()
             conn.close()
             return 1, None
@@ -438,9 +432,7 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            "select password from " + self.DB_TABLE_TRALALA_USERS + " where email=%s",
-            (email,))
+        cursor.callproc("get_password_for_user", (email.lower(),))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
@@ -457,9 +449,7 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
 
-        cursor.execute(
-            "select * from " + self.DB_TABLE_TRALALA_RESET_PASSWORD + " where userid=%s",
-            (uid,))
+        cursor.callproc("count_password_requests", (uid,))
         data = cursor.fetchall()
         app.logger.debug("Total resets for " + str(uid) + ": " + str(cursor.rowcount))
         if cursor.rowcount >= 5:
@@ -481,8 +471,7 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.execute("INSERT INTO " + self.DB_TABLE_TRALALA_RESET_PASSWORD + " VALUES (%s,%s,%s)",
-                           (uid, token, timestamp,))
+            cursor.callproc("set_reset_token", (uid, token, timestamp,))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -497,9 +486,7 @@ class DB_Handler:
         conn = mysql.connect()
         cursor = conn.cursor()
         try:
-            cursor.execute(
-                "SELECT userid, token FROM " + self.DB_TABLE_TRALALA_RESET_PASSWORD + " WHERE userid=%s ORDER BY requesttime DESC",
-                (userid,))
+            cursor.callproc("get_reset_token", (userid,))
             data = cursor.fetchall()
 
             if cursor.rowcount == 0:
