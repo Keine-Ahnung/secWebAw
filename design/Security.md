@@ -245,7 +245,7 @@ Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur
 * ✓ Default Credentials (haben wir nicht)
 * X Default Content (Debug-Error Seiten)
 * ✓ Hidden Content (haben wir nicht)
-* X gefährliche HTTP-Methoden (` @app.route("/pfad", ["GET", "POST"])`)
+* X gefährliche HTTP-Methoden (`@app.route("/pfad", ["GET", "POST"])`)
 * X Verwendung der Webapp als Proxy
 * X Verwendung der Webapp als Spammer
 * X Hosting Misconfiguration
@@ -327,22 +327,66 @@ Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur
 ### Injection Attacks
 
 * ✓ SQL injection
-* X XSS (neue Überprüfung nach eigener Implementierung für Input Sanitizer)
+* X Reflected/Stored XSS (neue Überprüfung nach eigener Implementierung für Input Sanitizer)
 * ✓ LDAP Injection (haben wir nicht)
 * ✓ SMTP Injection (haben wir nicht)
 * ✓ SOAP Injection (haben wir nicht)
 * ✓ XPath Injection (haben wir nicht)
 * ✓ OS Command Injection (Webapp hat keinen direkten Zugriff auf das OS, höchstens über SQLi möglich)
+* ✓ XML External Entity Injection (haben wir nicht)
+* ✓ NodeJS Injection (haben wir nicht)
 * [FuzzDB](https://www.github.com/fuzzdb-project/fuzzdb)
 * [SecLists](https://www.github.com/danielmiessler/SecLists)
 
+### Injection Attacks (Gegenmaßnahmen)
 
+* X Input Filtering (Review nötig)
+* X Input Encoding (Review nötig)
+* X Output Encoding (Review nötig)
 
+### Information Disclosure
 
+* X Script Error Nachrichten (`app.run(debug=False)`)
+* ✓ Stack Traces (s.o.)
+* ✓ Server und Datenbank Fehler (s.o.)
+* ✓ Debug Nachrichten (s.o.)
+* ✓ Kommentare (?)
+* X Schlechtes Error Handling (Review nötig)
+* X Kommentare im Source Code (Review nötig)
+* X Debuggingfunktionen (Review nötig)
+* X Unzureichendes Server Hardening (Beispieldateien, fehlerhafte Zugriffsrechte auf Systemebene) (Review nötig)
 
+### Information Disclosure (Gegenmaßnahmen)
 
+* ✓ Angebrachtes Error Handling
+* ✓ Kein Debug Code
+* ✓ Log Files beschützen
+* X Core Dumps beschützen (wie?)
+* X Kein Directory Listing zulassen (wie?)
+* ✓ Entweder Standardpages oder Redirect auf Startseite
 
+### Secure Coding Basics
 
+* X Banned Functions vermeiden
+* X Anerkannte Cryptofunktionen wiederverwenden
+* X Daten sicher speichern (DB angemessen abgesichert? Benutzerrechte etc.?)
+* X Sicheres Error Handling
+* X Input und Output Validation
+* ✓ Keine eigene Krypto bauen (zu viel Arbeit)
+* X Anerkannte Krypto-Libs verwenden
+* X Starke Verschlüsselung (min. AES-128, RSA-2048, ECC-256 etc.)
+* X CSPRNG (verwendet Flask das?)
+* X Aktuellste TLS-Version
+* ✓ Gesamte Certificate Chain checken (zu viel Arbeit)
+* X Data Avoidance vor Data Protection (nur Daten speichern die man unbedingt braucht)
+* X OS für den Schutz der Daten mitverwenden
+* X Sensible Daten nach Benutzung löschen (nicht speichern)
+* ✓ Keine detaillierten Fehler (debug=False)
+* ✓ Log Files benutzen
+* X NULL/None vermeiden (Review nötig)
+* X Fehler provozieren (Review nötig)
+* X Output Validation (Review nötig)
+* X Code Reviews (automatisierung und manuell)
 
 
 
