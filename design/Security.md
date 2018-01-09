@@ -237,10 +237,15 @@ Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur
 
 ### Testen
 
-* TLS
-* Crawling/Spidering
-* ✓ Alle möglichen Inputs ermitteln 
-
+* X TLS
+* X Crawling/Spidering
+* ✓ Alle möglichen Inputs ermitteln
+* X Alle Rollen und deren Rechte ermitteln
+* X automatisiert auf Schwachstellen prüfen
+* ✓ Default Credentials (haben wir nicht)
+* X Default Content (Debug-Error Seiten)
+* ✓ Hidden Content (haben wir nicht)
+* X gefährliche HTTP-Methoden (`python @app.route("/pfad", ["GET", "POST"])`)
 
 
 
