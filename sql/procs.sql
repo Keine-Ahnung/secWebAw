@@ -415,6 +415,43 @@ END$$
 
 DELIMITER ;
 
+-- Stored Proc: db_handler.check_user_locked()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.check_user_locked(
+  IN uid int(12)
+)
+READS SQL DATA
+BEGIN
+  SELECT uid, counter FROM tralala.tralala_login_attempts WHERE uid = uid;
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.create_entry_user_locked()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.create_entry_user_locked(
+  IN uid int(12)
+)
+BEGIN
+  INSERT INTO tralala.tralala_login_attempts (uid, counter) VALUES (uid, 1);
+END$$
+
+DELIMITER ;
+
+-- Stored Proc: db_handler.iter_locked_counter()
+DELIMITER $$
+
+CREATE PROCEDURE tralala.iter_locked_counter(
+  IN uid int(12)
+)
+MODIFIES SQL DATA
+BEGIN
+  UPDATE tralala.tralala_login_attempts SET counter = counter + 1 WHERE uid = uid;
+END$$
+
+DELIMITER ;
 
 
 

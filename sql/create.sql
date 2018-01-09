@@ -53,7 +53,8 @@ CREATE TABLE tralala.tralala_active_sessions(
 CREATE TABLE tralala.tralala_reset_password(
 	userid INT NOT NULL,
 	token varchar(100) NOT NULL UNIQUE,
-	requesttime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+	requesttime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	PRIMARY KEY (userid)
 ) ENGINE=INNODB;
 
 CREATE TABLE tralala.tralala_cp_change(
@@ -63,6 +64,13 @@ CREATE TABLE tralala.tralala_cp_change(
 	action varchar(50) NOT NULL,
 	data varchar(250) NOT NULL
 ) ENGINE=INNODB;
+
+CREATE TABLE tralala.tralala_login_attempts(
+  uid INT NOT NULL,
+  counter INT NOT NULL,
+  locktime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (uid)
+)ENGINE=INNODB;
 
 
 DROP USER IF EXISTS 'db_admin_tralala'@'localhost', 'db_admin_tralala'@'%';

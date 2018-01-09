@@ -665,10 +665,12 @@ class DB_Handler:
         cursor = conn.cursor()
 
         session_start = datetime.datetime.now()
-        session_max_alive = session_start + datetime.timedelta(minutes=self.MAX_SESSION_TIME)
+        session_max_alive = session_start \
+                            + datetime.timedelta(minutes=self.MAX_SESSION_TIME)
 
         try:
-            cursor.callproc("refresh_session_state", (session_start, session_max_alive, uid,))
+            cursor.callproc("refresh_session_state", (session_start,
+                                                      session_max_alive, uid,))
             conn.commit()
             conn.close()
             return 1
@@ -677,3 +679,45 @@ class DB_Handler:
             conn.close()
             return -1
             # return str(e)
+
+    def check_user_locked(self, mysql, uid):
+
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.callproc("check_user_locked", (uid,))
+            data = cursor.fetchall()
+
+            if len(data) > 0 and data[0][1] >= 3:
+                return -1
+            else:
+                return 0
+
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            conn.close()
+            return -2
+
+    def set_locked_count(self, mysql, uid):
+
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        try:
+            cursor.callproc("check_user_locked", (uid,))
+            userexists = cursor.rowcount
+
+            if userexists == 0:
+                cursor.callproc("create_entry_user_locked", (uid, ))
+
+            if userexists == 1:
+                cursor.callproc("iter_locked_counter", (uid,))
+
+            conn.commit()
+            conn.close()
+            return 0
+
+        except Exception as e:
+            return -1

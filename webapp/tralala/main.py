@@ -130,15 +130,20 @@ def login():
         return_info = {}
         return_info["invalid_method"] = "GET"
         logger.error("Unzulässiger Zugriff mit HTTP-GET. Präsentiere JSON")
-        return prepare_info_json(url_for("post_user"), "GET ist unzulässig für den Login", return_info)
+        return prepare_info_json(url_for("post_user"), "GET ist unzulässig "
+                                                       "für den Login",
+                                 return_info)
 
     login_email = request.form["login_email"]
     login_password = request.form["login_password"]
 
-    # Hier soll lediglich auf die Länge der Credentials getestet werden. Ein Test auf Passwortstärke wäre unnötig, da dieser bereits bei der Registrierung durchgeführt wurde
-    if not function_helper.check_params("text", login_email) or not function_helper.check_params("text",
-                                                                                                 login_password):
-        return prepare_info_json(url_for("post_user"), "Es wurden Felder beim Login leergelassen")
+    # Hier soll lediglich auf die Länge der Credentials getestet werden.
+    # Ein Test auf Passwortstärke wäre unnötig, da dieser bereits bei
+    # der Registrierung durchgeführt wurde
+    if not function_helper.check_params("text", login_email) \
+            or not function_helper.check_params("text", login_password):
+        return prepare_info_json(url_for("post_user"),
+                                 "Es wurden Felder beim Login leergelassen")
 
     # Hashe Passwort
     login_password_hashed = generate_password_hash(login_password)
@@ -146,20 +151,35 @@ def login():
     # Suche nach User in DB
     db_handler = DB_Handler()
     (code, data) = db_handler.check_for_existence(mysql, login_email)
-    if code == -1:
+
+    account_locked = db_handler.check_user_locked(mysql, data["uid"])
+
+    if account_locked == -1:
+        logger.error("Account logged" + login_email)
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Benuteraccount gesperrt,"
+                                         " bitte warten")
+
+    if code == -1 or account_locked == -2:
         logger.error("Gescheiterter Login (Datenbankfehler): " + login_email)
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Benutzername und/oder Passwort sind inkorrekt!")
+                               info_text="Benutzername und/oder Passwort"
+                                         " sind inkorrekt!")
     elif code == -2:
         logger.error("Gescheiterter Login (unbestätigt): " + login_email)
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du musst deinen Account bestätigen, bevor du dich einloggen kannst.")
+                               info_text="Du musst deinen Account bestätigen,"
+                                         " bevor du dich einloggen kannst.")
+
 
     # Ueberprüfe gehashte Passwoerter
     if not check_password_hash(data["password"], login_password):
-        logger.error("Gescheiterter Login (Übereinstimmung): " + login_email)
+        return_code = db_handler.set_locked_count(mysql, data["uid"])
+        logger.error("Gescheiterter Login (Übereinstimmung): " + login_email +
+                     "\tLockedcounter return: " + str(return_code))
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Benutzername und/oder Passwort sind inkorrekt!")
+                               info_text="Benutzername und/oder Passwort"
+                                         " sind inkorrekt!")
 
     else:
         # Setze Sessionvariable
