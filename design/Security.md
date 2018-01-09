@@ -232,3 +232,52 @@ method_label=method_labels[method])
 KeyError: 'upvawote'
 ```
 Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur noch eine generische Fehlerseite für den HTTP-Errorcode 500 angezeigt.
+
+# Konformität mit Webapp Skript
+
+### Testen
+
+* TLS
+* Crawling/Spidering
+* ✓ Alle möglichen Inputs ermitteln 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
