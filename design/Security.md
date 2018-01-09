@@ -390,9 +390,10 @@ Rollen ID | Name | Benutzer löschen | Rolle vergeben
 * X CSPRNG (verwendet Flask das?)
 * X Aktuellste TLS-Version
 * ✓ Gesamte Certificate Chain checken (zu viel Arbeit)
-* X Data Avoidance vor Data Protection (nur Daten speichern die man unbedingt braucht)
-* X OS für den Schutz der Daten mitverwenden
-* X Sensible Daten nach Benutzung löschen (nicht speichern)
+* ✓ Data Avoidance vor Data Protection (nur Daten speichern die man unbedingt braucht)
+* ✓ OS für den Schutz der Daten mitverwenden (da Verwendung von Docker)
+* ✓ Sensible Daten nach Benutzung löschen (nicht speichern) (E-Mail) (=> Datenbank verschlüsseln?)
+* Brute Force serverseitig durch Tabelle nachverfolgen (Captcha für Client und serverseitiges Tracking, Datenbank als Zähler)
 * ✓ Keine detaillierten Fehler (debug=False)
 * ✓ Log Files benutzen
 * X NULL/None vermeiden (Review nötig)
