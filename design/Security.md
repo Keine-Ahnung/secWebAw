@@ -309,6 +309,32 @@ Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur
 * X Tokens nicht wiederverwenden (muss noch nachgeprüft werden)
 * ✓ Transportverschlüsselung (gesamtes Session Cookie ist durch Master Key verschlüsselt)
 
+### Access Controls Schwachstellen
+
+* ✓ Sicherer Zugriffsschutz (User A kann keine Daten von User B abrufen)
+* ✓ Privilege Escalation nur bei direktem Zugriff auf die Datenbank möglich
+* ✓ Horizontale Privilege Escalation nicht möglich
+* ✓ Vertikale Privilege Escalation nicht möglich
+* ✓ Durch Direktlink auf Seiten zugreifen und Access Control umgehen (Seite mit Access Control check auch immer nach Rollen ID)
+* ✓ SQLi (nicht möglich durch Stored Procedures)
+
+### Access Controls Schwachstellen (Gegenmaßnahmen)
+
+* X Zugriffsmodell (benötigt Review)
+* X Zugriffsframework (nötig bei uns?)
+* X Manual Review und Test
+
+### Injection Attacks
+
+* ✓ SQL injection
+* X XSS (neue Überprüfung nach eigener Implementierung für Input Sanitizer)
+* ✓ LDAP Injection (haben wir nicht)
+* ✓ SMTP Injection (haben wir nicht)
+* ✓ SOAP Injection (haben wir nicht)
+* ✓ XPath Injection (haben wir nicht)
+* ✓ OS Command Injection (Webapp hat keinen direkten Zugriff auf das OS, höchstens über SQLi möglich)
+* [FuzzDB](github.com/fuzzdb-project/fuzzdb)
+* [SecLists](github.com/danielmiessler/SecLists)
 
 
 
