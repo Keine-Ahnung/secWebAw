@@ -25,10 +25,10 @@
     <form id="contact" action="{{ url_for('post_message') }}" method="POST">
         <h3>Neuer Post</h3>
         <fieldset>
-            <textarea placeholder="Deine Nachricht..." name="post_message" id="post_message" tabindex="5" required></textarea>
+            <textarea maxlength="180" placeholder="Deine Nachricht..." name="post_message" id="post_message" tabindex="4" required></textarea>
         </fieldset>
         <fieldset>
-            <input placeholder="Hashtags bitte ohne # und mit einem Komma trennen..." name="post_hashtags" id="post_hashtags" type="text" tabindex="4" required>
+            <input maxlength="50" placeholder="Hashtags bitte ohne # und mit einem Komma trennen..." name="post_hashtags" id="post_hashtags" type="text" tabindex="5" required>
         </fieldset>
         <fieldset>
             <button name="submit" type="submit" id="contact-submit" data-submit="...Sending">Posten</button>
