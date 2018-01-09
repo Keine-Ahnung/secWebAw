@@ -233,6 +233,18 @@ KeyError: 'upvawote'
 ```
 Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur noch eine generische Fehlerseite für den HTTP-Errorcode 500 angezeigt.
 
+## Testen
+
+### Rollen und Rechte
+
+Rollen ID | Name | Benutzer löschen | Rolle vergeben
+--------- | ---- | ---------------- | --------------
+1 | anonymous | nicht erlaubt | nicht erlaubt
+2 | ad_bot | nicht erlaubt | nicht erlaubt
+3 | unverified | nicht erlaubt | nicht erlaubt
+4 | verified | nicht erlaubt | nicht erlaubt
+5 | administrator | erlaubt | erlaubt
+
 # Konformität mit Webapp Skript
 
 ### Testen
