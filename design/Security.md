@@ -333,8 +333,8 @@ Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur
 * ✓ SOAP Injection (haben wir nicht)
 * ✓ XPath Injection (haben wir nicht)
 * ✓ OS Command Injection (Webapp hat keinen direkten Zugriff auf das OS, höchstens über SQLi möglich)
-* [FuzzDB](github.com/fuzzdb-project/fuzzdb)
-* [SecLists](github.com/danielmiessler/SecLists)
+* [FuzzDB](https://www.github.com/fuzzdb-project/fuzzdb)
+* [SecLists](https://www.github.com/danielmiessler/SecLists)
 
 
 
