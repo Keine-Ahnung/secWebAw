@@ -245,8 +245,69 @@ Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur
 * ✓ Default Credentials (haben wir nicht)
 * X Default Content (Debug-Error Seiten)
 * ✓ Hidden Content (haben wir nicht)
-* X gefährliche HTTP-Methoden (```python @app.route("/pfad", ["GET", "POST"])```)
+* X gefährliche HTTP-Methoden (` @app.route("/pfad", ["GET", "POST"])`)
+* X Verwendung der Webapp als Proxy
+* X Verwendung der Webapp als Spammer
+* X Hosting Misconfiguration
+* X Software Bugs
+* X Updateprozess implementieren, um gefundene Schwachstellen schnell zu patchen (brauchen wir sowas wirklich? App wird nach Abgabe nicht mehr gewartet)
+* X Server Hardening (bezieht auch Rechte des technischen DB-Users mit ein)
 
+### Clientseitige Schwachstellen
+
+* X Feldlängen
+* X Hidden Fields
+* X Client Side Input Validation
+* ✓ Java Applets die dekompiliert und analysiert werden (haben wir nicht)
+* ✓ Active X Objekte die dekompiliert und analysiert werden (haben wir nicht)
+* ✓ Flash Objekte die dekompiliert und analysiert werden (haben wir nicht)
+
+### Clientseitige Schwachstellen (Gegenmaßnahmen)
+
+* X Alle Inputs Server Side checken
+* X Client Side Checks möglich (und erwünscht), sind aber nur für die Convenience da
+
+### Authentication Schwachstellen
+
+* ✓ Passwortstärke und -richtlinien
+* X User Enumeration
+* X Passwort Guessing
+* X Sichere Account Recovery
+* ✓ Remember Me (haben wir nicht)
+* ✓ Automatisch generierte Passworter (haben wir nicht)
+* X Übertragung von Credentials (nur über TLS)
+* X Verteilung von Credentials (bspw. keine Klartextpasswörter an die Mail schicken, aber Link generieren, über den das Klartextpasswort eingesehen werden kann)
+
+### Authentication Schwachstellen (Gegenmaßnahmen)
+
+* ✓ Passwortqualität erzwingen
+* X Bruteforce-Schutz (Tracking wie oft ein User sich schon von IP X anmelden wollte)
+* ✓ Sichere Passwortspeicherung (mit Salt gehasht und als Hash abgespeichert)
+* ✓ angemessene Login Forms. Soll keine Rückschlüsse über existierende Benutzer zulassen. Nach Absenden kann Auskunft über bereits existierenden Benutzer gegeben werden, aber nicht direkt im Login Form (da hilfreich für automatische User Enumeration)
+* X Übertragung über TLS
+* ✓ angemessene Account Recovery (läuft bei uns über die E-Mail. Sicher genug?)
+
+### Session Management Schwachstellen
+
+* X Wie sieht die Verwendung des Tokens innerhalb der App aus (?)
+* ✓ Tokens können nicht vorhergesagt werden (zumindest nicht ohne extremen Aufwand)
+* X Übertragung per HTTP (HttpSecure-Flag)
+* ✓ Tokens werden als Cookie gespeichert und nicht in der URL
+* X Session Termination (?)
+* X Session Fixation
+* X Cookie Scope (?)
+
+### Session Management Schwachstellen (Gegenmaßnahmen)
+
+* ✓ kryptografisch sicheres Session Management (Verschlüsselung mit Master Key)
+* ✓ sichere Tokengenerierung
+* X Session Timeouts (unterschiedliche Zeiten für unterschiedlich kritische Transaktionen)
+* X Nonces für Requests (Anti-CSRF)
+* ✓ Re-Authentication bei kritischen Transaktionen/Funktionen
+* X Regenerierung des Session Tokens bei kritischen Anwendungen (nötig bei unserer Webapp? Wir haben keine hochkritischen Anwendungen)
+* X Generelle Regenerierung des Session Tokens (brauchen wir das?)
+* X Tokens nicht wiederverwenden (muss noch nachgeprüft werden)
+* ✓ Transportverschlüsselung (gesamtes Session Cookie ist durch Master Key verschlüsselt)
 
 
 
