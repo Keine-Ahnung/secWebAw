@@ -245,7 +245,7 @@ Dieser Modus kann durch `app.run(debug=True)` deaktiviert werden. Somit wird nur
 * ✓ Default Credentials (haben wir nicht)
 * X Default Content (Debug-Error Seiten)
 * ✓ Hidden Content (haben wir nicht)
-* X gefährliche HTTP-Methoden (`python @app.route("/pfad", ["GET", "POST"])`)
+* X gefährliche HTTP-Methoden (```python @app.route("/pfad", ["GET", "POST"])```)
 
 
 
