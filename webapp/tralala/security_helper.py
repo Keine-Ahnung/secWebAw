@@ -1,4 +1,4 @@
-import bleach
+import html
 import re
 
 
@@ -8,7 +8,7 @@ def clean_messages(message_text):
     We will stay with the <br> as long as we thought about something new.
     """
 
-    return bleach.clean(message_text, tags=['br', 'b', 'i', 'strong'])
+    return html.escape(message_text)
     # return bleach.clean(message_text, tags=bleach.ALLOWED_TAGS) # zu liberal?
 
 
@@ -19,12 +19,15 @@ def clean_hashtags(hashtags_text):
     Will replace : everything what looks like html
     """
 
-    html_cleaned = bleach.clean(hashtags_text)
+    html_cleaned = html.escape(hashtags_text)
 
-    hashtag_list = html_cleaned.split(' ')  # string.replace would be possible although. should talk about that
+    hashtag_list = "".join(html_cleaned.split()).split(',')
 
     if '#' in hashtag_list:
         hashtag_list.remove('#')
+
+    if '' in hashtag_list:
+        hashtag_list = list(filter(None, hashtag_list))
 
     return ','.join(hashtag_list)
 
