@@ -252,12 +252,12 @@ Rollen ID | Name | Benutzer löschen | Rolle vergeben
 * X TLS
 * X Crawling/Spidering
 * ✓ Alle möglichen Inputs ermitteln
-* X Alle Rollen und deren Rechte ermitteln
+* ✓ Alle Rollen und deren Rechte ermitteln
 * X automatisiert auf Schwachstellen prüfen
 * ✓ Default Credentials (haben wir nicht)
-* X Default Content (Debug-Error Seiten)
+* ✓ Default Content (Debug-Error Seiten)
 * ✓ Hidden Content (haben wir nicht)
-* X gefährliche HTTP-Methoden (`@app.route("/pfad", ["GET", "POST"])`)
+* X gefährliche HTTP-Methoden (`@app.route("/pfad", ["GET", "POST"])`: Der Handler nimmt nur GET- und POST-Anfragen entgegen. Falls keine Methode angegeben wird akzeptiert der Handler nur GET) => `main.py.method_not_allowed_error()`
 * X Verwendung der Webapp als Proxy
 * X Verwendung der Webapp als Spammer
 * X Hosting Misconfiguration

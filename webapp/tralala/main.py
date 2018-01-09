@@ -103,7 +103,7 @@ def index():
     return render_template("index.html", post_list=post_list)
 
 
-@app.route("/login", methods=["POST", "GET"])
+@app.route("/login", methods=["POST"])
 def login():
     """
     Ziel des Loginformulars. Überprüft in der Datenbank auf Existenz des angegebenen Benutzers als auch der Übereinstimmung
@@ -184,8 +184,8 @@ def login():
                                info_text="Du wurdest eingeloggt. Willkommen zurück, " + login_email)
 
 
-@app.route("/auth/logout", methods=["POST", "GET"])
-@app.route("/logout", methods=["POST", "GET"])
+@app.route("/auth/logout")
+@app.route("/logout")
 def logout():
     """
     Logge den aktuell angemeldeten Benutzer aus => Terminiere die Session, indem die Session-Variablen aus der Session
@@ -209,7 +209,7 @@ def logout():
     return render_template("quick_info.html", info_success=True, info_text="Du wurdest erfolgreich ausgeloggt!")
 
 
-@app.route("/signup/post_user", methods=["POST", "GET"])
+@app.route("/signup/post_user", methods=["POST"])
 def post_user():
     """
     Überprüfe die Eingaben des Benutzers unabhängig von der clientseitigen Überprüfung.
@@ -289,6 +289,9 @@ def admin_dashboard():
     """
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+    except KeyError as e:
+        logger.error("Ein nicht eingeloggter Benutzer wollte auf das Admin Dashboard zugreifen.")
+        return render_template("quick_info.html", info_danger=True, info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
     except:
         logger.error("Unbefugter Benutzer '" + session[
             SESSIONV_USER] + " versucht auf das Admin Dashboard zuzugreifen. Verweigere Zugriff.")
@@ -372,7 +375,7 @@ def write_post():
     return render_template("new_post.html", new_post_active="active")
 
 
-@app.route("/auth/post_message", methods=["POST", "GET"])
+@app.route("/auth/post_message", methods=["POST"])
 def post_message():
     """
     Ziel nachdem ein neuer Post zur abgeschickt wurde. Aktion ist nur zugänglich für eingeloggte Mitglieder.
@@ -482,7 +485,7 @@ def vote():
                            method_label=method_labels[method])
 
 
-@app.route("/auth/finish_vote", methods=["GET", "POST"])
+@app.route("/auth/finish_vote", methods=["POST"])
 def finish_vote():
     """
     Ziel nachdem das Bestätigungstoken für den Vote eingegeben wurde.
@@ -562,7 +565,7 @@ def finish_vote():
         return render_template("quick_info.html", info_success=True, info_text="Downvote erfolgreich!")
 
 
-@app.route("/auth/controlpanel/change-email")
+@app.route("/auth/controlpanel/change_email")
 def change_email():
     """
     Präsentiere Seite um die E-Mail zu ändern. (nicht Reset)
@@ -858,7 +861,7 @@ def confirm_password_change():
     return render_template("quick_info.html", info_success=True, info_text="Das Passwort wurde geändert.")
 
 
-@app.route("/reset_password1", methods=["GET", "POST"])
+@app.route("/reset_password1", methods=["POST"])
 def reset_password1():
     """
     @deprecated
@@ -879,7 +882,7 @@ def reset_password1():
                                            url=url_for('/reset_password/action'))
 
 
-@app.route("/auth/admin/delete_user", methods=["POST", "GET"])
+@app.route("/auth/admin/delete_user", methods=["POST"])
 def delete_user():
     """
      Administratorfunktion, um einen Benutzer zu löschen.
@@ -888,6 +891,9 @@ def delete_user():
 
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+    except KeyError as e:
+        logger.error("Ein nicht eingeloggter Benutzer wollte /auth/admin/delete_user aufrufen.")
+        return render_template("quick_info.html", info_danger=True, info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
     except:
         return render_template("quick_info.html", info_danger=True,
                                info_text="Du musst Administrator und eingeloggt sein, um diese Aktion durchführen zu dürfen")
@@ -957,6 +963,9 @@ def admin_confirm():
 
     try:
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+    except KeyError as e:
+        logger.error("Ein nicht eingeloggter Benutzer wollte /auth/admin/confirm aufrufen.")
+        return render_template("quick_info.html", info_danger=True, info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
     except:
         return render_template("quick_info.html", info_danger=True,
                                info_text="Du musst Administrator und eingeloggt sein, um diese Aktion durchführen zu dürfen")
@@ -1154,7 +1163,7 @@ def set_new_password():
                            info_text="Dein Passwort wurde geändert. Du kannst dich nun einloggen.")
 
 
-@app.route("/reset_password/action", methods=["GET", "POST"])
+@app.route("/reset_password/action", methods=["POST"])
 def reset_password_action():
     """
     Erhält Daten des neuen Passworts. Ändert Passwort des Benutzers in der Datenbank.
@@ -1300,6 +1309,12 @@ Errorhandler für HTTP-Errorcodes
 @app.errorhandler(404)
 def not_found_error(error):
     return redirect(url_for("index"))
+
+
+@app.errorhandler(405)
+def method_not_allowed_error(error):
+    return render_template("quick_info.html", info_danger=True,
+                           info_text="Unzulässige Zugriffsmethode auf die URL. Möglicherweise hast du eine URL aufgerufen, die nicht zum normalen Aufruf im Browser gedacht ist.")
 
 
 """
