@@ -28,7 +28,7 @@ mysql = MySQL()
 mysql.init_app(app)
 
 # Setup Logger
-logger = Logger("log")  # Setup eigener Logger
+logger = Logger("log")  # Setup eigener Loggerddd
 
 # Sessionvariablen
 SESSIONV_LOGGED_IN = "logged_in"
