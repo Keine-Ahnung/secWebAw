@@ -1,0 +1,32 @@
+{% extends "base_2.html" %}
+
+{% block title %} Hashtags suchen {% endblock %}
+
+{% block body %}
+
+<div>
+    Dein Suchbegriff: <b>{{ query }}</b>
+</div>
+
+{% for post in post_list %}
+<div class="col-md-5 col-md-offset-3" style="float: none; margin: 0 auto; background-color: white;">
+    <div>
+        <div>
+            {{ post[1] }} | {{ post[2] }} | <b>Votes: {{ post[5] - post[6] }}</b>&nbsp;&nbsp;&nbsp;<a
+                style="font-size: 150%; color: black;" href="{{ url_for('vote') }}?method=upvote&post_id={{ post[0] }}">+</a>&nbsp;&nbsp;&nbsp;<a
+                style="font-size: 150%; color: black;"
+                href="{{ url_for('vote') }}?method=downvote&post_id={{ post[0] }}">-</a>
+        </div>
+        </br>
+        <p>{{ post[3] }}</p>
+        </br>
+        </br>
+        <div>
+            <b>{{ post[4] }}</b>
+        </div>
+    </div>
+</div>
+</br>
+{% endfor %}
+
+{% endblock %}

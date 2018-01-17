@@ -710,7 +710,7 @@ class DB_Handler:
             userexists = cursor.rowcount
 
             if userexists == 0:
-                cursor.callproc("create_entry_user_locked", (uid, ))
+                cursor.callproc("create_entry_user_locked", (uid,))
 
             if userexists == 1:
                 cursor.callproc("iter_locked_counter", (uid,))
@@ -721,3 +721,31 @@ class DB_Handler:
 
         except Exception as e:
             return -1
+
+    def search_for_query(self, mysql, query):
+        conn = mysql.connect()
+        cursor = conn.cursor()
+
+        cursor.callproc("tralala.get_all_posts")
+        data = cursor.fetchall()
+
+        if cursor.rowcount == 0:
+            conn.close()
+            return None
+        else:
+            conn.close()
+
+        matches = []
+        for record in data:
+            hashtags = [x.lower() for x in str(record[4]).split(",")]
+
+            if query in hashtags:
+                matches.append([record[0],
+                                record[1],
+                                record[2],
+                                record[3],
+                                "#" + " #".join(hashtags),
+                                record[5],
+                                record[6]])
+
+        return matches

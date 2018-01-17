@@ -399,7 +399,7 @@ Rollen ID | Name | Benutzer löschen | Rolle vergeben
 * X NULL/None vermeiden (Review nötig)
 * X Fehler provozieren (Review nötig)
 * X Output Validation (Review nötig)
-* X Code Reviews (automatisierung und manuell)
+* ✓ Code Reviews (automatisierung und manuell)
 
 
 
