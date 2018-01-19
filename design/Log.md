@@ -11,7 +11,7 @@ Posts besser zu designen
 - [X] Stelle Funktionalität auf neues Design um
 - [X] Überprüfe alle Texeingaben (z.B.) E-Mail mit den implementierten Funktionen aus dem Backend
 - [X] Loggingtabelle erstellen
-- [ ] Konformität mit Skript (sind alle dort aufgezählten Schwachstellen mitigiert?)
+- [X] Konformität mit Skript (sind alle dort aufgezählten Schwachstellen mitigiert?)
 
 ## Zugriff auf die Datenbank
 - [X] Benutzen von Stored Procedures
@@ -57,6 +57,7 @@ Posts besser zu designen
 - [X] Was passiert, wenn Hashtags nicht im erwarteten Format angegeben wurden? (=> Es wird nur ein Hashtag angezeigt mit der falschen Formatierung, da nach "," gesplitted wird)
 - [X] Pro Post darf nur ein User voten
 - [X] Wenn Benutzer gelöscht wurde, lösche auch Posts
+- [X] Suche anhand von Hashtag
 
 ## Voting
 - [X] Ungültige Formen von Parametern: IDs als Text, IDs negativ oder zu groß, ...
@@ -68,7 +69,7 @@ Posts besser zu designen
 
 ## Controlpanel
 - [X] Passwortänderung mit E-Mail Bestätigung
-- [X] Änderung der E-mail mit E-Mail Bestätigung
+- [X] Änderung der E-Mail mit E-Mail Bestätigung
 
 ## Security
 - [x] Implemented a method to strip down html from messagebox

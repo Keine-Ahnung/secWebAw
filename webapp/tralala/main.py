@@ -16,6 +16,7 @@ from flask import g
 
 # Erstellung der App
 app = Flask(__name__)
+app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
 
 # MySQL Credentials
 app.config["MYSQL_DATABASE_USER"] = "db_admin_tralala"
@@ -186,7 +187,6 @@ def login():
                                info_text="Du musst deinen Account bestätigen,"
                                          " bevor du dich einloggen kannst.")
 
-
     # Ueberprüfe gehashte Passwoerter
     if not check_password_hash(data["password"], login_password):
         return_code = db_handler.set_locked_count(mysql, data["uid"])
@@ -326,7 +326,8 @@ def admin_dashboard():
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except KeyError as e:
         logger.error("Ein nicht eingeloggter Benutzer wollte auf das Admin Dashboard zugreifen.")
-        return render_template("quick_info.html", info_danger=True, info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
     except:
         logger.error("Unbefugter Benutzer '" + session[
             SESSIONV_USER] + " versucht auf das Admin Dashboard zuzugreifen. Verweigere Zugriff.")
@@ -928,7 +929,8 @@ def delete_user():
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except KeyError as e:
         logger.error("Ein nicht eingeloggter Benutzer wollte /auth/admin/delete_user aufrufen.")
-        return render_template("quick_info.html", info_danger=True, info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
     except:
         return render_template("quick_info.html", info_danger=True,
                                info_text="Du musst Administrator und eingeloggt sein, um diese Aktion durchführen zu dürfen")
@@ -1000,7 +1002,8 @@ def admin_confirm():
         session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
     except KeyError as e:
         logger.error("Ein nicht eingeloggter Benutzer wollte /auth/admin/confirm aufrufen.")
-        return render_template("quick_info.html", info_danger=True, info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
     except:
         return render_template("quick_info.html", info_danger=True,
                                info_text="Du musst Administrator und eingeloggt sein, um diese Aktion durchführen zu dürfen")
@@ -1216,6 +1219,28 @@ def reset_password_action():
         return render_template()
 
 
+@app.route("/search", methods=["GET"])
+def search_for_hashtag():
+    # Clean
+    search_query = request.args.get("q")
+
+    if not function_helper.check_params("text", search_query):
+        return render_template("quick_info.html", info_danger=True,
+                               info_text="Bitte gebe einen gültigen Suchbegriff ein.")
+    search_query = security_helper.clean_messages(search_query)
+
+    db_handler = DB_Handler()
+
+    all_posts = db_handler.search_for_query(mysql, search_query.lower())
+
+    if not all_posts:
+        return render_template("quick_info.html", info_warning=True,
+                               info_text="Wir konnten leider keine Posts mit dem angegebenen Hashtag finden.")
+
+
+    return render_template("find_hashtags.html", query=search_query, post_list=all_posts)
+
+
 """
 Hilfsfunktionen, die keine HTTP Requests bearbeiten
 ####################################################
@@ -1358,6 +1383,5 @@ Einstiegspunkt
 """
 
 if __name__ == '__main__':
-    app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
     logger.debug("Server Reload...")
     app.run(debug=True)
