@@ -16,6 +16,7 @@ import bleach
 
 # Erstellung der App
 app = Flask(__name__)
+app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
 
 # MySQL Credentials
 app.config["MYSQL_DATABASE_USER"] = "db_admin_tralala"
@@ -1367,6 +1368,5 @@ Einstiegspunkt
 """
 
 if __name__ == '__main__':
-    app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
     logger.debug("Server Reload...")
     app.run(debug=True)

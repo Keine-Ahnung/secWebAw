@@ -8,7 +8,7 @@ CREATE TABLE tralala.tralala_users(
     password VARCHAR(400) NOT NULL,
     role_id INT NOT NULL,
     verified BOOLEAN NOT NULL,
-    verification_token varchar(100) NOT NULL,
+    verification_token varchar(100),
     PRIMARY KEY (uid)
 ) ENGINE=INNODB;
 
