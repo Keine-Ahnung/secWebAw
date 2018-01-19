@@ -91,13 +91,13 @@ def send_reset_mail(to, uid, token, url, app):
         return False
 
 
-def reset_password(mysql: db_handler.DB_Handler, mail: str, url: str):
+def reset_password(mysql, mail: str, url: str):
     """
     Method to reset the password of an existing user, by sending a mail to the
     mailaddress stored in the database
     """
 
-    success, data = mysql.check_for_existence(mysql=mysql, email=mail)
+    success, data = db_handler.check_for_existence(mysql=mysql, email=mail)
     if success != 1:
         return False
     else:
@@ -117,12 +117,12 @@ def generate_token(length):
                    for _ in range(length))
 
 
-def compare_reset_token(mysql: db_handler.DB_Handler, userid: int, token: str):
+def compare_reset_token(mysql, userid: int, token: str):
     """
     Vergleiche das übergebene Reset Token mit dem in der Datenbank gespeicherten Reset Token.
     """
 
-    token_database = mysql.get_reset_token(mysql=mysql, userid=userid)
+    token_database = db_handler.get_reset_token(mysql=mysql, userid=userid)
 
     if token == token_database:
         return True
