@@ -19,20 +19,8 @@ class DB_Handler:
 
     MAX_SESSION_TIME = 60  # Minuten
 
-    def __init__(self):
-        self.db_connection_data = None
-
-    # if db_connection_data == None:
-    #     self.db_connection_data["MYSQL_DATABASE_USER"] = "db_admin_tralala"
-    #     self.db_connection_data["MYSQL_DATABASE_PASSWORD"] = "tr4l4l4_mysql_db."
-    #     self.db_connection_data["MYSQL_DATABASE_DB"] = "tralala"
-    #     self.db_connection_data["MYSQL_DATABASE_HOST"] = "localhost"
-    #     self.db_connection_data["DB_TABLE_TRALALA_USERS"] = "tralala_users"
-    #
-    # else:
-    #     self.db_connection_data = db_connection_data
-
-    def add_new_user(self, mysql, email, pw_hash, verification_token):
+    @staticmethod
+    def add_new_user(mysql, email, pw_hash, verification_token):
         """
         DB-Verbindung nach jedem Call wieder schließen
 
@@ -183,7 +171,8 @@ class DB_Handler:
             conn.close()
             return -1
 
-    def get_all_posts(self, mysql):
+    @staticmethod
+    def get_all_posts(conn):
         """
         Gebe alls Posts als Liste zurück zurück.
 
@@ -195,18 +184,14 @@ class DB_Handler:
         - 4: post_upvotes
         - 5: post_downvotes
         """
-
-        conn = mysql.connect()
         cursor = conn.cursor()
 
         cursor.callproc("tralala.get_all_posts")
         data = cursor.fetchall()
 
         if cursor.rowcount == 0:
-            conn.close()
             return -1, "no_posts"
         else:
-            conn.close()
             return 1, data
 
     def get_post_by_pid(self, mysql, post_id):
@@ -559,7 +544,8 @@ class DB_Handler:
 
     def set_token_password_change(self, mysql, uid, token, new_pass):
         """
-        Registriere Token für Controlpanel Aktion (Passwort- oder E-Mailänderung).
+        Registriere Token für Controlpanel Aktion (Passwort-
+        oder E-Mailänderung).
         """
 
         ts = time.time()
@@ -569,7 +555,10 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.callproc("set_token_password_change", (uid, token, timestamp, "change_password", new_pass,))
+            cursor.callproc("set_token_password_change", (uid, token,
+                                                          timestamp,
+                                                          "change_password",
+                                                          new_pass,))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -587,7 +576,9 @@ class DB_Handler:
         cursor = conn.cursor()
 
         try:
-            cursor.callproc("set_token_email_change", (uid, token, timestamp, "change_email", new_email,))
+            cursor.callproc("set_token_email_change", (uid, token, timestamp,
+                                                       "change_email",
+                                                       new_email,))
             conn.commit()
             conn.close()
         except Exception as e:
@@ -609,10 +600,13 @@ class DB_Handler:
                 conn.close()
                 return None
 
-            # Gebe das neue Passwort zurück, das nun in die Users-Tabelle geschrieben wird (spezieller Modus, um nicht zu viele einzelne Funktionen zu haben)
+            # Gebe das neue Passwort zurück, das nun in die Users-Tabelle
+            # geschrieben wird (spezieller Modus, um nicht zu viele einzelne
+            # Funktionen zu haben)
             if mode == "get_data":
                 return data[0][2]
-            # Gebe das Token zur Überprüfung zurück (eigentlicher Standardmodus)
+            # Gebe das Token zur Überprüfung zurück (eigentlicher
+            # Standardmodus)
             return data[0][1]
 
         except Exception as e:
@@ -674,7 +668,9 @@ class DB_Handler:
             conn.commit()
             conn.close()
             return 1
-            # return "refreshed session for " + str(uid) + " with session_start=" + str(session_start) + " session_max_alive=" + str(session_max_alive)
+            # return "refreshed session for " + str(uid) + " with session_
+            # start=" + str(session_start) + " session_max_alive=" +
+            #  str(session_max_alive)
         except Exception as e:
             conn.close()
             return -1

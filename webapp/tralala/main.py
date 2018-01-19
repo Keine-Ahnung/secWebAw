@@ -12,7 +12,7 @@ import security_helper
 from db_handler import DB_Handler
 from function_helper import generate_token
 import datetime
-import bleach
+from flask import g
 
 # Erstellung der App
 app = Flask(__name__)
@@ -23,9 +23,25 @@ app.config["MYSQL_DATABASE_PASSWORD"] = "tr4l4l4_mysql_db."
 app.config["MYSQL_DATABASE_DB"] = "tralala"
 app.config["MYSQL_DATABASE_HOST"] = "localhost"
 
-# Setup MySQL
-mysql = MySQL()
-mysql.init_app(app)
+
+def connect_db():
+    mysql = MySQL()
+    mysql.init_app(app)
+    connection = mysql.connect()
+    return connection
+
+
+def get_db():
+    if not hasattr(g, 'database'):
+        g.database = connect_db()
+    return g.database
+
+
+@app.teardown_appcontext
+def teardown_db(exception):
+    if hasattr(g, 'database'):
+        g.database.close()
+
 
 # Setup Logger
 logger = Logger("log")  # Setup eigener Loggerddd
@@ -61,7 +77,6 @@ def index():
     Die Indexseite der Webapplikation stellt zugleich die Übersicht der Posts dar.
     """
 
-    db_handler = DB_Handler()
     (code, data) = db_handler.get_all_posts(mysql)
 
     if code == -1:
