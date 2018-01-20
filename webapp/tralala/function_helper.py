@@ -108,9 +108,33 @@ def reset_password(mysql, mail: str, url: str):
     return mail_sended
 
 
+def confirm_password_reset(user_email, confirm_url):
+    html = """\
+    <html>
+        <head></head>
+        <body>
+            <p> Hallo, </br>
+            Benutze den folgenden Link, um das Zurücksetzen deines Passworts 
+            zu bestaetigen. </br>
+            <a href=\"""" + confirm_url + """\"> Bestaetigung </a> </br> </br>
+            Viel Freude, </br>
+            dein Tralala- Team
+            </p>
+        </body>
+    </html>
+    """
+    text = "Hallo " + to + "\nanbei der Link zur Bestaetigung der " \
+                           "Änderung deines Passworts " \
+                           "\nkopiere diesen in deinen Browser, " \
+                           "um die Änderung bestätigen\n\n" + confirm_url
+    return send_mail_basic(user_email, subject="Passwort Bestaetigung",
+                           html_mail_body=html, text_mail_body=text)
+
+
 def generate_token(length):
     """
-    Generiere ein Verification Token der Länge length (String zufälliger Buchstaben und Zahlen)
+    Generiere ein Verification Token der Länge length
+    (String zufälliger Buchstaben und Zahlen)
     """
 
     return ''.join(random.choice(string.ascii_lowercase + string.digits)
@@ -119,7 +143,8 @@ def generate_token(length):
 
 def compare_reset_token(mysql, userid: int, token: str):
     """
-    Vergleiche das übergebene Reset Token mit dem in der Datenbank gespeicherten Reset Token.
+    Vergleiche das übergebene Reset Token mit dem in der Datenbank
+    gespeicherten Reset Token.
     """
 
     token_database = db_handler.get_reset_token(mysql=mysql, userid=userid)
@@ -132,8 +157,10 @@ def compare_reset_token(mysql, userid: int, token: str):
 
 def check_params(t, param):
     """
-    Hilfsfunktion die das Format von Parametern überprüft, wie bspw. die Passwortstärke. Gibt True zurück, wenn die Evaluation erfolgreich war
-    und False, wenn Abweichungen oder nicht-zugelassene Formate entdeckt wurden.
+    Hilfsfunktion die das Format von Parametern überprüft, wie bspw. die
+    Passwortstärke. Gibt True zurück, wenn die Evaluation erfolgreich war
+    und False, wenn Abweichungen oder nicht-zugelassene Formate
+    entdeckt wurden.
 
     Typen:
     - email
@@ -182,8 +209,6 @@ def check_params(t, param):
 
         if not security_helper.check_password_strength(param)[0]:
             return False
-
-        return True
 
         return True
 

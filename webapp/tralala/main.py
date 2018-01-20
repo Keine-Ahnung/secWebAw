@@ -15,8 +15,9 @@ import datetime
 from flask import g
 
 # Erstellung der App
+# Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
 app = Flask(__name__)
-app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"  # Wichtig für Sessions, da Cookies durch diesen Key signiert sind!
+app.secret_key = "e5ac358c-f0bf-11e5-9e39-d3b532c10a28"
 
 # MySQL Credentials
 app.config["MYSQL_DATABASE_USER"] = "db_admin_tralala"
@@ -54,14 +55,18 @@ SESSIONV_UID = "uid"
 SESSIONV_ROLE_ID = "role_id"
 SESSIONV_VERIFIED = "verified"
 SESSIONV_ADMIN = "is_admin"
-SESSIONV_ITER = [SESSIONV_LOGGED_IN, SESSIONV_USER, SESSIONV_UID, SESSIONV_ROLE_ID,
-                 SESSIONV_VERIFIED]  # Iterable, für Session Termination
+SESSIONV_ITER = [SESSIONV_LOGGED_IN, SESSIONV_USER, SESSIONV_UID,
+                 SESSIONV_ROLE_ID, SESSIONV_VERIFIED]
 
-# Muss von Hand geänder werden, sollte sich die Rollen-ID des Administrators ändern!
+# Muss von Hand geänder werden, sollte sich die Rollen-ID des
+# Administrators ändern!
 SESSIONID_ROLE_ADMIN = 5
 
 # Funktionmodi
-DBC_CP_GETDATA = "get_data"  # Modus für db_handler.get_reset_token_cp. Wird im DB_Handler verwendet um nur die Daten zurückzugeben, die zu einem Change Request gespeichert wurden (bspw. neue E-Mail oder neues Passwort)
+# Modus für db_handler.get_reset_token_cp. Wird im DB_Handler verwendet
+#  um nur die Daten zurückzugeben, die zu einem Change Request gespeichert
+# wurden (bspw. neue E-Mail oder neues Passwort)
+DBC_CP_GETDATA = "get_data"
 
 """
 Flask Handler
@@ -73,16 +78,19 @@ Flask Handler
 @app.route("/index")
 def index():
     """
-    Landing Page der Webapplikation. Kann durch "/" oder "/index" aufgerufen werden.
+    Landing Page der Webapplikation. Kann durch "/" oder "/index"
+    aufgerufen werden.
 
-    Die Indexseite der Webapplikation stellt zugleich die Übersicht der Posts dar.
+    Die Indexseite der Webapplikation stellt zugleich die
+    Übersicht der Posts dar.
     """
 
     (code, data) = db_handler.get_all_posts(get_db())
 
     if code == -1:
         logger.debug("Keine Posts gefunden")
-        return render_template("index.html", error_message="Keine Posts gefunden!")
+        return render_template("index.html",
+                               error_message="Keine Posts gefunden!")
 
     colors = ["red", "blue", "green", "yellow"]
 
@@ -102,10 +110,12 @@ def index():
         html_trans += "<div class=\"" + colors[color_key] + "\">"
         html_trans += "<div id=\"usr\">" + str(row[1]) + " | " + str(
             row[2]) + " | <b>Votes: " + str(total_votes) + "</b>"
-        html_trans += "&nbsp;&nbsp;&nbsp;<a style=\"font-size: 150%; color: black;\" href=\"" + url_for(
+        html_trans += "&nbsp;&nbsp;&nbsp;<a style=\"font-size: 150%;" \
+                      " color: black;\" href=\"" + url_for(
             "vote") + "?method=upvote&post_id=" + str(
             row[0]) + "\">+</a>&nbsp;&nbsp;&nbsp;"
-        html_trans += "<a style=\"font-size: 150%; color: black;\" href=\"" + url_for(
+        html_trans += "<a style=\"font-size: 150%; color: black;\" " \
+                      "href=\"" + url_for(
             "vote") + "?method=downvote&post_id=" + str(
             row[0]) + "\">-</a>&nbsp;&nbsp;&nbsp;</div>"
         html_trans += "</div>"
@@ -989,7 +999,8 @@ def change_password_handler():
                                timeout_text="Du wurdest automatisch ausgeloggt"
                                             "."
                                             " Melde dich erneut an")
-    # Greife auf Index 1 zu, da Tupel zurückgegeben wird mit (1, "pbkdf2:sha256:xxx")
+    # Greife auf Index 1 zu, da Tupel zurückgegeben wird mit (1,
+    # "pbkdf2:sha256:xxx")
     user_email = session[SESSIONV_USER]
     curr_pass = db_handler.get_password_for_user(get_db(), user_email)[1]
     uid = int(session[SESSIONV_UID])
@@ -1011,95 +1022,134 @@ def change_password_handler():
     timestamp = datetime.datetime.fromtimestamp(ts).strftime(
         '%Y-%m-%d %H:%M:%S')
 
-    function_helper.send_mail_basic(user_email,
-                                    "Änderung des Passworts",
-                                    "Hallo " + user_email + ",\n bitte klicke auf den folgenden Link, um die Änderung deines Passworts um " + str(
-                                        timestamp) + " zu bestätigen.\n\nlocalhost:5000" + url_for(
-                                        "confirm_password_change") + "?uid=" + str(uid) + "&token=" + str(token))
+    url = "localhost: 5000" + url_for("confirm_password_change") + "?uid="
+    + str(uid) + "&token=" + str(token)
 
-    logger.success("Bestätigungsmail für Passwortänderung wurde an " + user_email + " gesendet.")
+    if function_helper.confirm_password_reset(user_email, url):
+        logger.success("Bestätigungsmail für Passwortänderung wurde an "
+                       + user_email + " gesendet.")
+    else:
+        logger.error("Bestätigungsmail für Passwortänderung an "
+                       + user_email + "wurde NICHT gesendet.")
 
     return render_template("quick_info.html", info_success=True,
-                           info_text="Wir haben eine Bestätigungsmail an die angegebene E-Mail Adresse geschickt. Der darin enthaltene Link bestätigt deine Änderung.")
+                           info_text="Wir haben eine Bestätigungsmail an"
+                                     " die angegebene E-Mail Adresse"
+                                     " geschickt. Der darin enthaltene Link"
+                                     " bestätigt deine Änderung.")
 
 
 @app.route("/auth/controlpanel/confirm_password_change")
 def confirm_password_change():
     """
     Ziel des Bestätigungslink nach einer angeforderten Passwortänderung.
-    Überprüft die Gültigkeit des Tokens (also, ob ein solches in der Änderungstabelle bekannt ist) und lädt anschließend
+    Überprüft die Gültigkeit des Tokens (also, ob ein solches in der
+    Änderungstabelle bekannt ist) und lädt anschließend
     die Daten, die zu diesem Token gespeichert wurden (neues Passwort).
     """
 
     uid = request.args.get("uid")
     token = request.args.get("token")
 
-    if not function_helper.check_params("id", uid) or not function_helper.check_params("text", token):
-        logger.error("URL-Parameter konnten nicht verarbeitet werden (ungültiges Format).")
+    if not function_helper.check_params("id", uid)\
+            or not function_helper.check_params("text", token):
+        logger.error("URL-Parameter konnten nicht verarbeitet werden"
+                     " (ungültiges Format).")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Leider konnten wir deine übermittelte Anfrage nicht verstehen. Bitte verändere nichts an dem Link, den wir dir geschickt haben.")
+                               info_text="Leider konnten wir deine"
+                                         " übermittelte Anfrage nicht"
+                                         " verstehen. Bitte verändere nichts"
+                                         " an dem Link, den wir dir geschickt"
+                                         " haben.")
 
     try:
         int(uid)
     except:
-        logger.error("Die UID des Bestätigungslinks kann nicht in INT umgewandelt werden.")
+        logger.error("Die UID des Bestätigungslinks kann nicht in"
+                     " INT umgewandelt werden.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Leider konnten wir deine übermittelte Anfrage nicht verstehen. Bitte verändere nichts an dem Link, den wir dir geschickt haben.")
+                               info_text="Leider konnten wir deine"
+                                         " übermittelte Anfrage nicht"
+                                         " verstehen. Bitte verändere nichts"
+                                         " an dem Link, den wir dir geschickt"
+                                         " haben.")
 
     # Session Timeout Handling
     if not check_if_valid_session(session):
         return render_template("session_timeout.html",
-                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+                               timeout_text="Du wurdest automatisch "
+                                            "ausgeloggt. Melde dich erneut an")
 
-    sys_token = db_handler.get_reset_token_cp(get_db(), int(uid), "change_password", app=app)
+    sys_token = db_handler.get_reset_token_cp(get_db(), int(uid),
+                                              "change_password", app=app)
 
     if sys_token == None:
-        logger.error("Keine Änderungsanfrage für die E-Mail für UID " + str(uid) + " gefunden (sys_token is None)")
+        logger.error("Keine Änderungsanfrage für die E-Mail für UID "
+                     + str(uid) + " gefunden (sys_token is None)")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Wir konnten leider keine zugehörige Anfrage zur Passwortänderung im System finden. Bitte achte darauf, nichts an dem Link zu verändern und versuche es erneut.")
+                               info_text="Wir konnten leider keine zugehörige"
+                                         " Anfrage zur Passwortänderung im "
+                                         "System finden. Bitte achte darauf, "
+                                         "nichts an dem Link zu verändern und "
+                                         "versuche es erneut.")
 
     if not sys_token == token:
-        logger.error("Das über die URL übergebene Token stimmt nicht mit dem im System registrierten Token überein.")
+        logger.error("Das über die URL übergebene Token stimmt nicht mit "
+                     "dem im System registrierten Token überein.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Das übermittelte Token war ungültig.")
+                               info_text="Das übermittelte Token war"
+                                         " ungültig.")
 
-    new_pass = db_handler.get_reset_token_cp(get_db(), int(uid), "change_password", mode=DBC_CP_GETDATA)
+    new_pass = db_handler.get_reset_token_cp(get_db(), int(uid),
+                                             "change_password",
+                                             mode=DBC_CP_GETDATA)
 
     db_handler.set_pass_for_user(get_db(), int(uid), new_pass, app)
 
     # Tabelle aufräumen
     db_handler.delete_cp_token(get_db(), int(uid), "change_password")
     logger.success(
-        "Benutzer " + str(uid) + " hat Passwort geändert. Räume Tabelle mit alten Einträgen dieses Users auf...")
+        "Benutzer " + str(uid) + " hat Passwort geändert. Räume Tabelle mit"
+                                 " alten Einträgen dieses Users auf...")
 
     delete_user_session()
-    logger.debug("Logge User aus, um sich mit den neuen Credentials anzumelden.")
+    logger.debug("Logge User aus, um sich mit den neuen Credentials"
+                 " anzumelden.")
 
-    return render_template("quick_info.html", info_success=True, info_text="Das Passwort wurde geändert.")
+    return render_template("quick_info.html", info_success=True,
+                           info_text="Das Passwort wurde geändert.")
 
 
 @app.route("/auth/admin/delete_user", methods=["POST"])
 def delete_user():
     """
      Administratorfunktion, um einen Benutzer zu löschen.
-     Benötigt die Passwortbestätigung durch den Administrator, um CSRF-Attacken zu vermeiden.
+     Benötigt die Passwortbestätigung durch den Administrator,
+      um CSRF-Attacken zu vermeiden.
     """
-
+    # Nur eingeloggte Benutzer dürfen Nachrichten posten
     try:
-        session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+        session[SESSIONV_LOGGED_IN]
     except KeyError as e:
-        logger.error("Ein nicht eingeloggter Benutzer wollte /auth/admin/delete_user aufrufen.")
+        logger.error("Ein nicht eingeloggter Benutzer wollte"
+                     " /auth/admin/delete_user aufrufen.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
+                               info_text="Du möchtest eine geschützte"
+                                         " Seite aufrufen. Dieser Vorfall"
+                                         " wird gemeldet.")
     except:
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du musst Administrator und eingeloggt sein, um diese Aktion durchführen zu dürfen")
+                               info_text="Du musst Administrator und"
+                                         " eingeloggt sein, um diese Aktion"
+                                         " durchführen zu dürfen")
 
     if not session[SESSIONV_ADMIN]:
         logger.error(
-            "Unbefugter Benutzer " + session[SESSIONV_USER] + " wollte User löschen. Mögliche Attacke erkannt.")
+            "Unbefugter Benutzer " + session[SESSIONV_USER]
+            + " wollte User löschen. Mögliche Attacke erkannt.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du musst Administrator sein, um diese Aktion durchführen zu dürfen")
+                               info_text="Du musst Administrator sein, um "
+                                         "diese Aktion durchführen zu dürfen")
 
     uid = request.args.get("uid")
     password = request.form["password"]
@@ -1119,74 +1169,97 @@ def delete_user():
     # Session Timeout Handling
     if not check_if_valid_session(session):
         return render_template("session_timeout.html",
-                               timeout_text="Du wurdest automatisch ausgeloggt. Melde dich erneut an")
+                               timeout_text="Du wurdest automatisch "
+                                            "ausgeloggt. Melde dich erneut an")
 
     # Überprüfe, ob Passwork korrekt
-    (code, data) = db_handler.get_password_for_user(get_db(), session[SESSIONV_USER])
+    (code, data) = db_handler.get_password_for_user(get_db(),
+                                                    session[SESSIONV_USER])
 
     if code == -1:
-        logger.error("Konnte Benutzerdaten für Administrator nicht abrufen (Datenbankfehler)")
+        logger.error("Konnte Benutzerdaten für Administrator nicht abrufen"
+                     " (Datenbankfehler)")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Konnte Benutzerdaten nicht abrufen. Bitte versuche es erneut.")
+                               info_text="Konnte Benutzerdaten nicht abrufen."
+                                         " Bitte versuche es erneut.")
 
     if not check_password_hash(data, password):
         logger.error("Eingegebenes Passwort des Administrators war falsch.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Das eingegebene Passwort war ungültig.")
+                               info_text="Das eingegebene Passwort war"
+                                         " ungültig.")
 
     (code, e) = db_handler.delete_user(get_db(), int(uid))
 
     if code == -1:
-        logger.error("Benutzer " + str(uid) + " konnte nicht gelöscht werden (Datenbankfehler). Stacktrace: " + str(e))
+        logger.error("Benutzer " + str(uid) + " konnte nicht gelöscht werden "
+                                              "(Datenbankfehler). Stacktrace: "
+                     + str(e))
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Ein unerwarteter Fehler ist aufgetreten.")
+                               info_text="Ein unerwarteter Fehler ist"
+                                         " aufgetreten.")
     elif code == 1:
         logger.success("Benutzer " + str(uid) + " wurde gelöscht.")
         return render_template("quick_info.html", info_success=True,
-                               info_text="Benutzer (UID: " + str(uid) + ") wurde gelöscht.")
+                               info_text="Benutzer (UID: " + str(uid)
+                                         + ") wurde gelöscht.")
     else:
-        logger.error("Unerwarteter Fehler beim Löschen des Benutzers " + str(uid))
+        logger.error("Unerwarteter Fehler beim Löschen des Benutzers "
+                     + str(uid))
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Ein unerwarteter Fehler ist aufgetreten.")
+                               info_text="Ein unerwarteter Fehler"
+                                         " ist aufgetreten.")
 
 
 @app.route("/auth/admin/confirm")
 def admin_confirm():
     """
-    Präsentiert die Bestätigungsseite für die Durchführung einer Administratorfunktion.
+    Präsentiert die Bestätigungsseite für die Durchführung
+     einer Administratorfunktion.
     """
-
+    # Nur eingeloggte Benutzer dürfen Nachrichten posten
     try:
-        session[SESSIONV_LOGGED_IN]  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+        session[SESSIONV_LOGGED_IN]
     except KeyError as e:
-        logger.error("Ein nicht eingeloggter Benutzer wollte /auth/admin/confirm aufrufen.")
+        logger.error("Ein nicht eingeloggter Benutzer wollte"
+                     " /auth/admin/confirm aufrufen.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du möchtest eine geschützte Seite aufrufen. Dieser Vorfall wird gemeldet.")
+                               info_text="Du möchtest eine geschützte"
+                                         " Seite aufrufen. Dieser Vorfall"
+                                         " wird gemeldet.")
     except:
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du musst Administrator und eingeloggt sein, um diese Aktion durchführen zu dürfen")
+                               info_text="Du musst Administrator und"
+                                         " eingeloggt sein, um diese Aktion"
+                                         " durchführen zu dürfen")
 
     if not session[SESSIONV_ADMIN]:
         logger.error("Unebfugter Benutzer " + session[
-            SESSIONV_USER] + " möchte auf eine Adminfunktion zugreifen. Mögliche Attacke erkannt.")
+            SESSIONV_USER] + " möchte auf eine Adminfunktion zugreifen. "
+                             "Mögliche Attacke erkannt.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du musst Administrator sein, um diese Aktion durchführen zu dürfen")
+                               info_text="Du musst Administrator sein, um "
+                                         "diese Aktion durchführen zu dürfen")
 
     method = request.args.get("method")
     obj = request.args.get("obj")
 
-    if not function_helper.check_params("text", method) or not function_helper.check_params("id", obj):
+    if not function_helper.check_params("text", method) \
+            or not function_helper.check_params("id", obj):
         logger.error("obj konnte nicht zu INT umgewandelt werden.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Auswertung der Parameter war fehlerhaft.")
+                               info_text="Auswertung der Parameter war "
+                                         "fehlerhaft.")
 
     if not method in ["delete"]:
         logger.error("Unbekannte Methode. Erlaubt sind: delete")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Ungültige Aktion. Bitte versuche es erneut.")
+                               info_text="Ungültige Aktion. Bitte versuche"
+                                         " es erneut.")
 
     logger.success(
-        "Adminstratorfunktion wurde erfolgreich bestätigt. (Methode:" + str(method) + ", Objekt: " + str(obj))
+        "Adminstratorfunktion wurde erfolgreich bestätigt. (Methode:"
+        + str(method) + ", Objekt: " + str(obj))
     return render_template("confirm_admin.html", obj=obj, method=method)
 
 
@@ -1201,20 +1274,27 @@ def reset_password():
 @app.route("/reset/password/handle", methods=["POST"])
 def handle_password_reset():
     """
-    Ziel nach Absenden des Passwort-Request Formulars. Überprüft die eingegebene E-Mail-Adresse auf Format.
-    Ebenfalls wird überprüft, ob die eingegebene E-Mail im System registriert ist. Anschließend wird eine Reset-Mail an die
+    Ziel nach Absenden des Passwort-Request Formulars. Überprüft die
+    eingegebene E-Mail-Adresse auf Format.
+    Ebenfalls wird überprüft, ob die eingegebene E-Mail im System
+    registriert ist. Anschließend wird eine Reset-Mail an die
     angegebene E-Mail-Adresse geschickt.
 
-    Um Spam-Attacken zu vermeiden, wurde die Anzahl der möglichen Resets innerhalb von 30 Minuten auf 5 Versuche beschränkt. Das
+    Um Spam-Attacken zu vermeiden, wurde die Anzahl der möglichen
+    Resets innerhalb von 30 Minuten auf 5 Versuche beschränkt. Das
     Tracking erfolgt mittels der tralala_reset_password-Tabelle.
 
-    Funktioniert nur bei nicht-eingeloggten Benutzern unter der Annahme, dass eingeloggte Benutzer ihr Passwort noch kennen.
+    Funktioniert nur bei nicht-eingeloggten Benutzern unter der Annahme,
+     dass eingeloggte Benutzer ihr Passwort noch kennen.
     """
-
+    # Nur eingeloggte Benutzer dürfen Nachrichten posten
     try:
-        if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+        if session[SESSIONV_LOGGED_IN]:
             return render_template("quick_info.html", info_danger=True,
-                                   info_text="Du bist bereits eingeloggt. Du musst dich zuerst ausloggen, bevor du dein Passwort zurücksetzen kannst.")
+                                   info_text="Du bist bereits eingeloggt. "
+                                             "Du musst dich zuerst ausloggen, "
+                                             "bevor du dein Passwort "
+                                             "zurücksetzen kannst.")
     except:
         pass
 
@@ -1223,91 +1303,137 @@ def handle_password_reset():
     if not function_helper.check_params("email", email):
         logger.error("E-Mail besitzt ein ungültiges Format")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Die E-Mail besitzt ein ungültiges Format. Bitte versuche es erneut.")
+                               info_text="Die E-Mail besitzt ein ungültiges "
+                                         "Format. Bitte versuche es erneut.")
 
     # Überprüfe, ob Account mit angegebener E-Mail existiert
     (code, data) = db_handler.check_for_existence(get_db(), email)
     if code != 1:
-        logger.error("Konnte keinen Benutzer mit der E-Mail " + str(email) + " finden.")
+        logger.error("Konnte keinen Benutzer mit der E-Mail "
+                     + str(email) + " finden.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Wir konnten leider keinen Account mit der angegebenen E-Mail finden. Bitte Überprüfe die E-Mail und versuche es erneut.")
+                               info_text="Wir konnten leider keinen Account"
+                                         " mit der angegebenen E-Mail finden. "
+                                         "Bitte Überprüfe die E-Mail und "
+                                         "versuche es erneut.")
 
     uid = data["uid"]
 
     # Überprüfe auf Spam Attacke bzw. zu viele Passwort Resets
     if not db_handler.count_password_requests(get_db(), int(uid), app):
         logger.error("Für Benutzer " + str(
-            uid) + " wurde mehr als 5 mal versucht, das Passwort zurückzusetzen. Mögliche Spam-Attacke erkannt. Timout für Benutzer " + str(
-            uid))
+            uid) + " wurde mehr als 5 mal versucht, das Passwort "
+                   "zurückzusetzen. Mögliche Spam-Attacke erkannt. "
+                   "Timout für Benutzer " + str(uid))
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Du hast zu oft versucht dein Passwort zurückzusetzen, weshalb wir dieses Feature für dich vorübergehend deaktiviert haben, um mögliche Spam-Attacken zu verhindern. Vielen Dank für dein Verständnis.")
+                               info_text="Du hast zu oft versucht dein "
+                                         "Passwort zurückzusetzen, weshalb wir"
+                                         " dieses Feature für dich "
+                                         "vorübergehend deaktiviert haben, "
+                                         "um mögliche Spam-Attacken zu "
+                                         "verhindern. Vielen Dank für "
+                                         "dein Verständnis.")
 
     # Persistiere Reset Token
     token = function_helper.generate_token(32)
     db_handler.set_reset_token(get_db(), token, uid, app)
 
     # Sende Reset Email
-    function_helper.send_reset_mail(email, uid, token, url_for("confirm_password_reset"), app)
+    function_helper.send_reset_mail(email, uid, token,
+                                    url_for("confirm_password_reset"), app)
 
-    logger.success("Anfrage für Passwort Reset wurde registriert. Sende Reset E-Mail an " + email)
+    logger.success("Anfrage für Passwort Reset wurde registriert. "
+                   "Sende Reset E-Mail an " + email)
 
     return render_template("quick_info.html", info_success=True,
-                           info_text="Falls deine E-Mail Adresse bei uns registriert ist, haben wir dir eine E-Mail mit weiteren Anweisungen zum Vorgehen geschickt.")
+                           info_text="Falls deine E-Mail Adresse bei "
+                                     "uns registriert ist, haben wir dir "
+                                     "eine E-Mail mit weiteren Anweisungen "
+                                     "zum Vorgehen geschickt.")
 
 
 @app.route("/reset/password/confirm_reset")
 def confirm_password_reset():
     """
-    Ziel des Links des Password-Resets. Überprüft das über die URL angegebene Token mit Einträgen in der Datenbank.
-    Ist das Token richtig (= wurde in der Datenbank gefunden) wird ein Formular präsentiert, auf der das Passwort geändert werden kann.
+    Ziel des Links des Password-Resets. Überprüft das über die URL
+    angegebene Token mit Einträgen in der Datenbank.
+    Ist das Token richtig (= wurde in der Datenbank gefunden) wird ein
+    Formular präsentiert, auf der das Passwort geändert werden kann.
 
-    Das Token als auch die User-ID werden als Hidden Fields auf der Seite zur Änderung des Passworts eingetragen. Diese Felder
-    werden unbedingt benötigt, um die Änderung festzuschreiben. Werden diese Werte verändert, wird der Reset nicht durchgeführt,
-    da erneut überprüft wird, ob die Eingaben beim Absenden des Formulars verändert wurden oder nicht.
+    Das Token als auch die User-ID werden als Hidden Fields auf der Seite
+    zur Änderung des Passworts eingetragen. Diese Felder
+    werden unbedingt benötigt, um die Änderung festzuschreiben. Werden diese
+     Werte verändert, wird der Reset nicht durchgeführt,
+    da erneut überprüft wird, ob die Eingaben beim Absenden des Formulars
+    verändert wurden oder nicht.
     """
+    # Nur eingeloggte Benutzer dürfen Nachrichten posten
     try:
-        if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+        if session[SESSIONV_LOGGED_IN]:
             return render_template("quick_info.html", info_danger=True,
-                                   info_text="Du bist bereits eingeloggt. Du musst dich zuerst ausloggen, bevor du den Password Reset vervollständigen kannst.")
+                                   info_text="Du bist bereits eingeloggt. "
+                                             "Du musst dich zuerst ausloggen, "
+                                             "bevor du den Password Reset "
+                                             "vervollständigen kannst.")
     except:
         pass
 
     token = request.args.get("token")
     uid = request.args.get("uid")
 
-    if not function_helper.check_params("token", token) or not function_helper.check_params("id", uid):
+    if not function_helper.check_params("token", token) \
+            or not function_helper.check_params("id", uid):
         logger.error("Konnte die übergebenen URL-Parameter nicht auswerten.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Leider konnten wir deine Anfrage nicht verstehen. Bitte ändere nichts an dem Link, den wir dir per Mail zugeschickt haben.")
+                               info_text="Leider konnten wir deine Anfrage "
+                                         "nicht verstehen. Bitte ändere nichts"
+                                         " an dem Link, den wir dir per Mail"
+                                         " zugeschickt haben.")
 
-    ref_token = db_handler.get_reset_token(get_db(), uid)  # Suche nach zugehörigem Reset Token in der Datenbank
+    # Suche nach zugehörigem Reset Token in der Datenbank
+    ref_token = db_handler.get_reset_token(get_db(), uid)
 
     if ref_token is None:
-        logger.error("Kein zugehöriger Passwort Reset Request für Token " + str(ref_token) + " gefunden.")
+        logger.error("Kein zugehöriger Passwort Reset Request für Token "
+                     + str(ref_token) + " gefunden.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Es wurde kein zugehöriger Passwort Request in unserem System gefunden. Bitte versuche es erneut.")
+                               info_text="Es wurde kein zugehöriger Passwort"
+                                         " Request in unserem System gefunden."
+                                         " Bitte versuche es erneut.")
 
     if not token == ref_token:
         logger.error(
-            "Übermitteltes Token stimmt nicht mit registriertem Token überein. Mögliche Attacke (SQLi) erkannt.")
+            "Übermitteltes Token stimmt nicht mit registriertem Token überein."
+            " Mögliche Attacke (SQLi) erkannt.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Wir konnten dein Token leider nicht bei uns im System finden. Bitte verändere nichts an dem Link, den wir die per Mail zugeschickt haben.")
-    return render_template("password_reset_change.html", token=ref_token, uid=uid)
+                               info_text="Wir konnten dein Token leider nicht"
+                                         " bei uns im System finden. Bitte"
+                                         " verändere nichts an dem Link, den"
+                                         " wir die per Mail zugeschickt"
+                                         " haben.")
+    return render_template("password_reset_change.html", token=ref_token,
+                           uid=uid)
 
 
 @app.route("/reset/password/set_new", methods=["POST"])
 def set_new_password():
     """
     Handler der letztendlich das neue Passwort setzt.
-    Hier wird erneut überprüft, ob das Token aus dem Hidden Field mit dem in der DB bekannten Token übereinstimmt. Ebenfalls
-    wird ein Check auf die ID aus dem Hidden Field gemacht, ob auch diese verändert wurde. Nur wenn diese beiden Werte unverändert
-    geblieben sind und einen zugehörigen Eintrag in der Datenbank haben, wird die Änderung des Passworts durchgeführt.
+    Hier wird erneut überprüft, ob das Token aus dem Hidden Field mit dem
+    in der DB bekannten Token übereinstimmt. Ebenfalls
+    wird ein Check auf die ID aus dem Hidden Field gemacht, ob auch diese
+    verändert wurde. Nur wenn diese beiden Werte unverändert
+    geblieben sind und einen zugehörigen Eintrag in der Datenbank haben,
+    wird die Änderung des Passworts durchgeführt.
     """
-
+    # Nur eingeloggte Benutzer dürfen Nachrichten posten
     try:
-        if session[SESSIONV_LOGGED_IN]:  # Nur eingeloggte Benutzer dürfen Nachrichten posten
+        if session[SESSIONV_LOGGED_IN]:
             return render_template("quick_info.html", info_danger=True,
-                                   info_text="Du bist bereits eingeloggt. Du musst dich zuerst ausloggen, bevor du den Password Reset vervollständigen kannst.")
+                                   info_text="Du bist bereits eingeloggt."
+                                             " Du musst dich zuerst ausloggen,"
+                                             " bevor du den Password Reset"
+                                             " vervollständigen kannst.")
     except:
         pass
 
@@ -1317,29 +1443,45 @@ def set_new_password():
     hidden_uid = request.form["h_uid"]
 
     # Überprüfe auf korrekte Form der Parameterinhalte
-    if not function_helper.check_params("password", new_pass) or not function_helper.check_params("password",
-                                                                                                  new_pass_confirm) or not function_helper.check_params(
-        "text", hidden_token) or not function_helper.check_params("id", hidden_uid):
-        logger.error("Übergebene URL-Parameter entsprechen nicht dem erwarteten Format.")
+    if not function_helper.check_params("password", new_pass) \
+            or not function_helper.check_params("password", new_pass_confirm) \
+            or not function_helper.check_params("text", hidden_token) \
+            or not function_helper.check_params("id", hidden_uid):
+        logger.error("Übergebene URL-Parameter entsprechen nicht dem "
+                     "erwarteten Format.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Wir konnten deine Anfrage leider nicht verarbeiten, da einige Felder entweder leer waren oder das falsche Format aufwiesen")
+                               info_text="Wir konnten deine Anfrage leider"
+                                         " nicht verarbeiten, da einige Felder"
+                                         " entweder leer waren oder das "
+                                         "falsche Format aufwiesen")
 
     # Überprüfe auf Gleichheit der Passwörter
     if not new_pass == new_pass_confirm:
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Die beiden Passwörter stimmen leider nicht überein. Bitte versuche es erneut.")
+                               info_text="Die beiden Passwörter stimmen"
+                                         " leider nicht überein. Bitte "
+                                         "versuche es erneut.")
 
-    # Überprüfe, ob Token und ID korrekt sind und setze anschließend das Passwort
+    # Überprüfe, ob Token und ID korrekt sind und setze anschließend
+    # das Passwort
     ref_token = db_handler.get_reset_token(get_db(), int(hidden_uid))
 
-    # Gibt Fehler zurück, sollte z.B. das Feld h_uid innerhalb des Formulars verändert worden sein
+    # Gibt Fehler zurück, sollte z.B. das Feld h_uid innerhalb des Formulars
+    #  verändert worden sein
     if not ref_token == hidden_token:
-        logger.error("Das übermittelte Reset Token stimmt leider nicht mit dem registrierten Token überein.")
+        logger.error("Das übermittelte Reset Token stimmt leider nicht mit"
+                     " dem registrierten Token überein.")
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Das übermittelte Reset Token stimmt leider nicht mit dem uns bekannten Token überein. Es ist möglich, dass dieses während der Übertragung verändert wurde. Bitte versuche es erneut.")
+                               info_text="Das übermittelte Reset Token stimmt"
+                                         " leider nicht mit dem uns bekannten"
+                                         " Token überein. Es ist möglich, dass"
+                                         " dieses während der Übertragung"
+                                         " verändert wurde. Bitte versuche"
+                                         " es erneut.")
 
     # Hole mit dem Token korrespondierendes Token aus der Datenbank
-    (uid, token) = db_handler.get_reset_token(get_db(), hidden_uid, "get_token_uid")
+    (uid, token) = db_handler.get_reset_token(get_db(),
+                                              hidden_uid, "get_token_uid")
 
     # Schreibe neues Passwort (bzw. Hash des Passworts) in die Datenbank
     hashed_pass = generate_password_hash(new_pass)
@@ -1348,17 +1490,22 @@ def set_new_password():
 
     # Lösche Tokeneintrag aus der Datenbank
     db_handler.delete_pass_reset_token(get_db(), uid, app)
-    logger.debug("Logge Benutzer " + str(uid) + " aus, um sich mit den geänderten Credentials erneut einzuloggen.")
+    logger.debug("Logge Benutzer " + str(uid) + " aus, um sich mit den"
+                                                " geänderten Credentials"
+                                                " erneut einzuloggen.")
 
     return render_template("quick_info.html", info_success=True,
-                           info_text="Dein Passwort wurde geändert. Du kannst dich nun einloggen.")
+                           info_text="Dein Passwort wurde geändert."
+                                     " Du kannst dich nun einloggen.")
 
 
 @app.route("/reset_password/action", methods=["POST"])
 def reset_password_action():
     """
-    Erhält Daten des neuen Passworts. Ändert Passwort des Benutzers in der Datenbank.
-    Wichtig: Setze das Passwort nur für die User ID die für das Token aus der Datenbank ausgelesen wurde und nicht das Passwort der UID,
+    Erhält Daten des neuen Passworts. Ändert Passwort des Benutzers
+     in der Datenbank.
+    Wichtig: Setze das Passwort nur für die User ID die für das Token
+     aus der Datenbank ausgelesen wurde und nicht das Passwort der UID,
     die über die URL mitgegeben wurde!
     :return:
     """
@@ -1379,16 +1526,19 @@ def search_for_hashtag():
 
     if not function_helper.check_params("text", search_query):
         return render_template("quick_info.html", info_danger=True,
-                               info_text="Bitte gebe einen gültigen Suchbegriff ein.")
+                               info_text="Bitte gebe einen gültigen"
+                                         " Suchbegriff ein.")
     search_query = security_helper.clean_messages(search_query)
     all_posts = db_handler.search_for_query(get_db(), search_query.lower())
 
     if not all_posts:
         return render_template("quick_info.html", info_warning=True,
-                               info_text="Wir konnten leider keine Posts mit dem angegebenen Hashtag finden.")
+                               info_text="Wir konnten leider keine Posts"
+                                         " mit dem angegebenen Hashtag"
+                                         " finden.")
 
-
-    return render_template("find_hashtags.html", query=search_query, post_list=all_posts)
+    return render_template("find_hashtags.html", query=search_query,
+                           post_list=all_posts)
 
 
 """
@@ -1399,7 +1549,8 @@ Hilfsfunktionen, die keine HTTP Requests bearbeiten
 
 def delete_user_session():
     """
-     Terminiere Benutzersession indem alle Sessionvariablen aus der Session gelöscht werden.
+     Terminiere Benutzersession indem alle Sessionvariablen aus
+      der Session gelöscht werden.
     """
 
     for sessionv in SESSIONV_ITER:
@@ -1411,8 +1562,10 @@ def check_for_session_state(uid):
     Überprüfe den Status der aktuellen Benutzersitzung.
 
     - True: Der Benutzer ist noch eingeloggt und kann Aktionen durchführen
-    - False: Die Sitzung des Benutzers ist außerhalb der Alive-Zeit (automatischer Timeout). Er wird bei der nächsten privilegierten
-    Aktion automatisch ausgeloggt (=> wird durch Timeout-Handling Code innerhalb der Funktionen durchgeführt).
+    - False: Die Sitzung des Benutzers ist außerhalb der Alive-Zeit
+    (automatischer Timeout). Er wird bei der nächsten privilegierten
+    Aktion automatisch ausgeloggt (=> wird durch Timeout-Handling Code
+    innerhalb der Funktionen durchgeführt).
     """
     (code, data) = db_handler.check_session_state(get_db(), uid)
 
@@ -1425,7 +1578,8 @@ def check_for_session_state(uid):
 
 def send_verification_email(reg_email):
     """
-    Wrapper. Verwendet Implementierung aus function_helper. Sende Bestätigungsmail mit Verification Token.
+    Wrapper. Verwendet Implementierung aus function_helper.
+    Sende Bestätigungsmail mit Verification Token.
     """
     app.logger.debug("Sende Bestaetigungsmail.")
 
@@ -1474,29 +1628,38 @@ def prepare_info_json(affected_url, info_text, additions):
 
 
 def register_new_account(email, pw_hash, verification_token):
-    success = db_handler.add_new_user(get_db(), email, pw_hash, verification_token)
+    success = db_handler.add_new_user(get_db(), email, pw_hash,
+                                      verification_token)
 
     return success
 
 
 def check_if_valid_session(session):
     """
-    Der Session State wird pro autorisierbarer Aktion aktualisiert, sofern die aktuelle Session noch gültig ist, ansonsten wird die Session terminiert.
-    Die Aktualisierung der Session bedeutet, dass session_start auf die aktuelle Zeit aktualisiert wird. session_max_alive wird auf session_start + MAX_SESSION_TIME gesetzt
+    Der Session State wird pro autorisierbarer Aktion aktualisiert, sofern
+    die aktuelle Session noch gültig ist, ansonsten wird die Session
+     terminiert.
+    Die Aktualisierung der Session bedeutet, dass session_start auf die
+     aktuelle Zeit aktualisiert wird. session_max_alive wird auf
+     session_start + MAX_SESSION_TIME gesetzt
 
-    Der Session Timeout erfolgt nur, wenn MAX_SESSION_TIME lang keine Aktion ausgeführt wurde (wie z.B. eine Nachricht posten), die die Session refreshed hätte.
+    Der Session Timeout erfolgt nur, wenn MAX_SESSION_TIME lang keine
+    Aktion ausgeführt wurde (wie z.B. eine Nachricht posten), die die
+    Session refreshed hätte.
     """
     sqlconnection = get_db()
     # Session Timeout Handling
     if session["logged_in"]:
-        if not check_for_session_state(session["uid"]):  # wenn False zurückgegeben wird, ist der Timeout erreicht
+        if not check_for_session_state(session["uid"]):
             db_handler.invalidate_session(sqlconnection, session["uid"])
-            logger.error("Session Timeout wurde erreicht. Automatischer Logout für Benutzer " + session[SESSIONV_USER])
+            logger.error("Session Timeout wurde erreicht. Automatischer"
+                         " Logout für Benutzer " + session[SESSIONV_USER])
             delete_user_session()
             return False
         else:
             # Refreshe den Session State
-            db_handler.refresh_session_state(sqlconnection, int(session[SESSIONV_UID]))
+            db_handler.refresh_session_state(sqlconnection,
+                                             int(session[SESSIONV_UID]))
             return True
 
 """
@@ -1513,7 +1676,11 @@ def not_found_error(error):
 @app.errorhandler(405)
 def method_not_allowed_error(error):
     return render_template("quick_info.html", info_danger=True,
-                           info_text="Unzulässige Zugriffsmethode auf die URL. Möglicherweise hast du eine URL aufgerufen, die nicht zum normalen Aufruf im Browser gedacht ist.")
+                           info_text="Unzulässige Zugriffsmethode auf die"
+                                     " URL. Möglicherweise hast du eine"
+                                     " URL aufgerufen, die nicht zum"
+                                     " normalen Aufruf im Browser"
+                                     " gedacht ist.")
 
 
 """

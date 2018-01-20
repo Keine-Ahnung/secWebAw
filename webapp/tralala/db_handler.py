@@ -1,11 +1,6 @@
-from flask import Flask
-from flaskext.mysql import MySQL
 import time
 import datetime
 import security_helper
-import traceback
-from werkzeug.security import generate_password_hash, check_password_hash
-
 
 __MAX_SESSION_TIME = 60  # Minuten
 
