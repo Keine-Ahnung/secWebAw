@@ -1,751 +1,651 @@
-from flask import Flask
-from flaskext.mysql import MySQL
 import time
 import datetime
 import security_helper
-import traceback
-from werkzeug.security import generate_password_hash, check_password_hash
+
+__MAX_SESSION_TIME = 60  # Minuten
 
 
-class DB_Handler:
-    db_connection_data = {}
-    DB_TABLE_TRALALA_USERS = "tralala_users"
-    DB_TABLE_TRALALA_POSTS = "tralala_posts"
-    DB_TABLE_TRALALA_POST_VOTES = "tralala_post_votes"
-    DB_TABLE_TRALALA_ACTIVE_SESSIONS = "tralala_active_sessions"
-    DB_TABLE_TRALALA_ROLES = "tralala_roles"
-    DB_TABLE_TRALALA_RESET_PASSWORD = "tralala_reset_password"
-    DB_TABLE_TRALALA_CP_CHANGE = "tralala_cp_change"
+def add_new_user(mysql, email, pw_hash, verification_token):
+    """
+    DB-Verbindung nach jedem Call wieder schließen
 
-    MAX_SESSION_TIME = 60  # Minuten
+    1: User wurde angelegt
+    0: User existiert bereits
+    -1: User konnte nicht angelegt werden
+    """
+    cursor = mysql.cursor()
 
-    def __init__(self):
-        self.db_connection_data = None
+    ROLE_ID = 1  # unverified
+    VERIFIED = 0
 
-    # if db_connection_data == None:
-    #     self.db_connection_data["MYSQL_DATABASE_USER"] = "db_admin_tralala"
-    #     self.db_connection_data["MYSQL_DATABASE_PASSWORD"] = "tr4l4l4_mysql_db."
-    #     self.db_connection_data["MYSQL_DATABASE_DB"] = "tralala"
-    #     self.db_connection_data["MYSQL_DATABASE_HOST"] = "localhost"
-    #     self.db_connection_data["DB_TABLE_TRALALA_USERS"] = "tralala_users"
-    #
-    # else:
-    #     self.db_connection_data = db_connection_data
+    # Überprüfe ob User schon existiert
+    cursor.callproc("tralala.check_for_existence", (email.lower(),))
 
-    def add_new_user(self, mysql, email, pw_hash, verification_token):
-        """
-        DB-Verbindung nach jedem Call wieder schließen
+    if cursor.rowcount != 0:  # User existiert bereits
+        return 0
 
-        1: User wurde angelegt
-        0: User existiert bereits
-        -1: User konnte nicht angelegt werden
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        pid = 1  # unverified
-        role_id = 1  # unverified
-        verified = 0
-
-        record = [email.lower(), pw_hash, role_id, verified, verification_token]
-
-        # Überprüfe ob User schon existiert
-        cursor.callproc("tralala.check_for_existence", (email.lower(),))
-        data = cursor.fetchone()
-
-        if cursor.rowcount != 0:  # User existiert bereits
-            return 0
-
-        # Füge neuen User zur DB
+    else:
         try:
-            # cursor.execute(
-            #     "insert into " + self.DB_TABLE_TRALALA_USERS + " (email, password, role_id, verified, verification_token) values (%s,%s,%s,%s,%s)",
-            #     record)
-
-            cursor.callproc("tralala.add_new_user", (email.lower(), pw_hash, role_id, verified, verification_token))
-
-            conn.commit()
-            conn.close()
+            cursor.callproc("tralala.add_new_user", (email.lower(), pw_hash,
+                                                     ROLE_ID, VERIFIED,
+                                                     verification_token))
+            mysql.commit()
             return 1
+
         except Exception as e:
             print(str(e))
-            conn.close()
             return -1
 
-    def get_token_for_user(self, mysql, email):
-        """
-        Gebe das Bestätigungstoken für eine E-Mail zurück.
-        """
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
+def get_token_for_user(mysql, email):
+    """
+    Gebe das Bestätigungstoken für eine E-Mail zurück.
+    """
+    cursor = mysql.cursor()
 
-        cursor.callproc("tralala.get_token_for_user", (email.lower(),))
-        data = cursor.fetchone()
+    cursor.callproc("tralala.get_token_for_user", (email.lower(),))
+    data = cursor.fetchone()
 
-        if cursor.rowcount == 0:
-            conn.close()
+    if cursor.rowcount == 0:
+        return -1, "no_token"
 
-            return -1, "no_token"
+    else:
+        return 1, data[0]
+
+
+def get_user_for_token(mysql, token):
+    """
+    Gebe den Benutzer basierend auf einem Bestätigungstoken zurück.
+    """
+    cursor = mysql.cursor()
+
+    cursor.callproc("tralala.get_user_for_token", (token,))
+    data = cursor.fetchone()
+
+    if cursor.rowcount == 0:
+        return -1, "no_email"
+
+    else:
+        if data[1] == 1:
+            # wenn der Benutzer bereits bestätigt ist (verified=1)
+            return 2, data[0]
+
         else:
-            conn.close()
             return 1, data[0]
 
-    def get_user_for_token(self, mysql, token):
-        """
-        Gebe den Benutzer basierend auf einem Bestätigungstoken zurück.
-        """
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
+def user_successful_verify(mysql, email):
+    """
+    Setze verified auf 1 und role_id auf 4 (verified) nach
+    erfolgreicher Bestätigung des Accounts
+    """
+    cursor = mysql.cursor()
 
-        cursor.callproc("tralala.get_user_for_token", (token,))
-        data = cursor.fetchone()
+    try:
+        cursor.callproc("user_successful_verify", (email.lower(),))
+        mysql.commit()
+        return 1
 
-        if cursor.rowcount == 0:
-            conn.close()
-            return -1, "no_email"
-        else:
-            if data[1] == 1:  # wenn der Benutzer bereits bestätigt ist (verified=1)
-                conn.close()
-                return 2, data[0]
-            else:
-                return 1, data[0]
+    except Exception as e:
+        print("Error bei user_successful_verify " + str(e))
+        return -1
 
-    def user_successful_verify(self, mysql, email):
-        """
-        Setze verified auf 1 und role_id auf 4 (verified) nach erfolgreicher Bestätigung des Accounts
-        """
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
+def check_for_existence(mysql, email):
+    """
+    Überprüfe anhand der E-Mail auf die Existenz eines Benutzers.
+    Überprüfe ebenfalls, ob der Benutzer bestätigt ist.
+    """
+    cursor = mysql.cursor()
+    cursor.callproc("tralala.check_for_existence", (email.lower(),))
+    data = cursor.fetchone()
 
-        try:
-            cursor.callproc("user_successful_verify", (email.lower(),))
+    if cursor.rowcount == 0:
+        return -1, "no_user"
 
-            conn.commit()
-            conn.close()
-            return 1
-        except Exception as e:
-            print("Error bei user_successful_verify " + str(e))
-            conn.close()
-            return -1
+    elif data[4] == 0:
+        return -2, "not_verified"
 
-    def check_for_existence(self, mysql, email):
-        """
-        Überprüfe anhand der E-Mail auf die Existenz eines Benutzers. Überprüfe ebenfalls, ob der Benutzer bestätigt ist.
-        """
+    else:
+        return 1, {"email": data[0], "password": data[1],
+                   "uid": data[2], "role_id": data[3], "verified": data[4]}
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
 
-        # cursor.execute(
-        #     "select email, password, uid, role_id, verified from " + self.DB_TABLE_TRALALA_USERS + " where email=%s",
-        #     (email.lower(),))
+def post_message_to_db(mysql, uid, email, text, hashtags):
+    """
+    Schreibe die neue Nachricht in die Datenbank. Die Nachricht als auch
+    die Hashtags werden sanitized, um bösartigen
+    Input zu unterbinden.
+    """
+    cursor = mysql.cursor()
+    post_date = time.strftime('%Y-%m-%d %H:%M:%S')
+    cleaned_hashtags = security_helper.clean_hashtags(hashtags.strip())
+    cleaned_text = security_helper.clean_messages(text)
 
-        cursor.callproc("tralala.check_for_existence", (email.lower(),))
+    try:
+        cursor.callproc("post_message_to_db", (uid, post_date, cleaned_text,
+                                               cleaned_hashtags, 0, 0))
 
-        data = cursor.fetchone()
+        mysql.commit()
+        return 1
 
-        if cursor.rowcount == 0:
-            conn.close()
-            return -1, "no_user"
-        elif data[4] == 0:
-            return -2, "not_verified"
-        else:
-            conn.close()
-            return 1, {"email": data[0], "password": data[1], "uid": data[2], "role_id": data[3], "verified": data[4]}
+    except Exception as e:
+        return -1
 
-    def post_message_to_db(self, mysql, uid, email, text, hashtags):
-        """
-        Schreibe die neue Nachricht in die Datenbank. Die Nachricht als auch die Hashtags werden sanitized, um bösartigen
-        Input zu unterbinden.
-        """
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
+def get_all_posts(mysql):
+    """
+    Gebe alls Posts als Liste zurück zurück.
 
-        post_date = time.strftime('%Y-%m-%d %H:%M:%S')
+    Indizes:
+    - 0: post_id
+    - 1: post_date
+    - 2: post_text
+    - 3: post_hashtags
+    - 4: post_upvotes
+    - 5: post_downvotes
+    """
+    cursor = mysql.cursor()
+    cursor.callproc("tralala.get_all_posts")
+    data = cursor.fetchall()
 
-        cleaned_hashtags = security_helper.clean_hashtags(hashtags.strip())
-        cleaned_text = security_helper.clean_messages(text)
+    if cursor.rowcount == 0:
+        return -1, "no_posts"
 
-        record = [uid, post_date, cleaned_text, cleaned_hashtags, 0, 0]
+    else:
+        return 1, data
 
-        try:
-            cursor.callproc("post_message_to_db", (uid, post_date, cleaned_text, cleaned_hashtags, 0, 0))
 
-            conn.commit()
-            conn.close()
-            return 1
-        except Exception as e:
-            conn.close()
-            return -1
+def get_post_by_pid(mysql, post_id):
+    """
+    Hole Post basierend auf einer spezifizierten Post-ID.
+    """
+    cursor = mysql.cursor()
+    cursor.callproc("get_post_by_pid", (post_id,))
+    data = cursor.fetchone()
 
-    def get_all_posts(self, mysql):
-        """
-        Gebe alls Posts als Liste zurück zurück.
+    if cursor.rowcount == 0:
+        return -1, "no_post"
 
-        Indizes:
-        - 0: post_id
-        - 1: post_date
-        - 2: post_text
-        - 3: post_hashtags
-        - 4: post_upvotes
-        - 5: post_downvotes
-        """
+    else:
+        return 1, data
 
-        conn = mysql.connect()
-        cursor = conn.cursor()
 
-        cursor.callproc("tralala.get_all_posts")
+def do_upvote(mysql, post_id):
+    """
+    Registriere Upvote (inkrementiere Upvote-Wert eines
+    Posts in der Tabelle um 1).
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("do_upvote", (post_id,))
+        mysql.commit()
+        return 1
+
+    except Exception as e:
+        return -1
+
+
+
+def do_downvote(mysql, post_id):
+    """
+    Registriere Downvote (inkrementiere Downvote-Wert
+    eines Posts in der Tabelle um 1).
+
+    Achtung: Der Downvotewert setzt sich folgendermaßen
+    zusammen: downvote_real = upvote - downvote
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("do_downvote", (post_id,))
+        mysql.commit()
+        return 1
+
+    except Exception as e:
+        return -1
+
+
+def get_all_users(mysql):
+    """
+    Liefere alle Benutzer zurück.
+    """
+    cursor = mysql.cursor()
+
+    cursor.callproc("get_all_users")
+    data = cursor.fetchall()
+
+    if cursor.rowcount == 0:
+        return -1, "no_user"
+
+    else:
+        return 1, data
+
+
+def get_all_roles(mysql):
+    """
+    Liefere alle Rollen zurück.
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("get_all_roles")
         data = cursor.fetchall()
 
         if cursor.rowcount == 0:
-            conn.close()
-            return -1, "no_posts"
-        else:
-            conn.close()
-            return 1, data
-
-    def get_post_by_pid(self, mysql, post_id):
-        """
-        Hole Post basierend auf einer spezifizierten Post-ID.
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        cursor.callproc("get_post_by_pid", (post_id,))
-
-        data = cursor.fetchone()
-
-        if cursor.rowcount == 0:
-            conn.close()
-            return -1, "no_post"
-        else:
-            conn.close()
-            return 1, data
-
-    def do_upvote(self, mysql, post_id):
-        """
-        Registriere Upvote (inkrementiere Upvote-Wert eines Posts in der Tabelle um 1).
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("do_upvote", (post_id,))
-
-            conn.commit()
-            conn.close()
-            return 1
-        except:
-            conn.close()
-            return -1
-
-    def do_downvote(self, mysql, post_id):
-        """
-        Registriere Downvote (inkrementiere Downvote-Wert eines Posts in der Tabelle um 1).
-
-        Achtung: Der Downvotewert setzt sich folgendermaßen zusammen: downvote_real = upvote - downvote
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("do_downvote", (post_id,))
-
-            conn.commit()
-            conn.close()
-            return 1
-        except:
-            conn.close()
-            return -1
-
-    def get_all_users(self, mysql):
-        """
-        Liefere alle Benutzer zurück.
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        cursor.callproc("get_all_users")
-        data = cursor.fetchall()
-
-        if cursor.rowcount == 0:
-            conn.close()
-            return -1, "no_user"
-        else:
-            conn.close()
-            return 1, data
-
-    def get_all_roles(self, mysql):
-        """
-        Liefere alle Rollen zurück.
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("get_all_roles")
-            data = cursor.fetchall()
-        except Exception as e:
-            print(str(e))
-
-        if cursor.rowcount == 0:
-            conn.close()
             return -1, "no_roles"
+
         else:
-            conn.close()
             return 1, data
 
-    def check_if_already_voted(self, mysql, post_id, uid):
-        """
-        Überprüfe, ob ein Benutzer bereits für einen Post abgestimmt hat.
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
+    except Exception as e:
+        print(str(e))
 
-        cursor.callproc("check_if_already_voted", (post_id, uid,))
-        data = cursor.fetchone()
 
-        if not cursor.rowcount == 0:
-            conn.close()
-            return -1, "already_voted"
-        else:
-            conn.close()
-            return 1, "not_voted_yet"
+def check_if_already_voted(mysql, post_id, uid):
+    """
+    Überprüfe, ob ein Benutzer bereits für einen Post abgestimmt hat.
+    """
+    cursor = mysql.cursor()
+    cursor.callproc("check_if_already_voted", (post_id, uid,))
 
-    def register_vote(self, mysql, post_id, uid, method):
-        """
-        Persistiere Vote des Benutzers.
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
+    if not cursor.rowcount == 0:
+        return -1, "already_voted"
 
-        vote_date = time.strftime('%Y-%m-%d %H:%M:%S')
-        was_upvote = 1 if method == "upvote" else 0
-        was_downvote = 1 if method == "downvote" else 0
+    else:
+        return 1, "not_voted_yet"
 
-        record = [uid, vote_date, post_id, was_upvote, was_downvote]
 
-        try:
-            cursor.callproc("register_vote", (uid, vote_date, post_id, was_upvote, was_downvote))
-            conn.commit()
-            conn.close()
-            return 1
-        except Exception as e:
-            conn.close()
-            return -1
+def register_vote(mysql, post_id, uid, method):
+    """
+    Persistiere Vote des Benutzers.
+    """
+    cursor = mysql.cursor()
+    vote_date = time.strftime('%Y-%m-%d %H:%M:%S')
+    was_upvote = 1 if method == "upvote" else 0
+    was_downvote = 1 if method == "downvote" else 0
 
-    def start_session(self, mysql, uid):
-        """
-        Trägt eine neue Session mit Startzeit und Endzeit in die Sessions-Tabelle ein (benötigt für automatischen Timeout).
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
+    try:
+        cursor.callproc("register_vote", (uid, vote_date, post_id,
+                                          was_upvote, was_downvote))
+        mysql.commit()
+        return 1
 
-        session_start = datetime.datetime.now()
-        session_max_alive = session_start + datetime.timedelta(minutes=self.MAX_SESSION_TIME)
+    except Exception as e:
+        return -1
 
-        record = [uid, session_start, session_max_alive]
 
-        try:
-            cursor.callproc("start_session", (uid, session_start, session_max_alive,))
-            conn.commit()
-            conn.close()
-            return 1
-        except Exception as e:
-            conn.close()
-            return -1
+def start_session(mysql, uid):
+    """
+    Trägt eine neue Session mit Startzeit und Endzeit in die Sessions-
+    Tabelle ein (benötigt für automatischen Timeout).
+    """
+    cursor = mysql.cursor()
+    session_start = datetime.datetime.now()
+    session_max_alive = session_start \
+                        + datetime.timedelta(minutes=__MAX_SESSION_TIME)
 
-    def check_session_state(self, mysql, uid):
-        """
-        Überprüfe ob Session für Benutzer noch gültig ist.
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
+    try:
+        cursor.callproc("start_session", (uid, session_start, session_max_alive,))
+        mysql.commit()
+        return 1
+    except Exception as e:
+        return -1
 
-        current_time = datetime.datetime.now()
 
-        try:
-            cursor.callproc("check_session_state", (uid,))
-            data = cursor.fetchone()
+def check_session_state(mysql, uid):
+    """
+    Überprüfe ob Session für Benutzer noch gültig ist.
+    """
+    cursor = mysql.cursor()
+    current_time = datetime.datetime.now()
 
-            if cursor.rowcount == 0:
-                conn.commit()
-                conn.close()
-                return 0, "no_active_session_found_for_uid"
-            else:
-                session_max_alive = data[1]
-
-            if current_time < session_max_alive:
-                # return 1, "session_still_active"
-                return 1, "times: now=" + str(current_time) + " max_active=" + str(session_max_alive)
-            else:
-                # return -1, "session_timeout"
-                return -1, "times: now=" + str(current_time) + " max_active=" + str(session_max_alive)
-        except Exception as e:
-            conn.close()
-            return -1, "current=" + str(current_time) + " FEHLER " + str(e)
-
-    def invalidate_session(self, mysql, uid):
-        """
-        Lösche den Session-Eintrag des Benutzers aus der Sessions-Tabelle
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("invalidate_session", (uid,))
-            conn.commit()
-            conn.close()
-            return 1, None
-        except Exception as e:
-            conn.close()
-            return -1, e
-
-    def delete_user(self, mysql, uid):
-        """
-        Lösche Benutzer.
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("delete_user", (uid,))
-            conn.commit()
-            conn.close()
-            return 1, None
-        except Exception as e:
-            conn.close()
-            return -1, e
-
-    def get_password_for_user(self, mysql, email):
-        """
-        Liefere Passwordhash für einen Benutzer zurück.
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        cursor.callproc("get_password_for_user", (email.lower(),))
+    try:
+        cursor.callproc("check_session_state", (uid,))
         data = cursor.fetchone()
 
         if cursor.rowcount == 0:
-            conn.close()
-            return -1, False
+            mysql.commit()
+            return 0, "no_active_session_found_for_uid"
+
         else:
-            conn.close()
-            return 1, data[0]
+            session_max_alive = data[1]
 
-    def count_password_requests(self, mysql, uid, app):
-        """
-        Liefere die Anzahl bereits abgeschickter Passwort Resets zurück.
-        """
-        conn = mysql.connect()
-        cursor = conn.cursor()
+        if current_time < session_max_alive:
+            # return 1, "session_still_active"
+            return 1, "times: now=" + str(current_time) + " max_active="\
+                   + str(session_max_alive)
 
-        cursor.callproc("count_password_requests", (uid,))
+        else:
+            # return -1, "session_timeout"
+            return -1, "times: now=" + str(current_time) + " max_active="\
+                   + str(session_max_alive)
+
+    except Exception as e:
+        return -1, "current=" + str(current_time) + " FEHLER " + str(e)
+
+
+def invalidate_session(mysql, uid):
+    """
+    Lösche den Session-Eintrag des Benutzers aus der Sessions-Tabelle
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("invalidate_session", (uid,))
+        mysql.commit()
+        return 1, None
+
+    except Exception as e:
+        return -1, e
+
+
+def delete_user(mysql, uid):
+    """
+    Lösche Benutzer.
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("delete_user", (uid,))
+        mysql.commit()
+        return 1, None
+
+    except Exception as e:
+        return -1, e
+
+
+def get_password_for_user(mysql, email):
+    """
+    Liefere Passwordhash für einen Benutzer zurück.
+    """
+    cursor = mysql.cursor()
+    cursor.callproc("get_password_for_user", (email.lower(),))
+    data = cursor.fetchone()
+
+    if cursor.rowcount == 0:
+        return -1, False
+
+    else:
+        return 1, data[0]
+
+#think about a better solution
+def count_password_requests(mysql, uid, app):
+    """
+    Liefere die Anzahl bereits abgeschickter Passwort Resets zurück.
+    """
+    cursor = mysql.cursor()
+    cursor.callproc("count_password_requests", (uid,))
+    app.logger.debug("Total resets for " + str(uid)
+                     + ": " + str(cursor.rowcount))
+
+    if cursor.rowcount >= 5:
+        return False
+
+    else:
+        return True
+
+
+def set_reset_token(mysql, token, uid, app):
+    """
+    Registriere ein neues Reset Token für einen Passwortreset.
+    """
+    ts = time.time()
+    timestamp = datetime.datetime.fromtimestamp(ts).strftime(
+        '%Y-%m-%d %H:%M:%S')
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("set_reset_token", (uid, token, timestamp,))
+        mysql.commit()
+
+    except Exception as e:
+        app.logger.debug("Exception bei set_reset_token:\n" + str(e))
+
+
+def get_reset_token(mysql, userid, mode=None):
+    """
+    Liefere das Token des aktuellsten Passwortrequest zurück.
+    """
+    cursor = mysql.cursor()
+    try:
+        cursor.callproc("get_reset_token", (userid,))
         data = cursor.fetchall()
-        app.logger.debug("Total resets for " + str(uid) + ": " + str(cursor.rowcount))
-        if cursor.rowcount >= 5:
-            conn.close()
-            return False
+
+        if cursor.rowcount == 0:
+            cursor.close()
+            return None
+
+        if mode == "get_token_uid":
+            return data[0][0], data[0][1]
+
+        return data[0][1]
+
+    except Exception:
+        return None
+
+
+def set_pass_for_user(mysql, uid, new_pass, app):
+    """
+    Setze neues Passwort für einen Benutzer.
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("set_pass_for_user", (new_pass, uid,))
+        mysql.commit()
+        return 1
+
+    except Exception as e:
+        app.logger.debug("Fehler bei set_pass_for_user:\n" + str(e))
+        return -1
+
+
+def set_email_for_user(mysql, uid, new_email, app):
+    """
+    Setze neue E-Mail für einen Benutzer.
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("set_email_for_user", (new_email, uid,))
+        mysql.commit()
+        return 1
+
+    except Exception as e:
+        app.logger.debug("Fehler bei set_email_for_user:\n" + str(e))
+        return -1
+
+
+def delete_pass_reset_token(mysql, uid, app):
+    """
+    Lösche alle Token vergangener Passwortrequests.
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("delete_pass_reset_token", (uid,))
+        mysql.commit()
+        return 1, None
+
+    except Exception as e:
+        app.logger.debug("Fehler bei delete_pass_reset_token:\n" + str(e))
+        return -1, e
+
+
+def set_token_password_change(mysql, uid, token, new_pass):
+    """
+    Registriere Token für Controlpanel Aktion (Passwort-
+    oder E-Mailänderung).
+    """
+    ts = time.time()
+    timestamp = datetime.datetime.fromtimestamp(ts).strftime(
+        '%Y-%m-%d %H:%M:%S')
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("set_token_password_change", (uid, token,
+                                                      timestamp,
+                                                      "change_password",
+                                                      new_pass,))
+        mysql.commit()
+
+    except Exception as e:
+        print(str(e))
+
+
+def set_token_email_change(mysql, uid, token, new_email):
+    """
+    Setze Token für E-Mailänderung.
+    """
+    ts = time.time()
+    timestamp = datetime.datetime.fromtimestamp(ts).strftime(
+        '%Y-%m-%d %H:%M:%S')
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("set_token_email_change", (uid, token, timestamp,
+                                                   "change_email",
+                                                   new_email,))
+        mysql.commit()
+
+    except Exception as e:
+        print(str(e))
+
+
+def get_reset_token_cp(mysql, uid, action, mode=None, app=None):
+    """
+    Setze Token für Passwortänderung.
+    """
+    cursor = mysql.cursor()
+    try:
+        cursor.callproc("get_reset_token_cp", (uid, action,))
+        data = cursor.fetchall()
+
+        if cursor.rowcount == 0:
+            cursor.close()
+            return None
+
+        # Gebe das neue Passwort zurück, das nun in die Users-Tabelle
+        # geschrieben wird (spezieller Modus, um nicht zu viele einzelne
+        # Funktionen zu haben)
+        if mode == "get_data":
+            return data[0][2]
+        # Gebe das Token zur Überprüfung zurück (eigentlicher
+        # Standardmodus)
+        return data[0][1]
+
+    except Exception as e:
+        if not app is None:
+            app.logger.debug("Fehler bei get_reset_token_cp:\n" + str(e))
+        return None
+
+
+def delete_cp_token(mysql, uid, action):
+    """
+    Lösche Token für Controlpanel Aktionen.
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("delete_cp_token", (uid, action,))
+        mysql.commit()
+        return 1, None
+    except Exception as e:
+        return -1, e
+
+
+def set_email_for_user(mysql, uid, new_email, app):
+    """
+    Setze neue E-Mail für Benutzer.
+    """
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("set_email_for_user", (new_email, uid,))
+        mysql.commit()
+        return 1
+
+    except Exception as e:
+        app.logger.debug("Fehler bei set_email_for_user:\n" + str(e))
+        return -1
+
+
+def refresh_session_state(mysql, uid):
+    """
+    Refreshe die Session für den Benutzer.
+    """
+    cursor = mysql.cursor()
+    session_start = datetime.datetime.now()
+    session_max_alive = session_start \
+                        + datetime.timedelta(minutes=__MAX_SESSION_TIME)
+
+    try:
+        cursor.callproc("refresh_session_state", (session_start,
+                                                  session_max_alive, uid,))
+        mysql.commit()
+        return 1
+
+    except Exception as e:
+        return -1
+
+
+def check_user_locked(mysql, uid):
+    cursor = mysql.cursor()
+
+    try:
+        cursor.callproc("check_user_locked", (uid,))
+        data = cursor.fetchall()
+
+        if len(data) > 0 and data[0][1] >= 3:
+            return -1
         else:
-            conn.close()
-            return True
-
-    def set_reset_token(self, mysql, token, uid, app):
-        """
-        Registriere ein neues Reset Token für einen Passwortreset.
-        """
-
-        ts = time.time()
-        timestamp = datetime.datetime.fromtimestamp(ts).strftime(
-            '%Y-%m-%d %H:%M:%S')
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("set_reset_token", (uid, token, timestamp,))
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            app.logger.debug("Exception bei set_reset_token:\n" + str(e))
-            conn.close()
-
-    def get_reset_token(self, mysql, userid, mode=None):
-        """
-        Liefere das Token des aktuellsten Passwortrequest zurück.
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        try:
-            cursor.callproc("get_reset_token", (userid,))
-            data = cursor.fetchall()
-
-            if cursor.rowcount == 0:
-                cursor.close()
-                conn.close()
-                return None
-
-            if mode == "get_token_uid":
-                return data[0][0], data[0][1]
-
-            return data[0][1]
-
-        except Exception:
-            conn.close()
-            return None
-
-    def set_pass_for_user(self, mysql, uid, new_pass, app):
-        """
-        Setze neues Passwort für einen Benutzer.
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("set_pass_for_user", (new_pass, uid,))
-            conn.commit()
-            conn.close()
-            return 1
-        except Exception as e:
-            app.logger.debug("Fehler bei set_pass_for_user:\n" + str(e))
-            conn.close()
-            return -1
-
-    def set_email_for_user(self, mysql, uid, new_email, app):
-        """
-        Setze neue E-Mail für einen Benutzer.
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("set_email_for_user", (new_email, uid,))
-            conn.commit()
-            conn.close()
-            return 1
-        except Exception as e:
-            app.logger.debug("Fehler bei set_email_for_user:\n" + str(e))
-            conn.close()
-            return -1
-
-    def delete_pass_reset_token(self, mysql, uid, app):
-        """
-        Lösche alle Token vergangener Passwortrequests.
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("delete_pass_reset_token", (uid,))
-            conn.commit()
-            conn.close()
-            return 1, None
-        except Exception as e:
-            app.logger.debug("Fehler bei delete_pass_reset_token:\n" + str(e))
-            conn.close()
-            return -1, e
-
-    def set_token_password_change(self, mysql, uid, token, new_pass):
-        """
-        Registriere Token für Controlpanel Aktion (Passwort- oder E-Mailänderung).
-        """
-
-        ts = time.time()
-        timestamp = datetime.datetime.fromtimestamp(ts).strftime(
-            '%Y-%m-%d %H:%M:%S')
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("set_token_password_change", (uid, token, timestamp, "change_password", new_pass,))
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            conn.close()
-
-    def set_token_email_change(self, mysql, uid, token, new_email):
-        """
-        Setze Token für E-Mailänderung.
-        """
-
-        ts = time.time()
-        timestamp = datetime.datetime.fromtimestamp(ts).strftime(
-            '%Y-%m-%d %H:%M:%S')
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("set_token_email_change", (uid, token, timestamp, "change_email", new_email,))
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            conn.close()
-
-    def get_reset_token_cp(self, mysql, uid, action, mode=None, app=None):
-        """
-        Setze Token für Passwortänderung.
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-        try:
-            cursor.callproc("get_reset_token_cp", (uid, action,))
-            data = cursor.fetchall()
-
-            if cursor.rowcount == 0:
-                cursor.close()
-                conn.close()
-                return None
-
-            # Gebe das neue Passwort zurück, das nun in die Users-Tabelle geschrieben wird (spezieller Modus, um nicht zu viele einzelne Funktionen zu haben)
-            if mode == "get_data":
-                return data[0][2]
-            # Gebe das Token zur Überprüfung zurück (eigentlicher Standardmodus)
-            return data[0][1]
-
-        except Exception as e:
-            conn.close()
-            if not app is None:
-                app.logger.debug("Fehler bei get_reset_token_cp:\n" + str(e))
-            return None
-
-    def delete_cp_token(self, mysql, uid, action):
-        """
-        Lösche Token für Controlpanel Aktionen.
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("delete_cp_token", (uid, action,))
-            conn.commit()
-            conn.close()
-            return 1, None
-        except Exception as e:
-            conn.close()
-            return -1, e
-
-    def set_email_for_user(self, mysql, uid, new_email, app):
-        """
-        Setze neue E-Mail für Benutzer.
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("set_email_for_user", (new_email, uid,))
-            conn.commit()
-            conn.close()
-            return 1
-        except Exception as e:
-            app.logger.debug("Fehler bei set_email_for_user:\n" + str(e))
-            conn.close()
-            return -1
-
-    def refresh_session_state(self, mysql, uid):
-        """
-        Refreshe die Session für den Benutzer.
-        """
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        session_start = datetime.datetime.now()
-        session_max_alive = session_start \
-                            + datetime.timedelta(minutes=self.MAX_SESSION_TIME)
-
-        try:
-            cursor.callproc("refresh_session_state", (session_start,
-                                                      session_max_alive, uid,))
-            conn.commit()
-            conn.close()
-            return 1
-            # return "refreshed session for " + str(uid) + " with session_start=" + str(session_start) + " session_max_alive=" + str(session_max_alive)
-        except Exception as e:
-            conn.close()
-            return -1
-            # return str(e)
-
-    def check_user_locked(self, mysql, uid):
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("check_user_locked", (uid,))
-            data = cursor.fetchall()
-
-            if len(data) > 0 and data[0][1] >= 3:
-                return -1
-            else:
-                return 0
-
-            conn.commit()
-            conn.close()
-        except Exception as e:
-            conn.close()
-            return -2
-
-    def set_locked_count(self, mysql, uid):
-
-        conn = mysql.connect()
-        cursor = conn.cursor()
-
-        try:
-            cursor.callproc("check_user_locked", (uid,))
-            userexists = cursor.rowcount
-
-            if userexists == 0:
-                cursor.callproc("create_entry_user_locked", (uid,))
-
-            if userexists == 1:
-                cursor.callproc("iter_locked_counter", (uid,))
-
-            conn.commit()
-            conn.close()
             return 0
 
-        except Exception as e:
-            return -1
+    except Exception as e:
+        return -2
 
-    def search_for_query(self, mysql, query):
-        conn = mysql.connect()
-        cursor = conn.cursor()
 
-        cursor.callproc("tralala.get_all_posts")
-        data = cursor.fetchall()
+def set_locked_count(mysql, uid):
+    cursor = mysql.cursor()
 
-        if cursor.rowcount == 0:
-            conn.close()
-            return None
-        else:
-            conn.close()
+    try:
+        cursor.callproc("check_user_locked", (uid,))
+        userexists = cursor.rowcount
 
-        matches = []
-        for record in data:
-            hashtags = [x.lower() for x in str(record[4]).split(",")]
+        if userexists == 0:
+            cursor.callproc("create_entry_user_locked", (uid,))
 
-            if query in hashtags:
-                matches.append([record[0],
-                                record[1],
-                                record[2],
-                                record[3],
-                                "#" + " #".join(hashtags),
-                                record[5],
-                                record[6]])
+        if userexists == 1:
+            cursor.callproc("iter_locked_counter", (uid,))
 
-        return matches
+        mysql.commit()
+        return 0
+
+    except Exception as e:
+        return -1
+
+
+def search_for_query(mysql, query):
+    cursor = mysql.cursor()
+    cursor.callproc("tralala.get_all_posts")
+    data = cursor.fetchall()
+
+    if cursor.rowcount == 0:
+        return None
+
+    matches = []
+    for record in data:
+        hashtags = [x.lower() for x in str(record[4]).split(",")]
+
+        if query in hashtags:
+            matches.append([record[0],
+                            record[1],
+                            record[2],
+                            record[3],
+                            "#" + " #".join(hashtags),
+                            record[5],
+                            record[6]])
+
+    return matches
